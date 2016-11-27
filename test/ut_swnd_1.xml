@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+
+
+<!-- Test of AStateWnd
+     -->
+
+
+<!DOCTYPE node SYSTEM "../etc/objspec.dtd"> 
+
+<node id="testroot" parent="Elem">
+    <node id="Modules" parent="AImports">
+	<import id="/SysComps" />
+	<import id="/IncapsComps" />
+	<import id="/DesComps/Des" />
+	<import id="/DesComps/StVarInp" />
+	<import id="/DesComps/StateVarMc" />
+	<import id="/GVisComps/GWidget"/>
+	<import id="/GVisComps/GWindow"/>
+    </node>
+
+    <node id="Test" parent ="./Modules/DesComps/Des">
+	<node id="Env" parent="AVisEnv">
+	    <node id="Window" parent="./../../Modules/GVisComps/GWindow"/>
+	    <cont id="Init" val="Yes"/>
+	    <!--
+	    <node id="Widget" parent="Syst">
+		<node node="./Agents" id="EventMediator" parent="AGehMediator"/>
+		<node node="./Agents" id="StateWnd" parent="AStateWnd"/>
+		<node id="Inp_W" parent="/*/Modules/DesComps/StVarInp" />
+		<node id="Inp_H" parent="/*/Modules/DesComps/StVarInp" />
+		<node id="Inp_Title" parent="/*/Modules/DesComps/StVarInp" />
+	    </node> -->
+	    <node id="Width" parent="/*/Modules/DesComps/StateVarMc"/>
+	    <node id="Heigth" parent="/*/Modules/DesComps/StateVarMc"/>
+	    <node id="Title" parent="/*/Modules/DesComps/StateVarMc"/>
+	    <node id="E1" parent="Aedge"> 
+		<cont val="{P1:'./../Width/Capsule/Out' P2:'./../Window/Inp_W'}"/> 
+	    </node>
+	    <node id="E2" parent="Aedge"> 
+		<cont val="{P1:'./../Heigth/Capsule/Out' P2:'./../Window/Inp_H'}"/> 
+	    </node>
+	    <node id="E3" parent="Aedge"> 
+		<cont val="{P1:'./../Title/Capsule/Out' P2:'./../Window/Inp_Title'}"/> 
+	    </node>
+	</node>
+	<cont node="./Env/Width/Confirmed" id="Value" val="SI 600"/>
+	<cont node="./Env/Width/Prepared" id="Value" val="SI 600"/>
+	<cont node="./Env/Heigth/Confirmed" id="Value" val="SI 600"/>
+	<cont node="./Env/Heigth/Prepared" id="Value" val="SI 600"/>
+	<cont node="./Env/Title/Confirmed" id="Value" val="SS Title"/>
+	<cont node="./Env/Title/Prepared" id="Value" val="SS Title"/>
+    </node>
+
+</node>

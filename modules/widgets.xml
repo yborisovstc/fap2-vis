@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE node SYSTEM "/usr/share/grayb/conf/objspec.dtd"> 
+<node id="GVisComps" parent="Elem" >
+    <import id="/SysComps" />
+    <node id="GWidget" parent="Syst" >
+	<node id="Owner" parent="/*/Modules/SysComps/ConnPoint" >
+	    <cont node="./Provided" val="MGWidgetOwner" />
+	    <cont node="./Required" val="MGWidgetComp" />
+	</node>
+	<node id="Comp" parent="/*/Modules/SysComps/ConnPoint" >
+	    <cont node="./Provided" val="MGWidgetComp" />
+	    <cont node="./Required" val="MGWidgetOwner" />
+	</node>
+	<node id="Inp_X" parent="/*/Modules/DesComps/StVarInp" />
+	<node id="Inp_Y" parent="/*/Modules/DesComps/StVarInp" />
+	<node id="Inp_W" parent="/*/Modules/DesComps/StVarInp" />
+	<node id="Inp_H" parent="/*/Modules/DesComps/StVarInp" />
+	<node id="BtnPressEvent" parent="/*/Modules/DesComps/StVarOut">
+	    <cont id="About" val="BtnPressEvent: tuple, TPL,SI:Type,SI:State,SI:Button" />
+	</node>
+	<node id="Inp_State" parent="/*/Modules/DesComps/StVarInp" >
+	    <cont id="About" val="This in input for widget state" />
+	</node>
+	<node id="MotionEvent" parent="/*/Modules/DesComps/StVarOut" />
+	<node id="BtnReleaseEvent" parent="/*/Modules/DesComps/StVarOut" />
+	<node id="Allocation" parent="/*/Modules/DesComps/StVarOut" />
+	<node id="SizeRequest" parent="/*/Modules/DesComps/StVarOut" />
+    </node>
+
+    <node id="HintFixed" parent="/*/Modules/DesComps/Des">
+	<cont id="About" val="Hints of component layout in fixed layout container"/>
+	<node id="Position" parent="/Root/Modules/DesComps/StateVarMc"/>
+    </node>
+
+    <node id="GWindow" parent="./GWidget">
+	<cont id="About" val="Top-level window"/>
+	<node node="./Agents" id="GWindow" parent="AGWindow"/>
+    </node>
+</node>
