@@ -37,11 +37,20 @@ AC_SUBST(FAPWS2_CFLAGS)
 AC_SUBST(FAPWS2_LIBS)
 
 
+PKG_CHECK_MODULES([LIBCPPU], [cppunit >= 1.13], , [AC_MSG_ERROR([
+You must have the libcppunit-1.13 and development headers installed to build.
+])])
+
+AC_SUBST(LIBCPPU_CFLAGS)
+AC_SUBST(LIBCPPU_LIBS)
+
+CXXFLAGS="-std=c++11 -Wno-deprecated-declarations"
+
 if test x$debug = xyes; then
-    CXXFLAGS="-g -O0"
+    CXXFLAGS="$CXXFLAGS -g -O0"
 else
 #    CXXFLAGS="-g -O2"
-    CXXFLAGS="-g -O0"
+    CXXFLAGS="$CXXFLAGS -g -O0"
 fi
 
 

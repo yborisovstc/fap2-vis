@@ -11,13 +11,13 @@ void HndlGdkEvent(GdkEvent *event, gpointer data)
     self->OnEvent(event);
 }
 
-AVisEnv::AVisEnv(const string& aName, MElem* aMan, MEnv* aEnv): Elem(aName, aMan, aEnv), iActive(ETrue)
+AVisEnv::AVisEnv(const string& aName, MElem* aMan, MEnv* aEnv): ADes(aName, aMan, aEnv)
 {
     SetParent(Type());
     //Construct();
 }
 
-AVisEnv::AVisEnv(MElem* aMan, MEnv* aEnv): Elem(Type(), aMan, aEnv), iActive(ETrue)
+AVisEnv::AVisEnv(MElem* aMan, MEnv* aEnv): ADes(Type(), aMan, aEnv)
 {
     SetParent(Elem::PEType());
     //Construct();
@@ -97,81 +97,7 @@ void AVisEnv::UpdateIfi(const string& aName, const RqContext* aCtx)
     }
 }
 
-TBool AVisEnv::IsActive()
-{
-    return iActive;
-}
-
-void AVisEnv::SetActive()
-{
-    iActive = ETrue;
-}
-
-void AVisEnv::ResetActive()
-{
-    iActive = EFalse;
-}
-
-void AVisEnv::Update()
-{
-    Logger()->Write(MLogRec::EInfo, this, "Update");
-    for (TInt ci = 0; ci < CompsCount(); ci++) {
-	MElem* eit = GetComp(ci);
-	MDesSyncable* msync = (MDesSyncable*) eit->GetSIfiC(MDesSyncable::Type(), this);
-	if (msync != NULL) {
-	    if (msync->IsActive()) {
-		try {
-		    msync->Update();
-		    SetUpdated();
-		} catch (std::exception e) {
-		    Logger()->Write(MLogRec::EErr, this, "Error on update [%s]", eit->GetUri().c_str());
-		}
-	    }
-	}
-    }
-    ResetActive();
-}
-
-void AVisEnv::Confirm()
-{
-    // Confirm all the DES components
-    for (TInt ci = 0; ci < CompsCount(); ci++) {
-	MElem* eit = GetComp(ci);
-	MDesSyncable* msync = (MDesSyncable*) eit->GetSIfiC(MDesSyncable::Type(), this);
-	if (msync != NULL) {
-	    if (msync->IsUpdated()) {
-		msync->Confirm();
-		ResetUpdated();
-	    }
-	}
-    }
-}
-
-TBool AVisEnv::IsUpdated()
-{
-    return iUpdated;
-}
-
-void AVisEnv::SetUpdated()
-{
-    iUpdated = ETrue;
-}
-
-void AVisEnv::ResetUpdated()
-{
-    iUpdated = EFalse;
-}
-
-void AVisEnv::OnUpdated()
-{
-    SetActive();
-}
-
-void AVisEnv::OnActivated()
-{
-}
-
-TBool AVisEnv::OnCompChanged(MElem& aComp, const string& aContName)
+TBool AVisEnv::OnCompChanged(MElem& aComp, const string& aContName, TBool aModif)
 {
     Construct();
     Elem::OnCompChanged(aComp, aContName);
@@ -361,14 +287,14 @@ bool AGWidget::mInit = false;
 AGWidget::tStatesMap  AGWidget::mStatesMap;
 
 AGWidget::AGWidget(const string& aName, MElem* aMan, MEnv* aEnv): Elem(aName, aMan, aEnv),
-    iX(0), iY(0), iH(10), iW(10)
+    iX(0), iY(0), iH(10), iW(10), iActive(ETrue)
 {
     SetParent(Type());
     Construct();
 }
 
 AGWidget::AGWidget(MElem* aMan, MEnv* aEnv): Elem(Type(), aMan, aEnv),
-    iX(0), iY(0), iH(10), iW(10)
+    iX(0), iY(0), iH(10), iW(10), iActive(ETrue)
 {
     SetParent(Elem::PEType());
     Construct();
@@ -473,7 +399,7 @@ MGWidgetOwner* AGWidget::GetOwner()
     if (eprntcp != NULL) {
 	res = (MGWidgetOwner*) eprntcp->GetSIfiC(MGWidgetOwner::Type(), this);
     } else {
-	Logger()->Write(MLogRec::EErr, this, "Input [Comp] not exists");
+	Logger()->Write(EErr, this, "Input [Comp] not exists");
     }
     return res;
 }
@@ -506,7 +432,7 @@ TBool AGWidget::HandleCompChanged(MElem& aContext, MElem& aComp, const string& a
 	    }
 	}
     } else {
-	Logger()->Write(MLogRec::EErr, this, "Input [Comp] not exists");
+	Logger()->Write(EErr, this, "Input [Comp] not exists");
 	res = EFalse;
     }
     */
@@ -537,7 +463,7 @@ bool AGWidget::GetDataInt(const string& aInpUri, int& aData)
 	    }
 	}
     } else {
-	Logger()->Write(MLogRec::EErr, this, "Input [%s] not exists", aInpUri.c_str());
+	Logger()->Write(EErr, this, "Input [%s] not exists", aInpUri.c_str());
     }
     return res;
 }
@@ -564,7 +490,7 @@ bool AGWidget::GetInpState(const string& aInpUri, MGWidget::TState& aData)
 	    }
 	}
     } else {
-	Logger()->Write(MLogRec::EErr, this, "Input [%s] not exists", aInpUri.c_str());
+	Logger()->Write(EErr, this, "Input [%s] not exists", aInpUri.c_str());
     }
     return res;
 }
@@ -599,7 +525,7 @@ void AGWidget::Update()
     // Data providers updated - update the data
     // X coord
     bool res;
-    Logger()->Write(MLogRec::EInfo, this, "Update");
+    Logger()->Write(EInfo, this, "Update");
     int sX, oldX = iX;
     res = GetDataInt("./Inp_X/Int/PinData", sX);
     if (res && sX != iX) {
@@ -797,6 +723,9 @@ void AGWidget::OnGdkEvent(GdkEvent* event)
 
 // Top window
 
+const string KWndCnt_Init = "Init";
+const string KWndCnt_Init_Val = "Yes";
+
 AGWindow::AGWindow(const string& aName, MElem* aMan, MEnv* aEnv): AGWidget(aName, aMan, aEnv), mWindow(NULL), mWndInit(EFalse)
 {
     SetParent(Type());
@@ -826,6 +755,7 @@ void AGWindow::Construct()
     int rw_width = gdk_window_get_width(rootwnd);
     int rw_height = gdk_window_get_height(rootwnd);
 
+    gdk_rgb_init();
     GdkWindowAttr attr;
     attr.window_type = GDK_WINDOW_TOPLEVEL;
     attr.x = 0;
@@ -888,10 +818,17 @@ void AGWindow::OnUpdated_H(int aOldData)
 
 void AGWindow::Update()
 {
-    Logger()->Write(MLogRec::EInfo, this, "Update");
+    Logger()->Write(EInfo, this, "Update");
     if (!mWndInit) {
-	Construct();
-	mWndInit = ETrue;
+	// Checking in content flag showing that the window is part of visial env but not 
+	// just base agent. If so, initialise the agent
+	// TODO [YB] To find more suitable solution
+	MElem* host = iMan->GetMan();
+	string sCntInit = host->GetContent(KWndCnt_Init);
+	if (sCntInit == KWndCnt_Init_Val) {
+	    Construct();
+	    mWndInit = ETrue;
+	}
     }
     AGWidget::Update();
 }
@@ -1088,7 +1025,7 @@ void AStateWnd::ResetActive()
 
 void AStateWnd::Update()
 {
-    Logger()->Write(MLogRec::EInfo, this, "Update");
+    Logger()->Write(EInfo, this, "Update");
     if (!mInit) {
 	Construct();
 	mInit = ETrue;
@@ -1161,7 +1098,7 @@ bool AStateWnd::GetDataInt(const string& aInpUri, int& aData)
 	    }
 	}
     } else {
-	Logger()->Write(MLogRec::EErr, this, "Input [%s] not exists", aInpUri.c_str());
+	Logger()->Write(EErr, this, "Input [%s] not exists", aInpUri.c_str());
     }
     return res;
 }
@@ -1184,7 +1121,7 @@ bool AStateWnd::GetDataString(const string& aInpUri, string& aData)
 	    }
 	}
     } else {
-	Logger()->Write(MLogRec::EErr, this, "Input [%s] not exists", aInpUri.c_str());
+	Logger()->Write(EErr, this, "Input [%s] not exists", aInpUri.c_str());
     }
     return res;
 }

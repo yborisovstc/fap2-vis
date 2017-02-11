@@ -61,7 +61,7 @@ Elem* VisProv::GetNode(const string& aUri){
 	    parent = prov->GetNode("AGCont");
 	    res = new AGContFixed(NULL, iEnv);
 	} else if (aUri.compare(AVisEnv::Type()) == 0) {
-	    parent = prov->GetNode("Elem");
+	    parent = prov->GetNode("Syst");
 	    res = new AVisEnv(NULL, iEnv);
 	}
 	if (res != NULL) {
@@ -78,7 +78,9 @@ Elem* VisProv::GetNode(const string& aUri){
 void VisProv::AppendNodesInfo(vector<string>& aInfo)
 {
     aInfo.push_back(AGWidget::Type());
+    aInfo.push_back(AGWindow::Type());
     aInfo.push_back(AGCont::Type());
     aInfo.push_back(AGContFixed::Type());
+    aInfo.push_back(AVisEnv::Type());
 }
 

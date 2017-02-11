@@ -3,7 +3,8 @@
 
 #include "mwidget.h"
 #include <elem.h>
-#include <mdes.h>
+#include <syst.h>
+#include <des.h>
 #include <mdata.h>
 #include <mwidget.h>
 #include <gdk/gdk.h>
@@ -12,7 +13,7 @@
 using namespace std;
 
 // Visual environment
-class AVisEnv:  public Elem, public MDesSyncable, public MDesObserver, public MGdkEventHandler
+class AVisEnv:  public ADes, public MGdkEventHandler
 {
     public:
 	static const char* Type() { return "AVisEnv";};
@@ -23,28 +24,13 @@ class AVisEnv:  public Elem, public MDesSyncable, public MDesObserver, public MG
 	// From Base
 	virtual void *DoGetObj(const char *aName);
 	// From MElem
-	virtual TBool OnCompChanged(MElem& aComp, const string& aContName = string());
-	// From MDesSyncable
-	virtual void Update();
-	virtual void Confirm();
-	virtual TBool IsUpdated();
-	virtual void SetUpdated();
-	virtual void ResetUpdated();
-	virtual TBool IsActive();
-	virtual void SetActive();
-	virtual void ResetActive();
-	// From MDesObserver
-	virtual void OnUpdated();
-	virtual void OnActivated();
+	virtual TBool OnCompChanged(MElem& aComp, const string& aContName = string(), TBool aModif = EFalse);
 	// Iface provider
 	virtual void UpdateIfi(const string& aName, const RqContext* aCtx);
 	// From MGdkEventHandler
 	virtual void OnEvent(GdkEvent* event);
     protected:
 	void Construct();
-    private:
-	TBool iActive;
-	TBool iUpdated;
 };
 
 

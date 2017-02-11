@@ -2,6 +2,12 @@
 <!DOCTYPE node SYSTEM "/usr/share/grayb/conf/objspec.dtd"> 
 <node id="GVisComps" parent="Elem" >
     <import id="/SysComps" />
+    <import id="/DesComps" />
+
+    <node id="VisEnv" parent="/*/Modules/IncapsComps/Incaps"> 
+	<node node="./Agents" id="VisEnvAgt" parent="AVisEnv"/> 
+    </node>
+
     <node id="GWidget" parent="Syst" >
 	<node id="Owner" parent="/*/Modules/SysComps/ConnPoint" >
 	    <cont node="./Provided" val="MGWidgetOwner" />

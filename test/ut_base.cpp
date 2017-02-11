@@ -81,8 +81,11 @@ void Ut_base::test_Cre1()
     CPPUNIT_ASSERT_MESSAGE("Fail to create Env", iEnv != 0);
     //iEnv->ImpsMgr()->ResetImportsPaths();
     //iEnv->ImpsMgr()->AddImportsPaths("../modules");
+    // Don't add provider if provider is installed as plugin
+    /*
     VisProv* visprov = new VisProv("VisProv", iEnv);
     iEnv->AddProvider(visprov);
+    */
     iEnv->ConstructSystem();
     Elem* root = iEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
