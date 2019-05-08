@@ -1,175 +1,114 @@
 
-#include "widget.h"
+#include "visenv.h"
 #include <mdata.h>
 #include <iostream>
+#include <functional>
+
+//#include "GL/freeglut.h"
+#include "GL/gl.h"
+#include <GL/glfw.h>
 
 using namespace std;
 
-void HndlGdkEvent(GdkEvent *event, gpointer data)
-{
-    AVisEnv* self = (AVisEnv*) data;
-    self->OnEvent(event);
-}
+const string AVisEnv::mCont_Init = "Init";
 
-AVisEnv::AVisEnv(const string& aName, MElem* aMan, MEnv* aEnv): ADes(aName, aMan, aEnv)
+static AVisEnv* sEnv = NULL;
+
+AVisEnv::AVisEnv(const string& aName, MUnit* aMan, MEnv* aEnv): ADes(aName, aMan, aEnv), mIdleHandler(NULL)
 {
-    SetParent(Type());
+    // For native agt (aName is empty) set type as name. For inherited agent set given name
+    iName = aName.empty() ? GetType(PEType()) : aName;
+    // Don't construct native agent here. Only heirs needs to be constructed fully.
     //Construct();
 }
 
-AVisEnv::AVisEnv(MElem* aMan, MEnv* aEnv): ADes(Type(), aMan, aEnv)
+void renderFunction(void)
 {
-    SetParent(Elem::PEType());
-    //Construct();
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glColor3f(1.0, 1.0, 1.0);
+    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    glBegin(GL_POLYGON);
+    glVertex2f(-0.5, -0.5);
+    glVertex2f(-0.5, 0.5);
+    glVertex2f(0.5, 0.5);
+    glVertex2f(0.5, -0.5);
+    glEnd();
+    glFlush();
 }
 
 void AVisEnv::Construct()
 {
-    // Init GDK
-    g_type_init ();
-    gdk_init(0, NULL);
-    gdk_rgb_init();
-    gdk_event_handler_set(HndlGdkEvent, this, NULL);
+    /*
+    sEnv = this;
+    int argc = 0;
+    glutInit(&argc, NULL);
+    glutInitDisplayMode(GLUT_SINGLE);
+    glutInitWindowSize(500,500);
+    glutInitWindowPosition(100,100);
+    glutCreateWindow("OpenGL - First window demo");
+    //glutDisplayFunc(renderFunction);
+    */
+    if (!glfwInit()) {
+	// TODO handle error
+    }
 }
 
 AVisEnv::~AVisEnv()
 {
 }
 
-void AVisEnv::OnEvent(GdkEvent* event)
-{
-    GdkEventType type = event->type;
-    GdkEventAny any = event->any;
-    cout << "Event: " << any.type << ", window: " << any.window << endl;
-
-    for (TInt ci = 0; ci < CompsCount(); ci++) {
-	MElem* eit = GetComp(ci);
-	//MGdkEventHandler* mhandler = (MGdkEventHandler*) eit->GetSIfiC(MGdkEventHandler::Type(), this);
-	// TODO To consider specific CP "GdkEventHandler" for Gwindow
-	MGWidgetComp* mhandler = (MGWidgetComp*) eit->GetSIfiC(MGWidgetComp::Type(), this);
-	if (mhandler != NULL) {
-	    //mhandler->OnEvent(event);
-	    mhandler->OnGdkEvent(event);
-	}
-    }
-
-
-    if (type == GDK_EXPOSE) {
-    } else if (type == GDK_WINDOW_STATE) {
-	GdkEventWindowState evt = event->window_state;
-    }
-}
-
 string AVisEnv::PEType()
 {
-    return AStateWnd::PEType() + GUri::KParentSep + Type();
+    return ADes::PEType() + GUri::KParentSep + Type();
 }
 
-void *AVisEnv::DoGetObj(const char *aName)
+MIface *AVisEnv::DoGetObj(const char *aName)
 {
-    void* res = NULL;
-    if (strcmp(aName, MDesSyncable::Type()) == 0) {
-	res = (MDesSyncable*) this;
-    }
-    else if (strcmp(aName, MDesObserver::Type()) == 0) {
-	res = (MDesObserver*) this;
-    }
-    else {
-	res = Elem::DoGetObj(aName);
+    MIface* res = NULL;
+    if (aName == MVisEnv::Type()) {
+	res = dynamic_cast<MVisEnv*>(this);
+    } else {
+	res = ADes::DoGetObj(aName);
     }
     return res;
 }
 
-void AVisEnv::UpdateIfi(const string& aName, const RqContext* aCtx)
+TBool AVisEnv::OnCompChanged(MUnit& aComp, const string& aContName, TBool aModif)
 {
-    void* res = NULL;
-    TIfRange rr;
-    RqContext ctx(this, aCtx);
-    if (strcmp(aName.c_str(), MDesObserver::Type()) == 0) {
-	res = (MDesObserver*) this;
-    } else if (strcmp(aName.c_str(), MDesSyncable::Type()) == 0) {
-	res = (MDesSyncable*) this;
-    } else {
-	res = Elem::DoGetObj(aName.c_str());
+    if (aContName == mCont_Init) {
+	Construct();
     }
-    if (res != NULL) {
-	InsertIfCache(aName, aCtx, this, res);
-    }
+
+    Unit::OnCompChanged(aComp, aContName);
 }
 
-TBool AVisEnv::OnCompChanged(MElem& aComp, const string& aContName, TBool aModif)
+void AVisEnv::SetOnIdleHandler(TIdleHandler aHandler)
 {
-    Construct();
-    Elem::OnCompChanged(aComp, aContName);
+    __ASSERT(mIdleHandler == NULL);
+    mIdleHandler = aHandler;
+    //glutIdleFunc(mIdleHandler);
 }
 
-
-
-
-
-// Gdk events handling mediator: just creates a "net" of MGdkEventHandler instances 
-
-AGehMediator::AGehMediator(const string& aName, MElem* aMan, MEnv* aEnv): Elem(aName, aMan, aEnv)
+void AVisEnv::Display(void)
 {
-    SetParent(Type());
 }
 
-AGehMediator::AGehMediator(MElem* aMan, MEnv* aEnv): Elem(Type(), aMan, aEnv)
+void Render()
 {
-    SetParent(Elem::PEType());
+    sEnv->Display();
 }
 
-string AGehMediator::PEType()
+void AVisEnv::Start(void)
 {
-    return Elem::PEType() + GUri::KParentSep + Type();
+    auto ff = []() -> void { };
+    std::function<void(void)> display(ff);
+    auto fun = display.target<void(*)(void)>();
+    //glutDisplayFunc(Render);
+    //glutMainLoop();    
 }
 
-void *AGehMediator::DoGetObj(const char *aName)
-{
-    void* res = NULL;
-    if (strcmp(aName, MGdkEventHandler::Type()) == 0) {
-	res = (MGdkEventHandler*) this;
-    } else {
-	res = Elem::DoGetObj(aName);
-    }
-    return res;
-}
-
-void AGehMediator::UpdateIfi(const string& aName, const RqContext* aCtx)
-{
-    void* res = NULL;
-    TIfRange rr;
-    RqContext ctx(this, aCtx);
-    if (strcmp(aName.c_str(), MGdkEventHandler::Type()) == 0) {
-	res = (MGdkEventHandler*) this;
-    } else {
-	res = Elem::DoGetObj(aName.c_str());
-    }
-    if (res != NULL) {
-	InsertIfCache(aName, aCtx, this, res);
-    }
-}
-
-void AGehMediator::OnEvent(GdkEvent* event)
-{
-    MElem* host = iMan->GetMan();
-    if (host != NULL) {
-	GdkEventType type = event->type;
-	GdkEventAny any = event->any;
-	//cout << "Mediator, Event: " << any.type << ", window: " << any.window << endl;
-	for (TInt ci = 0; ci < host->CompsCount(); ci++) {
-	    MElem* eit = host->GetComp(ci);
-	    MGdkEventHandler* mhandler = (MGdkEventHandler*) eit->GetSIfiC(MGdkEventHandler::Type(), this);
-	    if (mhandler != NULL) {
-		mhandler->OnEvent(event);
-	    }
-	}
-    }
-}
-
-
-
-
+#if 0
 // Base of Agent of widgets
 
 // Data provider for GdkEventButton
@@ -720,80 +659,29 @@ void AGWidget::OnGdkEvent(GdkEvent* event)
 
 }
 
+#endif
+
 
 // Top window
 
 const string KWndCnt_Init = "Init";
 const string KWndCnt_Init_Val = "Yes";
 
-AGWindow::AGWindow(const string& aName, MElem* aMan, MEnv* aEnv): AGWidget(aName, aMan, aEnv), mWindow(NULL), mWndInit(EFalse)
+AGWindow::AGWindow(const string& aName, MUnit* aMan, MEnv* aEnv): ADes(aName, aMan, aEnv), mWndInit(EFalse)
 {
-    SetParent(Type());
-}
-
-AGWindow::AGWindow(MElem* aMan, MEnv* aEnv): AGWidget(Type(), aMan, aEnv), mWindow(NULL), mWndInit(EFalse)
-{
-    SetParent(Elem::PEType());
+    iName = aName.empty() ? GetType(PEType()) : aName;
 }
 
 string AGWindow::PEType()
 {
-    return AGWidget::PEType() + GUri::KParentSep + Type();
+    return ADes::PEType() + GUri::KParentSep + Type();
 }
 
 void AGWindow::Construct()
 {
-    GdkDisplayManager* dm = gdk_display_manager_get();
-    const gchar* dname = gdk_get_display_arg_name();
-    GdkDisplay* d1 = gdk_display_open(NULL);
-    gdk_display_manager_set_default_display (dm, d1);
-
-    GdkDisplay* display = gdk_display_get_default();
-    GdkScreen* screen = gdk_display_get_default_screen(display);
-    GdkWindow* rootwnd = gdk_screen_get_root_window(screen);
-    GdkWindowType rwtype = gdk_window_get_window_type(rootwnd);
-    int rw_width = gdk_window_get_width(rootwnd);
-    int rw_height = gdk_window_get_height(rootwnd);
-
-    gdk_rgb_init();
-    GdkWindowAttr attr;
-    attr.window_type = GDK_WINDOW_TOPLEVEL;
-    attr.x = 0;
-    attr.y = 0;
-    attr.width = 400;
-    attr.height = 500;
-    attr.colormap = gdk_rgb_get_cmap();
-    attr.wclass = GDK_INPUT_OUTPUT;
-    gint mask =  GDK_WA_X | GDK_WA_Y | GDK_WA_COLORMAP;
-
-
-    mWindow = gdk_window_new(rootwnd, &attr, mask); 
-    GdkWindowType wtype = gdk_window_get_window_type(mWindow);
-    GdkColor color;
-    //gint cwres = gdk_color_white(attr.colormap, &color);
-    color.green = 65535;
-    gboolean cares = gdk_colormap_alloc_color(attr.colormap, &color, 0, 1);
-    //gdk_window_move(mWindow, 200, 200);
-    //gdk_window_move_resize(mWindow, 200, 200, 400, 300);
-    gint cwres = gdk_color_white(attr.colormap, &color);
-    //gdk_window_set_background(rootwnd, &color);
-    gdk_window_show(rootwnd);
-    gdk_window_set_background(mWindow, &color);
-    gboolean wiv = gdk_window_is_visible(mWindow);
-    gboolean rwiv = gdk_window_is_visible(rootwnd);
-    GdkGC* wnd1gc = gdk_gc_new(mWindow);
-    //gdk_gc_set_colormap(wnd1gc, attr.colormap);
-    GdkColor color_drw1;
-    color_drw1.red = 65535;
-    cares = gdk_colormap_alloc_color(attr.colormap, &color_drw1, 0, 1);
-    gdk_gc_set_foreground(wnd1gc, &color);
-    gdk_draw_line(mWindow, wnd1gc, 5, 5, 40, 60); 
-    gdk_draw_point(mWindow, wnd1gc, 2, 2);
-    gdk_draw_rectangle(mWindow, wnd1gc, TRUE, 5, 5, 40, 60);
-    gdk_window_show(mWindow);
-    gdk_window_flush(mWindow);
 }
 
+/*
 void AGWindow::OnUpdated_X(int aOldData)
 {
 }
@@ -815,6 +703,7 @@ void AGWindow::OnUpdated_H(int aOldData)
 	gdk_window_resize(mWindow, iW, iH);
     }
 }
+*/
 
 void AGWindow::Update()
 {
@@ -823,36 +712,21 @@ void AGWindow::Update()
 	// Checking in content flag showing that the window is part of visial env but not 
 	// just base agent. If so, initialise the agent
 	// TODO [YB] To find more suitable solution
-	MElem* host = iMan->GetMan();
+	MUnit* host = iMan->GetMan();
 	string sCntInit = host->GetContent(KWndCnt_Init);
 	if (sCntInit == KWndCnt_Init_Val) {
 	    Construct();
 	    mWndInit = ETrue;
 	}
     }
-    AGWidget::Update();
-}
-
-
-void AGWindow::OnGdkEvent(GdkEvent* event)
-{
-    GdkEventType type = event->type;
-    GdkEventAny any = event->any;
-    GdkWindow* wnd = any.window;
-    if (wnd == mWindow) {
-	cout << "Handling event: " << any.type << ", window: " << any.window << endl;
-	if (type == GDK_DELETE) {
-	    gdk_window_destroy(mWindow);
-	}
-    } else {
-	AGWidget::OnGdkEvent(event);
-    }
 }
 
 
 
 
 
+
+#if 0
 AStateWnd::AStateWnd(const string& aName, MElem* aMan, MEnv* aEnv): Elem(aName, aMan, aEnv), iActive(ETrue), iWnd(NULL),
     mInit(EFalse)
 {
@@ -1143,3 +1017,4 @@ void AStateWnd::OnEvent(GdkEvent* event)
 	}
     }
 }
+#endif

@@ -8,17 +8,21 @@ lib_LTLIBRARIES = libfap2vis.la
 
 libfap2vis_la_SOURCES = \
 		       mwidget.h \
-		       widget.h \
-		       widget.cpp \
-		       gwcont.h \
-		       gwcont.cpp \
+		       visenv.h \
+		       visenv.cpp \
+		       scene.h \
+		       scene.cpp \
+		       scelem.h \
+		       scelem.cpp \
+		       sce_rect.h \
+		       sce_rect.cpp \
 		       visprov.h \
 		       plugin.cpp \
 		       visprov.cpp
 
 include_HEADERS = \
 		  mwidget.h \
-		  widget.h
+		  visenv.h
 
 
 libfap2vis_la_LDFLAGS = -rdynamic -no-undefined -lrt

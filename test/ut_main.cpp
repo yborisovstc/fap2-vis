@@ -20,10 +20,10 @@ int main(int argc, char* argv[])
     CPPUNIT_NS::BriefTestProgressListener progress;
     controller.addListener( &progress );
     CPPUNIT_NS::TestRunner runner;
-    if (argc == 0) {
+    if (argc == 1) {
 	runner.addTest( CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest() );
     } else {
-	for (int cnt = 0; cnt < argc; cnt++) {
+	for (int cnt = 1; cnt < argc; cnt++) {
 	    CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry(argv[cnt]);
 	    runner.addTest(registry.makeTest());
 	}

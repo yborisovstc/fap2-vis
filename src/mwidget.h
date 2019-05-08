@@ -3,10 +3,10 @@
 
 #include <gdk/gdk.h>
 
-class MGdkEventHandler
+class MGEventHandler
 {
     public:
-	static const char* Type() { return "MGdkEventHandler";};
+	static const char* Type() { return "MGEventHandler";};
 	virtual void OnEvent(GdkEvent* event) = 0;
 };
 

@@ -21,12 +21,25 @@ AC_ARG_ENABLE([debug],
 			      [debug="$withval"], [debug=no])
 
 
-PKG_CHECK_MODULES(GDK, [gdk-2.0 >= 2.24.0], , [
-    AC_MSG_ERROR([You must have 'gdk-2.0' dev headers (libgtk2.0-dev) installed
+
+PKG_CHECK_MODULES(GLFW, [libglfw >= 2.7], , [
+    AC_MSG_ERROR([You must have 'libglfw' dev headers (libglfw-dev) installed
     ]) ])
 
-AC_SUBST(GDK_CFLAGS)
-AC_SUBST(GDK_LIBS)
+AC_SUBST(GLFW_CFLAGS)
+AC_SUBST(GLFW_LIBS)
+
+
+# libgl1-mesa-dev package doesn't include pc file so cannot be processed by pkg check
+#PKG_CHECK_MODULES(GL1MESA, [libgl1-mesa-dev >= 10.1.3], , [
+#    AC_MSG_ERROR([You must have 'freeglut3' dev headers (libgl1-mesa-dev) installed
+#    ]) ])
+
+AC_SUBST(GL1MESA_CFLAGS)
+AC_SUBST(GL1MESA_LIBS)
+
+GL1MESA_CFLAGS="-lGL"
+
 
 
 PKG_CHECK_MODULES(FAPWS2, [libgrayb >= 0.1], , [
@@ -54,8 +67,8 @@ else
 fi
 
 
-CXXFLAGS="$CXXFLAGS $FAPWS2_CFLAGS $GDK_CFLAGS" 
-LDFLAGS="$LDFLAGS $FAP2WS_LIBS $GDK_LIBS"
+CXXFLAGS="$CXXFLAGS $FAPWS2_CFLAGS $GLFW_CFLAGS  $GL1MESA_CFLAGS" 
+LDFLAGS="$LDFLAGS $FAP2WS_LIBS $GLFW_LIBS $GL1MESA_LIBS"
 
 AC_CONFIG_FILES([fap2vis.pc])
 

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE node SYSTEM "/usr/share/grayb/conf/objspec.dtd"> 
+<node id="GVisComps" parent="Elem" >
+    <import id="/SysComps" />
+    <import id="/DesComps" />
+
+    <cont id="About" val="Visualization system based on GLUT"/>
+
+    <node id="VisEnv" parent="Syst"> 
+	<cont id="About" val="Visualization system environment"/>
+	<node id="VisEnvAgt" parent="AVisEnv"/> 
+    </node>
+
+    <node id="GWindow" parent="Syst">
+	<cont id="About" val="Top-level window"/>
+	<node id="GWindow" parent="AGWindow"/>
+
+	<node id="Inp_X" parent="CpStatecInp" />
+	<node id="Inp_Y" parent="CpStatecInp" />
+	<node id="Inp_W" parent="CpStatecInp" />
+	<node id="Inp_H" parent="CpStatecInp" />
+	<node id="Inp_Title" parent="CpStatecInp" />
+    </node>
+
+    <node id="Scene" parent="Syst"> 
+	<cont id="About" val="Visualization system scene"/>
+	<node id="SceneAgt" parent="AGtScene"/> 
+    </node>
+
+    <node id="SceRect" parent="Syst"> 
+	<cont id="About" val="Scene element"/>
+	<node id="Agent" parent="ASceRect"/> 
+    </node>
+</node>

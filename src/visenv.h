@@ -1,55 +1,40 @@
 #ifndef __FAP2VIS_WIDGET_H
 #define __FAP2VIS_WIDGET_H
 
-#include "mwidget.h"
-#include <elem.h>
+#include <unit.h>
 #include <syst.h>
 #include <des.h>
 #include <mdata.h>
-#include <mwidget.h>
-#include <gdk/gdk.h>
+#include <mvisenv.h>
 
 
 using namespace std;
 
 // Visual environment
-class AVisEnv:  public ADes, public MGdkEventHandler
+class AVisEnv:  public ADes, public MVisEnv
 {
     public:
 	static const char* Type() { return "AVisEnv";};
 	static string PEType();
-	AVisEnv(const string& aName = string(), MElem* aMan = NULL, MEnv* aEnv = NULL);
-	AVisEnv(MElem* aMan = NULL, MEnv* aEnv = NULL);
+	AVisEnv(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual ~AVisEnv();
 	// From Base
-	virtual void *DoGetObj(const char *aName);
+	virtual MIface *DoGetObj(const char *aName) override;
 	// From MElem
-	virtual TBool OnCompChanged(MElem& aComp, const string& aContName = string(), TBool aModif = EFalse);
-	// Iface provider
-	virtual void UpdateIfi(const string& aName, const RqContext* aCtx);
-	// From MGdkEventHandler
-	virtual void OnEvent(GdkEvent* event);
+	virtual TBool OnCompChanged(MUnit& aComp, const string& aContName = string(), TBool aModif = EFalse);
+	// From MVisEnv
+	virtual void SetOnIdleHandler(TIdleHandler aHandler) override;
+	virtual void Start(void) override;
+	void Display(void);
     protected:
 	void Construct();
+	static const string mCont_Init;
+    protected:
+	TIdleHandler mIdleHandler;
 };
 
 
-// Gdk events handling mediator: just creates a "net" of MGdkEventHandler instances 
-class AGehMediator: public Elem, public MGdkEventHandler
-{
-    public:
-	static const char* Type() { return "AGehMediator";};
-	static string PEType();
-	AGehMediator(const string& aName = string(), MElem* aMan = NULL, MEnv* aEnv = NULL);
-	AGehMediator(MElem* aMan = NULL, MEnv* aEnv = NULL);
-	// From Base
-	virtual void *DoGetObj(const char *aName);
-	// Iface provider
-	virtual void UpdateIfi(const string& aName, const RqContext* aCtx);
-	// From MGdkEventHandler
-	virtual void OnEvent(GdkEvent* event);
-};
-
+#if 0
 class AGWidget: public Elem, public MGWidget, public MGWidgetComp, public MGWidgetOwner, public MACompsObserver, public MDesSyncable, public MDesObserver
 {
     public:
@@ -182,31 +167,54 @@ class AGWidget: public Elem, public MGWidget, public MGWidgetComp, public MGWidg
 	static bool mInit;
 	static tStatesMap  mStatesMap;
 };
+#endif
 
+#if 0
 // Top window
-class AGWindow: public AGWidget
+class AGWindow: public Unit, public MDesSyncable_Imd
 {
     public:
 	static const char* Type() { return "AGWindow";};
 	static string PEType();
-	AGWindow(const string& aName = string(), MElem* aMan = NULL, MEnv* aEnv = NULL);
-	AGWindow(MElem* aMan = NULL, MEnv* aEnv = NULL);
+	AGWindow(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
     public:
 	// From MDesSyncable
 	virtual void Update();
-	// From MGWidgetComp
-	virtual void OnGdkEvent(GdkEvent* event);
+	virtual void Confirm() {}
+	virtual TBool IsUpdated() {return EFalse;}
+	virtual void SetUpdated() {}
+	virtual void ResetUpdated() {}
+	virtual TBool IsActive() {return EFalse;}
+	virtual void SetActive() {}
+	virtual void ResetActive() {}
+	virtual MIface* MDesSyncable_Call(const string& aSpec, string& aRes) {return NULL;}
+	virtual string MDesSyncable_Mid() const override { return string();}
+
     protected:
 	void Construct();
-	virtual void OnUpdated_X(int aOldData);
-	virtual void OnUpdated_Y(int aOldData);
-	virtual void OnUpdated_W(int aOldData);
-	virtual void OnUpdated_H(int aOldData);
     protected:
 	GdkWindow* mWindow;
 	TBool mWndInit;
 };
+#endif
 
+// Top window
+class AGWindow: public ADes
+{
+    public:
+	static const char* Type() { return "AGWindow";};
+	static string PEType();
+	AGWindow(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	// From MDesSyncable
+    public:
+	virtual void Update();
+    protected:
+	void Construct();
+    protected:
+	TBool mWndInit;
+};
+
+#if 0
 // Main state that manages GDK window
 class AStateWnd:  public Elem, public MDesSyncable, public MDesObserver, public MGdkEventHandler
 {
@@ -246,6 +254,7 @@ class AStateWnd:  public Elem, public MDesSyncable, public MDesObserver, public 
 	TBool mInit;
 	string mTitle;
 };
+#endif
 
 #endif
 
