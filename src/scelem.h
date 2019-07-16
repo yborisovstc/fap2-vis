@@ -24,6 +24,8 @@ class AScElem: public ADes, public MSceneElem
 	// From MDesSyncable
     public:
 	virtual void Update();
+    protected:
+	virtual void Init() {}
 };
 
 #endif // __FAP2VIS_SCELEM_H

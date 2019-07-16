@@ -22,12 +22,21 @@ AC_ARG_ENABLE([debug],
 
 
 
-PKG_CHECK_MODULES(GLFW, [libglfw >= 2.7], , [
+PKG_CHECK_MODULES(GLFW, [glfw3 >= 3.0], , [
     AC_MSG_ERROR([You must have 'libglfw' dev headers (libglfw-dev) installed
     ]) ])
 
 AC_SUBST(GLFW_CFLAGS)
 AC_SUBST(GLFW_LIBS)
+
+
+PKG_CHECK_MODULES(GLEW, [glew >= 1.10], , [
+    AC_MSG_ERROR([You must have 'libglew' dev headers (libglew-dev) installed
+    ]) ])
+
+AC_SUBST(GLEW_CFLAGS)
+AC_SUBST(GLEW_LIBS)
+
 
 
 # libgl1-mesa-dev package doesn't include pc file so cannot be processed by pkg check
@@ -67,8 +76,8 @@ else
 fi
 
 
-CXXFLAGS="$CXXFLAGS $FAPWS2_CFLAGS $GLFW_CFLAGS  $GL1MESA_CFLAGS" 
-LDFLAGS="$LDFLAGS $FAP2WS_LIBS $GLFW_LIBS $GL1MESA_LIBS"
+CXXFLAGS="$CXXFLAGS $FAPWS2_CFLAGS $GLFW_CFLAGS  $GL1MESA_CFLAGS  $GLEW_CFLAGS" 
+LDFLAGS="$LDFLAGS $FAP2WS_LIBS $GLFW_LIBS $GL1MESA_LIBS $GLEW_LIBS"
 
 AC_CONFIG_FILES([fap2vis.pc])
 

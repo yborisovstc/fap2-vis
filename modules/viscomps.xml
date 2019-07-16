@@ -13,13 +13,19 @@
 
     <node id="GWindow" parent="Syst">
 	<cont id="About" val="Top-level window"/>
-	<node id="GWindow" parent="AGWindow"/>
+	<node id="AWnd" parent="AGWindow"/>
 
 	<node id="Inp_X" parent="CpStatecInp" />
 	<node id="Inp_Y" parent="CpStatecInp" />
 	<node id="Inp_W" parent="CpStatecInp" />
 	<node id="Inp_H" parent="CpStatecInp" />
 	<node id="Inp_Title" parent="CpStatecInp" />
+
+	<node id="Width" parent="AStatec"/>
+	<cont node="./Width" id="Value" val="SI 0" />
+	<node id="Heigth" parent="AStatec"/>
+	<cont node="./Heigth" id="Value" val="SI 0" />
+
     </node>
 
     <node id="Scene" parent="Syst"> 

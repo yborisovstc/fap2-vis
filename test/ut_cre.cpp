@@ -98,11 +98,23 @@ void Ut_cre::test_CreWnd()
     CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
     sSync = sync;
 
+    /*
     // Set GLES idle handler
     mvisenv->SetOnIdleHandler(OnIdle);
     // Start vis env loop
     mvisenv->Start();
+    */
 
+    const TInt ticksnum = 5;
+    //for (TInt cnt = 0; cnt < ticksnum; cnt++) {
+    while (true) {
+	if (sync->IsActive()) {
+	    sync->Update();
+	}
+	if (sync->IsUpdated()) {
+	    sync->Confirm();
+	}
+    }
     delete iEnv;
 }
 

@@ -19,7 +19,7 @@ void AScElem::Update()
 MIface *AScElem::DoGetObj(const char *aName)
 {
     MIface* res = NULL;
-    if (aName == MSceneElem::Type()) {
+    if (strcmp(aName, MSceneElem::Type()) == 0) {
 	res = dynamic_cast<MSceneElem*>(this);
     } else {
 	res = ADes::DoGetObj(aName);

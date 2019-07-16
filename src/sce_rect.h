@@ -4,6 +4,10 @@
 #include <scelem.h>
 
 
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
+
 using namespace std;
 
 
@@ -20,6 +24,12 @@ class ASceRect: public AScElem
 	// From MDesSyncable
     public:
 	virtual void Update();
+    protected:
+	virtual void Init();
+    protected:
+	bool mIsInitialised = false;
+	GLuint mProgram;
+	GLint mMvpLocation;
 };
 
 #endif // __FAP2VIS_SCELEM_H

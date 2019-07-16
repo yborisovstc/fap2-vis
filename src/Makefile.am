@@ -18,6 +18,10 @@ libfap2vis_la_SOURCES = \
 		       sce_rect.cpp \
 		       visprov.h \
 		       plugin.cpp \
+		       mdlvis.h \
+		       mdlvis.cpp \
+		       visrepr.h \
+		       visrepr.cpp \
 		       visprov.cpp
 
 include_HEADERS = \

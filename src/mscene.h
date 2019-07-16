@@ -10,7 +10,10 @@ class MScene: public MIface
 	static const char* Type() { return "MScene";};
 	virtual void RenderScene(void) = 0;
 	// From MIface
-	virtual MIface* Call(const string& aSpec, string& aRes) override {return NULL;}
+	virtual MIface* MScene_Call(const string& aSpec, string& aRes) { return NULL;}
+	virtual string MScene_Mid() const {return "?";}
+	MIface* Call(const string& aSpec, string& aRes) override {return MScene_Call(aSpec, aRes);}
+	string Mid() const override { return MScene_Mid();}
 };
 
 

@@ -1,5 +1,6 @@
 
 #include "scene.h"
+#include "mscel.h"
 
 const string KWndCnt_Init = "Init";
 const string KWndCnt_Init_Val = "Yes";
@@ -21,7 +22,7 @@ void AGtScene::Construct()
 MIface *AGtScene::DoGetObj(const char *aName)
 {
     MIface* res = NULL;
-    if (aName == MScene::Type()) {
+    if (strcmp(aName, MScene::Type()) == 0) {
 	res = dynamic_cast<MScene*>(this);
     } else {
 	res = ADes::DoGetObj(aName);
@@ -31,10 +32,23 @@ MIface *AGtScene::DoGetObj(const char *aName)
 
 void AGtScene::RenderScene(void)
 {
+    MUnit* sroot = GetNode("./../Root");
+    if (sroot != NULL) {
+	MSceneElem* mse = (MSceneElem*) sroot->GetSIfi(MSceneElem::Type(), this);
+	if (mse != NULL) {
+	    mse->Render();
+	}
+    }
+}
+
+MIfProv* AGtScene::IfProv()
+{
+    return dynamic_cast<MIfProv*>(this);
 }
 
 void AGtScene::Update()
 {
+    ADes::Update();
 }
 
 

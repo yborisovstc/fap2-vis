@@ -1,0 +1,131 @@
+<?xml version="1.0" ?>
+
+
+<!-- Test of AStateWnd
+     -->
+
+
+<!DOCTYPE node SYSTEM "../etc/objspec.dtd"> 
+
+<node id="testroot" parent="Elem">
+    <node id="Modules" parent="AImports">
+	<import id="/SysComps" />
+	<import id="/IncapsComps" />
+	<import id="/DesComps/Des" />
+	<import id="/DesComps/StcOutExt" />
+	<import id="/GVisComps/GWindow"/>
+	<import id="/GVisComps/VisEnv"/>
+	<import id="/GVisComps/Scene"/>
+	<import id="/GVisComps/SceRect"/>
+    </node>
+
+    <node id="Comps" parent="Elem">
+
+	<!-- Vis representation CP -->
+	<node id="VisrBindCp" parent="ConnPointMc">
+	    <cont val="{Provided:'MVisRepr' Required:''}"/>
+	</node>
+
+	<!-- Model representation CP -->
+	<node id="MdlBindCp" parent="ConnPointMc">
+	    <cont val="{Provided:'' Required:'MVisRepr'}"/>
+	</node>
+
+	<!-- Vis representation CP extender -->
+	<node id="VisrBindExt" parent="AExtd">
+	    <node id="Int" parent="./../MdlBindCp"/>
+	</node>
+
+    </node>
+
+    <node id="Test" parent ="./Modules/DesComps/Des">
+
+
+	<node id="Env" parent="./../Modules/GVisComps/VisEnv">
+
+	    <node id="VisrBind" parent="./../../Comps/VisrBindExt"/>
+
+	    <node id="Window" parent="./../../Modules/GVisComps/GWindow"/>
+	    <cont node="./VisEnvAgt" id="Init" val="Yes"/>
+	    <cont node="./Window/AWnd" id="Init" val="Yes"/>
+
+	    <node node="./Window" id="VisrBind" parent="./../../Comps/VisrBindExt"/>
+
+	    <node node="./Window" id="Scene" parent="./../../Modules/GVisComps/Scene"/>
+	    <node node="./Window/Scene" id="Root" parent="./../../Modules/GVisComps/SceRect"/>
+	    <node node="./Window/Scene" id="VisrBinding" parent="./../../Comps/VisrBindCp"/>
+
+	    <node node="./Window" id="E_Visrb" parent="Aedge"/> 
+	    <cont node="./Window/E_Visrb" val="{P1:'./../Scene/VisrBinding' P2:'./../VisrBind/Int'}"/> 
+
+	    <node id="Width" parent="AStatec"/>
+	    <node id="Heigth" parent="AStatec"/>
+	    <node id="Title" parent="AStatec"/>
+
+	    <node id="E1" parent="Aedge"> 
+		<cont val="{P1:'./../Width' P2:'./../Window/Inp_W'}"/> 
+	    </node>
+	    <node id="E2" parent="Aedge"> 
+		<cont val="{P1:'./../Heigth' P2:'./../Window/Inp_H'}"/> 
+	    </node>
+	    <node id="E3" parent="Aedge"> 
+		<cont val="{P1:'./../Title' P2:'./../Window/Inp_Title'}"/> 
+	    </node>
+
+
+	    <node id="E_Visrb" parent="Aedge"/> 
+	    <cont node="./E_Visrb" val="{P1:'./../Window/VisrBind' P2:'./../VisrBind/Int'}"/> 
+	</node>
+
+	<cont node="./Env/Width" id="Value" val="SI 600"/>
+	<cont node="./Env/Heigth" id="Value" val="SI 600"/>
+	<cont node="./Env/Title" id="Value" val="SS Title"/>
+
+
+
+	<node id="Model" parent="./../Modules/DesComps/Des">
+	    <node id="MdlBinding" parent="./../../Comps/MdlBindCp"/>
+
+	    <node id="Solid" parent="./../../Modules/DesComps/Des">
+
+		<node id="WidthOut" parent="./../../../Modules/DesComps/StcOutExt"/>
+
+		<node id="Width" parent="AStatec"/>
+		<cont node="./Width" id="Debug.Update" val="y"/>
+		<cont node="./Width" id="Value" val="SI 40"/>
+
+		<node id="Heigth" parent="AStatec"/>
+		<cont node="./Heigth" id="Value" val="SI 20"/>
+
+		<node id="Incr" parent="ATrcAddVar"/>
+
+		<node id="IncrData" parent="AStatec"/>
+		<cont node="./IncrData" id="Value" val="SI 1"/>
+
+		<node id="E1" parent="Aedge"> 
+		    <cont val="{P1:'./../IncrData' P2:'./../Incr/Inp'}"/> 
+		</node>
+
+		<node id="E2" parent="Aedge"> 
+		    <cont val="{P1:'./../Incr/Out' P2:'./../Width/Inp'}"/> 
+		</node>
+
+		<node id="E3" parent="Aedge"> 
+		    <cont val="{P1:'./../Width' P2:'./../Incr/Inp'}"/> 
+		</node>
+
+		<node id="E_Width_Out" parent="Aedge"> 
+		    <cont val="{P1:'./../Width' P2:'./../WidthOut/Int'}"/> 
+		</node>
+
+	    </node>
+
+	</node>
+
+	<node id="E_Mdl_bind" parent="Aedge"/> 
+	<cont node="./E_Mdl_bind" val="{P1:'./../Env/VisrBind' P2:'./../Model/MdlBinding'}"/> 
+
+
+    </node>
+
+</node>
