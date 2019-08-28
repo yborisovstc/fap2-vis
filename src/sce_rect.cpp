@@ -1,4 +1,6 @@
 
+#include <rdata.h>
+
 #include "sce_rect.h"
 
 #include "deps/linmath.h" // Ref https://github.com/glfw/glfw/tree/master/deps
@@ -53,6 +55,8 @@ void ASceRect::Update()
     if (!mIsInitialised) {
 	Init();
 	mIsInitialised = true;
+    } else {
+	AScElem::Update();
     }
 }
 
@@ -100,18 +104,34 @@ void ASceRect::Render()
 
 #endif
 
+    MUnit* host = GetMan();
+    MUnit* wu = host->GetNode("./Width");
+    MDVarGet* wvg = wu->GetObj(wvg);
+    MDtGet<Sdata<int>>* wsi = wvg->GetDObj(wsi);
+    Sdata<int> wi = 0;
+    wsi->DtGet(wi);
+
+    MUnit* hu = host->GetNode("./Height");
+    MDVarGet* hvg = hu->GetObj(wvg);
+    MDtGet<Sdata<int>>* hsi = hvg->GetDObj(wsi);
+    Sdata<int> hi = 0;
+    hsi->DtGet(hi);
 
     int width = 640, height = 480;
+
+    float wc = 0.5*(wi.mData)/width;
+    float hc = 0.5*(hi.mData)/height;
+
     glViewport(0, 0, width, height);
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(1.0, 1.0, 1.0);
     glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
     glBegin(GL_POLYGON);
-    glVertex2f(-0.5, -0.5);
-    glVertex2f(-0.5, 0.5);
-    glVertex2f(0.5, 0.5);
-    glVertex2f(0.5, -0.5);
+    glVertex2f(-wc, -hc);
+    glVertex2f(-wc, hc);
+    glVertex2f(wc, hc);
+    glVertex2f(wc, -hc);
     glEnd();
     glFlush();
 }

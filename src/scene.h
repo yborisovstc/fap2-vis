@@ -13,7 +13,7 @@ using namespace std;
  *
  * It is also visual representation of model
  * */
-class AGtScene: public ADes, public MScene, public MVisRepr
+class AGtScene: public ADes, public MScene
 {
     public:
 	static const char* Type() { return "AGtScene";};
@@ -23,8 +23,6 @@ class AGtScene: public ADes, public MScene, public MVisRepr
 	virtual MIface *DoGetObj(const char *aName) override;
 	// From MScene
 	virtual void RenderScene(void) override;
-	// From MVisRepr
-	virtual MIfProv* IfProv() override;
     public:
 	virtual void Update();
     protected:

@@ -10,7 +10,7 @@ using namespace std;
 
 /** @brier Model for visual representation agent
  * */
-class AMdlVis: public ADes, public MMdlVis
+class AMdlVis: public Unit, public MAgent, public MMdlVis
 {
     public:
 	static const char* Type() { return "AMdlVis";};
@@ -18,8 +18,12 @@ class AMdlVis: public ADes, public MMdlVis
 	AMdlVis(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	// From Base
 	virtual MIface *DoGetObj(const char *aName) override;
+	// From Unit
+	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// From MMdlVis
-	virtual MIfProv* IfProv() override;
+	virtual MUnit* IfProv() override;
+	// From MAgent
+	MIface* MAgent_DoGetIface(const string& aName) override;
     protected:
 	void Construct();
 };

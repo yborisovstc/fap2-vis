@@ -13,6 +13,7 @@
 	<import id="/IncapsComps" />
 	<import id="/DesComps/Des" />
 	<import id="/DesComps/StcOutExt" />
+	<import id="/DesComps/StcInpExt" />
 	<import id="/GVisComps/GWindow"/>
 	<import id="/GVisComps/VisEnv"/>
 	<import id="/GVisComps/Scene"/>
@@ -23,12 +24,12 @@
 
 	<!-- Vis representation CP -->
 	<node id="VisrBindCp" parent="ConnPointMc">
-	    <cont val="{Provided:'MVisRepr' Required:''}"/>
+	    <cont val="{Provided:'MVisRepr' Required:'MMdlVis'}"/>
 	</node>
 
 	<!-- Model representation CP -->
 	<node id="MdlBindCp" parent="ConnPointMc">
-	    <cont val="{Provided:'' Required:'MVisRepr'}"/>
+	    <cont val="{Provided:'MMdlVis' Required:'MVisRepr'}"/>
 	</node>
 
 	<!-- Vis representation CP extender -->
@@ -51,22 +52,38 @@
 
 	    <node node="./Window" id="VisrBind" parent="./../../Comps/VisrBindExt"/>
 
-	    <node node="./Window" id="Scene" parent="./../../Modules/GVisComps/Scene"/>
-	    <node node="./Window/Scene" id="Root" parent="./../../Modules/GVisComps/SceRect"/>
+	    <node node="./Window" id="Scene" parent="./../../Modules/GVisComps/Scene">
+		<node id="VisrBinder" parent="AVisRepr"/>
+		<node id="Solid" parent="./../../../../Modules/GVisComps/SceRect">
+		    <node id="WidthCp" parent="./../../../../../Modules/DesComps/StcInpExt"/>
+		    <node id="HeightCp" parent="./../../../../../Modules/DesComps/StcInpExt"/>
+		    <node id="Width" parent="AStatec"/>
+		    <cont node="./Width" id="Debug.Update" val="y"/>
+		    <cont node="./Width" id="Value" val="SI 20"/>
+
+		    <node id="Height" parent="AStatec"/>
+		    <cont node="./Height" id="Debug.Update" val="y"/>
+		    <cont node="./Height" id="Value" val="SI 60"/>
+
+		    <node id="E_Width_Inp" parent="Aedge"> <cont val="{P1:'./../Width/Inp' P2:'./../WidthCp/Int'}"/> </node>
+		    <node id="E_Height_Inp" parent="Aedge"> <cont val="{P1:'./../Height/Inp' P2:'./../HeightCp/Int'}"/> </node>
+		</node>
+	    </node>
+
 	    <node node="./Window/Scene" id="VisrBinding" parent="./../../Comps/VisrBindCp"/>
 
 	    <node node="./Window" id="E_Visrb" parent="Aedge"/> 
 	    <cont node="./Window/E_Visrb" val="{P1:'./../Scene/VisrBinding' P2:'./../VisrBind/Int'}"/> 
 
 	    <node id="Width" parent="AStatec"/>
-	    <node id="Heigth" parent="AStatec"/>
+	    <node id="Height" parent="AStatec"/>
 	    <node id="Title" parent="AStatec"/>
 
 	    <node id="E1" parent="Aedge"> 
 		<cont val="{P1:'./../Width' P2:'./../Window/Inp_W'}"/> 
 	    </node>
 	    <node id="E2" parent="Aedge"> 
-		<cont val="{P1:'./../Heigth' P2:'./../Window/Inp_H'}"/> 
+		<cont val="{P1:'./../Height' P2:'./../Window/Inp_H'}"/> 
 	    </node>
 	    <node id="E3" parent="Aedge"> 
 		<cont val="{P1:'./../Title' P2:'./../Window/Inp_Title'}"/> 
@@ -78,45 +95,46 @@
 	</node>
 
 	<cont node="./Env/Width" id="Value" val="SI 600"/>
-	<cont node="./Env/Heigth" id="Value" val="SI 600"/>
+	<cont node="./Env/Height" id="Value" val="SI 600"/>
 	<cont node="./Env/Title" id="Value" val="SS Title"/>
 
 
 
 	<node id="Model" parent="./../Modules/DesComps/Des">
+	    <node id="MdlBinder" parent="AMdlVis"/>
+
 	    <node id="MdlBinding" parent="./../../Comps/MdlBindCp"/>
 
 	    <node id="Solid" parent="./../../Modules/DesComps/Des">
 
-		<node id="WidthOut" parent="./../../../Modules/DesComps/StcOutExt"/>
+		<node id="WidthCp" parent="./../../../Modules/DesComps/StcOutExt"/>
+		<node id="HeightCp" parent="./../../../Modules/DesComps/StcOutExt"/>
 
 		<node id="Width" parent="AStatec"/>
 		<cont node="./Width" id="Debug.Update" val="y"/>
 		<cont node="./Width" id="Value" val="SI 40"/>
 
-		<node id="Heigth" parent="AStatec"/>
-		<cont node="./Heigth" id="Value" val="SI 20"/>
+		<node id="Height" parent="AStatec"/>
+		<cont node="./Height" id="Debug.Update" val="y"/>
+		<cont node="./Height" id="Value" val="SI 60"/>
 
-		<node id="Incr" parent="ATrcAddVar"/>
+		<node id="IncrW" parent="ATrcAddVar"/>
+		<node id="IncrH" parent="ATrcAddVar"/>
 
 		<node id="IncrData" parent="AStatec"/>
 		<cont node="./IncrData" id="Value" val="SI 1"/>
 
-		<node id="E1" parent="Aedge"> 
-		    <cont val="{P1:'./../IncrData' P2:'./../Incr/Inp'}"/> 
-		</node>
+		<node id="E1" parent="Aedge"> <cont val="{P1:'./../IncrData' P2:'./../IncrW/Inp'}"/> </node>
+		<node id="E2" parent="Aedge"> <cont val="{P1:'./../IncrW/Out' P2:'./../Width/Inp'}"/> </node>
+		<node id="E3" parent="Aedge"> <cont val="{P1:'./../Width' P2:'./../IncrW/Inp'}"/> </node>
 
-		<node id="E2" parent="Aedge"> 
-		    <cont val="{P1:'./../Incr/Out' P2:'./../Width/Inp'}"/> 
-		</node>
+		<node id="E1H" parent="Aedge"> <cont val="{P1:'./../IncrData' P2:'./../IncrH/Inp'}"/> </node>
+		<node id="E2H" parent="Aedge"> <cont val="{P1:'./../IncrH/Out' P2:'./../Height/Inp'}"/> </node>
+		<node id="E3H" parent="Aedge"> <cont val="{P1:'./../Height' P2:'./../IncrH/Inp'}"/> </node>
 
-		<node id="E3" parent="Aedge"> 
-		    <cont val="{P1:'./../Width' P2:'./../Incr/Inp'}"/> 
-		</node>
+		<node id="E_Width_Out" parent="Aedge"> <cont val="{P1:'./../Width' P2:'./../WidthCp/Int'}"/> </node>
 
-		<node id="E_Width_Out" parent="Aedge"> 
-		    <cont val="{P1:'./../Width' P2:'./../WidthOut/Int'}"/> 
-		</node>
+		<node id="E_Height_Out" parent="Aedge"> <cont val="{P1:'./../Height' P2:'./../HeightCp/Int'}"/> </node>
 
 	    </node>
 

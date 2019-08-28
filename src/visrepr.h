@@ -20,8 +20,10 @@ class AVisRepr: public Unit, public MAgent, public MVisRepr
 	AVisRepr(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	// From Base
 	virtual MIface *DoGetObj(const char *aName) override;
+	// From Unit
+	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// From MVisRepr
-	virtual MIfProv* IfProv() override;
+	virtual MUnit* IfProv() override;
 	// From MAgent
 	MIface* MAgent_DoGetIface(const string& aName) override;
 };

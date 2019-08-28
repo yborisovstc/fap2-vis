@@ -4,6 +4,7 @@
 #include <miface.h>
 
 class MIfProv;
+class MUnit;
 
 /** @brief Model for visual representation
  *
@@ -12,7 +13,7 @@ class MMdlVis: public MIface
 {
     public:
 	static const char* Type() { return "MMdlVis";};
-	virtual MIfProv* IfProv() = 0;
+	virtual MUnit* IfProv() = 0;
 	// From MIface
 	virtual MIface* MVisRepr_Call(const string& aSpec, string& aRes) { return NULL;}
 	virtual string MVisRepr_Mid() const {return "?";}

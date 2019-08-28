@@ -259,7 +259,7 @@ void AGWindow::Update()
 
 void AGWindow::Confirm()
 {
-    SetActive();
+    ADes::Confirm();
 }
 
 TBool AGWindow::OnCompChanged(MUnit& aComp, const string& aContName, TBool aModif)

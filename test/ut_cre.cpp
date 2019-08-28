@@ -105,9 +105,8 @@ void Ut_cre::test_CreWnd()
     mvisenv->Start();
     */
 
-    const TInt ticksnum = 5;
-    //for (TInt cnt = 0; cnt < ticksnum; cnt++) {
-    while (true) {
+    const TInt ticksnum = 512;
+    for (TInt cnt = 0; cnt < ticksnum; cnt++) {
 	if (sync->IsActive()) {
 	    sync->Update();
 	}

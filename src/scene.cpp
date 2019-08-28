@@ -32,18 +32,23 @@ MIface *AGtScene::DoGetObj(const char *aName)
 
 void AGtScene::RenderScene(void)
 {
-    MUnit* sroot = GetNode("./../Root");
+    /*
     if (sroot != NULL) {
 	MSceneElem* mse = (MSceneElem*) sroot->GetSIfi(MSceneElem::Type(), this);
 	if (mse != NULL) {
 	    mse->Render();
 	}
     }
-}
+    */
 
-MIfProv* AGtScene::IfProv()
-{
-    return dynamic_cast<MIfProv*>(this);
+    MUnit* host = GetMan();
+    for (int ind = 0; ind < host->CompsCount(); ind++) {
+	MUnit* comp = host->GetComp(ind);
+	MSceneElem* mse = (MSceneElem*) comp->GetSIfi(MSceneElem::Type(), this);
+	if (mse != NULL) {
+	    mse->Render();
+	}
+    }
 }
 
 void AGtScene::Update()

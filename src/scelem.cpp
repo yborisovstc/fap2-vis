@@ -14,6 +14,7 @@ string AScElem::PEType()
 
 void AScElem::Update()
 {
+    ADes::Update();
 }
 
 MIface *AScElem::DoGetObj(const char *aName)
