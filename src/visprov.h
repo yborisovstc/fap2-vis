@@ -35,6 +35,8 @@ class VisProv: public ProvBase
 	// From MProvider
 	virtual void AppendNodesInfo(vector<string>& aInfo);
 	virtual const string& ModulesPath() const;
+	virtual void SetChromoRslArgs(const string& aRargs) override {}
+	virtual void GetChromoRslArgs(string& aRargs) override {}
     private:
 	static const TFReg mReg;
 };
