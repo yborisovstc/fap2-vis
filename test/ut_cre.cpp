@@ -75,46 +75,52 @@ void OnIdle(void)
 
 void Ut_cre::test_CreWnd()
 {
-    iEnv = new Env("ut_swnd_2.xml", "ut_swnd_2.txt");
-    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", iEnv != 0);
-    //iEnv->ImpsMgr()->ResetImportsPaths();
-    iEnv->ImpsMgr()->AddImportsPaths("../modules");
-    VisProv* visprov = new VisProv("VisProv", iEnv);
-    iEnv->AddProvider(visprov);
-    iEnv->ConstructSystem();
-    MUnit* root = iEnv->Root();
-    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+    for (int ct = 1; ct < 2; ct++) {
+	const string specn("ut_swnd_2");
+	string ext = (ct == 0) ? "xml" : "chs";
+	string spec = specn + string(".") + ext;
+	string log = specn + "_" + ext + ".log";
+	iEnv = new Env(spec, log);
+	CPPUNIT_ASSERT_MESSAGE("Fail to create Env", iEnv != 0);
+	//iEnv->ImpsMgr()->ResetImportsPaths();
+	iEnv->ImpsMgr()->AddImportsPaths("../modules");
+	VisProv* visprov = new VisProv("VisProv", iEnv);
+	iEnv->AddProvider(visprov);
+	iEnv->ConstructSystem();
+	MUnit* root = iEnv->Root();
+	CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
-    // Set idle handler
-    MUnit* visenv = root->GetNode("./Test/Env/VisEnvAgt");
-    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent node", visenv != 0);
-    MVisEnv* mvisenv = visenv->GetObj(mvisenv);
-    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent", mvisenv != 0);
+	// Set idle handler
+	MUnit* visenv = root->GetNode("./Test/Env/VisEnvAgt");
+	CPPUNIT_ASSERT_MESSAGE("Fail to get env agent node", visenv != 0);
+	MVisEnv* mvisenv = visenv->GetObj(mvisenv);
+	CPPUNIT_ASSERT_MESSAGE("Fail to get env agent", mvisenv != 0);
 
-    // Sync the state
-    MUnit* esync = root->GetNode("./Test/Capsule/Sync");
-    CPPUNIT_ASSERT_MESSAGE("Fail to get input for Syncable iface", esync != 0);
-    MDesSyncable* sync = (MDesSyncable*) esync->GetSIfi(MDesSyncable::Type());
-    CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
-    sSync = sync;
+	// Sync the state
+	MUnit* esync = root->GetNode("./Test/Capsule/Sync");
+	CPPUNIT_ASSERT_MESSAGE("Fail to get input for Syncable iface", esync != 0);
+	MDesSyncable* sync = (MDesSyncable*) esync->GetSIfi(MDesSyncable::Type());
+	CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
+	sSync = sync;
 
-    /*
-    // Set GLES idle handler
-    mvisenv->SetOnIdleHandler(OnIdle);
-    // Start vis env loop
-    mvisenv->Start();
-    */
+	/*
+	// Set GLES idle handler
+	mvisenv->SetOnIdleHandler(OnIdle);
+	// Start vis env loop
+	mvisenv->Start();
+	*/
 
-    const TInt ticksnum = 512;
-    for (TInt cnt = 0; cnt < ticksnum; cnt++) {
-	if (sync->IsActive()) {
-	    sync->Update();
+	const TInt ticksnum = 128;
+	for (TInt cnt = 0; cnt < ticksnum; cnt++) {
+	    if (sync->IsActive()) {
+		sync->Update();
+	    }
+	    if (sync->IsUpdated()) {
+		sync->Confirm();
+	    }
 	}
-	if (sync->IsUpdated()) {
-	    sync->Confirm();
-	}
+	delete iEnv;
     }
-    delete iEnv;
 }
 
 
