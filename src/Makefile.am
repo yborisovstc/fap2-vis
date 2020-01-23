@@ -20,6 +20,8 @@ libfap2vis_la_SOURCES = \
 		       plugin.cpp \
 		       mdlvis.h \
 		       mdlvis.cpp \
+		       widget.h \
+		       widget.cpp \
 		       visrepr.h \
 		       visrepr.cpp \
 		       visprov.cpp

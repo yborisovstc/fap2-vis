@@ -1,5 +1,5 @@
-#ifndef __FAP2VIS_WIDGET_H
-#define __FAP2VIS_WIDGET_H
+#ifndef __FAP2VIS_ENV_H
+#define __FAP2VIS_ENV_H
 
 #include <unit.h>
 #include <syst.h>

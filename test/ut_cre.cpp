@@ -34,7 +34,7 @@ private:
 CPPUNIT_TEST_SUITE_REGISTRATION( Ut_cre );
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION(Ut_cre, "Ut_cre");
 
-MDesSyncable* sSync;
+static MDesSyncable* sSync;
 
 void Ut_cre::setUp()
 {
@@ -46,7 +46,7 @@ void Ut_cre::tearDown()
     CPPUNIT_ASSERT_EQUAL_MESSAGE("tearDown", 0, 0);
 }
 
-bool Utcre_OnIdle(void* aData)
+static bool Utcre_OnIdle(void* aData)
 {
     MDesSyncable* sync = (MDesSyncable*) aData;
     // Tick
@@ -61,7 +61,7 @@ bool Utcre_OnIdle(void* aData)
 }
 
 
-void OnIdle(void)
+static void OnIdle(void)
 {
     if (sSync != NULL) {
 	if (sSync->IsActive()) {

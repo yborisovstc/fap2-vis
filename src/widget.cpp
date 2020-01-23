@@ -1,7 +1,8 @@
 
+
 #include <rdata.h>
 
-#include "sce_rect.h"
+#include "widget.h"
 
 #include "deps/linmath.h" // Ref https://github.com/glfw/glfw/tree/master/deps
 
@@ -40,23 +41,24 @@ static const char* fragment_shader_text =
 static GLuint vertex_buffer, vertex_shader, fragment_shader;
 static GLint mMvpLocation, vpos_location, vcol_location;
 
-ASceRect::ASceRect(const string& aName, MUnit* aMan, MEnv* aEnv): AScElem(aName, aMan, aEnv)
+AVWidget::AVWidget(const string& aName, MUnit* aMan, MEnv* aEnv): ADes(aName, aMan, aEnv)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
 }
 
-string ASceRect::PEType()
+string AVWidget::PEType()
 {
-    return AScElem::PEType() + GUri::KParentSep + Type();
+    return ADes::PEType() + GUri::KParentSep + Type();
 }
 
-void ASceRect::Update()
+void AVWidget::Update()
 {
+    Logger()->Write(EInfo, this, "Update");
     if (!mIsInitialised) {
 	Init();
 	mIsInitialised = true;
     } else {
-	AScElem::Update();
+	ADes::Update();
     }
 }
 
@@ -71,39 +73,8 @@ static void CheckGlErrors()
     }
 }
 
-void ASceRect::Render()
+void AVWidget::Render()
 {
-#if 0
-    float ratio;
-    int width = 640, height = 480;
-    mat4x4 m, p, mvp;
-    //glfwGetFramebufferSize(window, &width, &height);
-    ratio = width / (float) height;
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT);
-    mat4x4_identity(m);
-    mat4x4_rotate_Z(m, m, (float) glfwGetTime());
-    mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-    mat4x4_mul(mvp, p, m);
-    CheckGlErrors();
-    if ( glIsProgram( mProgram ) != GL_TRUE ){
-	// Re-create the program
-	mProgram = glCreateProgram();
-	glAttachShader(mProgram, vertex_shader);
-	glAttachShader(mProgram, fragment_shader);
-	glLinkProgram(mProgram);
-	CheckGlErrors();
-    }
-    glUseProgram(mProgram);
-    CheckGlErrors();
-    glUniformMatrix4fv(mMvpLocation, 1, GL_FALSE, (const GLfloat*) mvp);
-    CheckGlErrors();
-    glDrawArrays(GL_TRIANGLES, 0, 3);
-    CheckGlErrors();
-    glFlush();
-
-#endif
-
     MUnit* host = GetMan();
     MUnit* wu = host->GetNode("./Width");
     MDVarGet* wvg = wu->GetObj(wvg);
@@ -136,9 +107,8 @@ void ASceRect::Render()
     glFlush();
 }
 
-void ASceRect::Init()
+void AVWidget::Init()
 {
-
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);

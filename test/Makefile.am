@@ -4,6 +4,7 @@ AM_CPPFLAGS = -D_PLAT_LINUX_ -g -O0
 
 ut_fap2vis_lib_SOURCES = \
 		       ut_main.cpp \
+		       ut_wdg.cpp \
 		       ut_cre.cpp
 
 ut_fap2vis_lib_LDFLAGS=-L../src/.libs/ -lfap2vis -lgrayb  -lcppunit -lrt
