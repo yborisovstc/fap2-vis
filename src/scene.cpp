@@ -44,7 +44,7 @@ void AGtScene::RenderScene(void)
     MUnit* host = GetMan();
     for (int ind = 0; ind < host->CompsCount(); ind++) {
 	MUnit* comp = host->GetComp(ind);
-	MSceneElem* mse = (MSceneElem*) comp->GetSIfi(MSceneElem::Type(), this);
+	MSceneElem* mse = (MSceneElem*) comp->GetSIfi(MSceneElem::Type());
 	if (mse != NULL) {
 	    mse->Render();
 	}
