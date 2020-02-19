@@ -1,44 +1,23 @@
 #ifndef __FAP2VIS_MWIDGET_H
 #define __FAP2VIS_MWIDGET_H
 
-#include <gdk/gdk.h>
 
-class MGEventHandler
+#include <miface.h>
+
+/** @brief Container component
+ * Represents container component in connection to container slot
+ *
+ * */
+class MVCcomp: public MIface
 {
     public:
-	static const char* Type() { return "MGEventHandler";};
-	virtual void OnEvent(GdkEvent* event) = 0;
-};
-
-class MElem;
-
-class MGWidget
-{
-    public:
-	typedef enum {
-	    EWs_Normal = 1,
-	    EWs_Active,
-	    EWs_Prelight,
-	    EWs_Selected,
-	    EWs_Insensitive
-	} TState;
-    public:
-	static const char* Type() { return "MGWidget";};
-	virtual MElem* GetLayoutHint() const = 0;
-};
-
-class MGWidgetOwner
-{
-    public:
-	static const char* Type() { return "MGWidgetOwner";};
-	virtual GdkWindow* GetWindow() = 0;
-};
-
-class MGWidgetComp
-{
-    public:
-	static const char* Type() { return "MGWidgetComp";};
-	virtual void OnGdkEvent(GdkEvent* event) = 0;
+	static const char* Type() { return "MVCcomp";};
+	//virtual MUnit* IfProv() = 0;
+	// From MIface
+	virtual MIface* MVisRepr_Call(const string& aSpec, string& aRes) { return NULL;}
+	virtual string MVisRepr_Mid() const {return "?";}
+	MIface* Call(const string& aSpec, string& aRes) override {return MVisRepr_Call(aSpec, aRes);}
+	string Mid() const override { return MVisRepr_Mid();}
 };
 
 #endif

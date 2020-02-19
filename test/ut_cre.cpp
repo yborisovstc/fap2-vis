@@ -96,6 +96,10 @@ void Ut_cre::test_CreWnd()
 	MVisEnv* mvisenv = visenv->GetObj(mvisenv);
 	CPPUNIT_ASSERT_MESSAGE("Fail to get env agent", mvisenv != 0);
 
+	// Solid width output
+	MUnit* sld_wo = root->GetNode("/testroot/Test/Model/Solid/WidthCp/Int");
+	CPPUNIT_ASSERT_MESSAGE("Fail to get sld_wo ", sld_wo != NULL);
+
 	// Sync the state
 	MUnit* esync = root->GetNode("./Test/Capsule/Sync");
 	CPPUNIT_ASSERT_MESSAGE("Fail to get input for Syncable iface", esync != 0);

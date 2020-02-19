@@ -8,19 +8,30 @@ FvWidgets : Elem
         $ + /DesComps/StcInpExt;
         $ + /DesComps/StcOutExt;
     }
-    FWidget : Syst
+    FWidgetBase : Syst
     {
         $ # " Widget base";
-        WdgAgent : AVWidget;
         $ # " Allocation";
         AlcX : AStatec;
+        AlcX < {
+            Debug.Update = y;
+            Value = "SI 10";
+        }
         AlcY : AStatec;
+        AlcY < {
+            Debug.Update = y;
+            Value = "SI 10";
+        }
         AlcW : AStatec;
         AlcW < {
             Debug.Update = y;
             Value = "SI 37";
         }
         AlcH : AStatec;
+        AlcH < {
+            Debug.Update = y;
+            Value = "SI 60";
+        }
         $ # " Requisition";
         RqsW : AStatec;
         RqsH : AStatec;
@@ -31,12 +42,19 @@ FvWidgets : Elem
         InpAlcW : /*/Modules/DesComps/StcInpExt;
         InpAlcH : /*/Modules/DesComps/StcInpExt;
         $ # " Outputs";
-        OutRqsW : /*/Modules/DesComps/StcInpExt;
-        OutRqsH : /*/Modules/DesComps/StcInpExt;
+        OutRqsW : /*/Modules/DesComps/StcOutExt;
+        OutRqsH : /*/Modules/DesComps/StcOutExt;
         $ # " Connections";
         ./InpAlcX/Int ~ ./AlcX/Inp;
         ./InpAlcY/Int ~ ./AlcY/Inp;
         ./InpAlcW/Int ~ ./AlcW/Inp;
         ./InpAlcH/Int ~ ./AlcH/Inp;
+        RqsW ~ ./OutRqsW/Int;
+        RqsH ~ ./OutRqsH/Int;
+    }
+    FWidget : FWidgetBase
+    {
+        $ # " Widget";
+        WdgAgent : AVWidget;
     }
 }

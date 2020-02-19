@@ -1,6 +1,6 @@
 testroot : Elem
 {
-    $ # "Unit test of Widget base agent";
+    $ # "Unit test of Container base agent";
     Modules : AImports
     {
         $ + /SysComps;
@@ -13,6 +13,7 @@ testroot : Elem
         $ + /GVisComps/Scene;
         $ + /GVisComps/SceRect;
         $ + /FvWidgets/FWidget;
+        $ + /ContainerMdl/HLayout;
     }
     Comps : Elem;
     Test : /testroot/Modules/DesComps/Des
@@ -29,9 +30,28 @@ testroot : Elem
                 Scene : /testroot/Modules/GVisComps/Scene
                 {
                     $ # "Visualisation scene";
-                    Wdg1 : /*/Modules/FvWidgets/FWidget
+                    Cnt1 : /*/Modules/ContainerMdl/HLayout
                     {
-                        BgColor = "{R:'0.0' G:'1.0' B:'0.0'}";
+                        AlcW < Value = "SI 220";
+                        AlcH < Value = "SI 330";
+                        Slot_1 < Wdg1 : /*/Modules/FvWidgets/FWidget
+                        {
+                            BgColor = "{R:'0.0' G:'1.0' B:'0.0'}";
+                            ./RqsW < {
+                                Debug.Update = y;
+                                Value = "SI 22";
+                            }
+                            ./RqsH < {
+                                Debug.Update = y;
+                                Value = "SI 43";
+                            }
+                            W1IncrW : ATrcAddVar;
+                            W1IncrData : AStatec;
+                            W1IncrData < Value = "SI 1";
+                            W1IncrData ~ ./W1IncrW/Inp;
+                            ./W1IncrW/Out ~ ./RqsW/Inp;
+                            ./RqsW ~ ./W1IncrW/Inp;
+                        }
                     }
                 }
             }
@@ -66,7 +86,7 @@ testroot : Elem
         IncrData ~ ./IncrH/Inp;
         ./IncrH/Out ~ ./WdgHeight/Inp;
         WdgHeight ~ ./IncrH/Inp;
-        WdgWidth ~ ./Env/Window/Scene/Wdg1/InpAlcW;
-        WdgHeight ~ ./Env/Window/Scene/Wdg1/InpAlcH;
+        $ # "WdgWidth ~ ./Env/Window/Scene/Cnt1/InpAlcW";
+        $ # "WdgHeight ~ ./Env/Window/Scene/Cnt1/InpAlcH";
     }
 }

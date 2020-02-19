@@ -1,5 +1,6 @@
 
 
+#include <iostream> 
 #include <rdata.h>
 
 #include "widget.h"
@@ -37,6 +38,11 @@ static const char* fragment_shader_text =
 "    gl_FragColor = vec4(color, 1.0);\n"
 "}\n";
 
+const string KCnt_BgColor = "BgColor";
+const string KCnt_Color_R = "R";
+const string KCnt_Color_G = "G";
+const string KCnt_Color_B = "B";
+const string KCnt_Color_A = "A";
 
 static GLuint vertex_buffer, vertex_shader, fragment_shader;
 static GLint mMvpLocation, vpos_location, vcol_location;
@@ -51,15 +57,27 @@ string AVWidget::PEType()
     return ADes::PEType() + GUri::KParentSep + Type();
 }
 
+MIface* AVWidget::DoGetObj(const char *aName)
+{
+    MIface* res = NULL;
+    if (strcmp(aName, MSceneElem::Type()) == 0) {
+	res = dynamic_cast<MSceneElem*>(this);
+    } else if (strcmp(aName, MACompsObserver::Type()) == 0) {
+	res = dynamic_cast<MACompsObserver*>(this);
+    } else {
+	res = ADes::DoGetObj(aName);
+    }
+    return res;
+}
+
 void AVWidget::Update()
 {
     Logger()->Write(EInfo, this, "Update");
     if (!mIsInitialised) {
 	Init();
 	mIsInitialised = true;
-    } else {
-	ADes::Update();
     }
+    ADes::Update();
 }
 
 static void CheckGlErrors()
@@ -73,38 +91,49 @@ static void CheckGlErrors()
     }
 }
 
+int AVWidget::GetParInt(const string& aUri)
+{
+    int res = 0;
+    MUnit* host = GetMan();
+    MUnit* pu = host->GetNode(aUri);
+    MDVarGet* pvg = pu->GetObj(pvg);
+    MDtGet<Sdata<int>>* psi = pvg->GetDObj(psi);
+    Sdata<int> pi = 0;
+    psi->DtGet(pi);
+    return pi.mData;
+}
+
 void AVWidget::Render()
 {
-    MUnit* host = GetMan();
-    MUnit* wu = host->GetNode("./Width");
-    MDVarGet* wvg = wu->GetObj(wvg);
-    MDtGet<Sdata<int>>* wsi = wvg->GetDObj(wsi);
-    Sdata<int> wi = 0;
-    wsi->DtGet(wi);
+    int xi = GetParInt("./AlcX");
+    int yi = GetParInt("./AlcY");
+    int wi = GetParInt("./AlcW");
+    int hi = GetParInt("./AlcH");
 
-    MUnit* hu = host->GetNode("./Height");
-    MDVarGet* hvg = hu->GetObj(wvg);
-    MDtGet<Sdata<int>>* hsi = hvg->GetDObj(wsi);
-    Sdata<int> hi = 0;
-    hsi->DtGet(hi);
+    // Get viewport parameters
+    GLint viewport[4];
+    glGetIntegerv( GL_VIEWPORT, viewport );
+    int vp_width = viewport[2], vp_height = viewport[3];
 
-    int width = 640, height = 480;
+    float xc = (float) xi;
+    float yc = (float) yi;
+    float wc = (float) wi;
+    float hc = (float) hi;
 
-    float wc = 0.5*(wi.mData)/width;
-    float hc = 0.5*(hi.mData)/height;
-
-    glViewport(0, 0, width, height);
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(1.0, 1.0, 1.0);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
     glBegin(GL_POLYGON);
-    glVertex2f(-wc, -hc);
-    glVertex2f(-wc, hc);
-    glVertex2f(wc, hc);
-    glVertex2f(wc, -hc);
+    glVertex2f(xc, yc);
+    glVertex2f(xc, yc + hc);
+    glVertex2f(xc + wc, yc + hc);
+    glVertex2f(xc + wc, yc);
     glEnd();
     glFlush();
+    CheckGlErrors();
 }
 
 void AVWidget::Init()
@@ -139,3 +168,54 @@ void AVWidget::Init()
 	    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
 }
 
+TBool AVWidget::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+{
+    TBool res = ETrue;
+
+    if (&aComp == GetMan()) {
+	string val = aComp.GetContent(aContName);
+	if (aContName == ContentCompId(KCnt_BgColor, KCnt_Color_R)) {
+	    mBgColor.r = stof(val);
+	} else if (aContName == ContentCompId(KCnt_BgColor, KCnt_Color_G)) {
+	    mBgColor.g = stof(val);
+	} else if (aContName == ContentCompId(KCnt_BgColor, KCnt_Color_B)) {
+	    mBgColor.b = stof(val);
+	}
+    }
+    return res;
+}
+
+void AVWidget::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
+{
+    MUnit* host = iMan;
+    bool done = false;
+#if 0
+    if ((aCtx.size()) > 1 && aName == MDesInpObserver::Type()) {
+	MUnit* rq = aCtx.at(aCtx.size() - 2);
+	if (host->IsComp(rq)) {
+	    // Request for DES observer from internal states
+	    // Redirect to container slot if it is connected
+	    TIfRange rr;
+	    TICacheRCtx ctx(aCtx); ctx.push_back(this);
+	    MVert* hostv = host->GetObj(hostv);
+	    __ASSERT(hostv != NULL);
+	    if (hostv->PairsCount() == 1) {
+		MVert* slotv = hostv->GetPair(0);
+		__ASSERT(slotv != NULL);
+		MUnit* slotu = (MUnit*) hostv->MVert_DoGetObj(MUnit::Type());
+		__ASSERT(slotu != NULL);
+		rr = slotu->GetIfi(aName, ctx);
+		InsertIfCache(aName, aCtx, slotu, rr);
+		done = true;
+	    } else if (hostv->PairsCount() == 0) {
+		Logger()->Write(EErr, this, "Widget is not connected to slot");
+	    } else {
+		Logger()->Write(EErr, this, "Widget has multiple connections");
+	    }
+	}
+    }
+#endif
+    if (!done) {
+	ADes::UpdateIfi(aName, aCtx);
+    }
+}

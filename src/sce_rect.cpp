@@ -52,11 +52,10 @@ string ASceRect::PEType()
 
 void ASceRect::Update()
 {
+    AScElem::Update();
     if (!mIsInitialised) {
 	Init();
 	mIsInitialised = true;
-    } else {
-	AScElem::Update();
     }
 }
 

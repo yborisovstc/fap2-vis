@@ -18,9 +18,9 @@ GVisComps : Elem
     Inp_H : CpStatecInp;
     Inp_Title : CpStatecInp;
     Width : AStatec;
-    ./Width - Value = "SI 0";
+    ./Width - Value = "SI 640";
     Heigth : AStatec;
-    ./Heigth - Value = "SI 0";
+    ./Heigth - Value = "SI 480";
   }
   Scene : Syst
   {

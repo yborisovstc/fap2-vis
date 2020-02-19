@@ -126,7 +126,21 @@ void AGWindow::Construct()
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    mWindow = glfwCreateWindow(640, 480, "My Title", NULL, NULL);
+    MUnit* host = GetMan();
+
+    MUnit* wu = host->GetNode("./Width");
+    MDVarGet* wvg = wu->GetObj(wvg);
+    MDtGet<Sdata<int>>* wsi = wvg->GetDObj(wsi);
+    Sdata<int> wi = 0;
+    wsi->DtGet(wi);
+
+    MUnit* hu = host->GetNode("./Heigth");
+    MDVarGet* hvg = hu->GetObj(wvg);
+    MDtGet<Sdata<int>>* hsi = hvg->GetDObj(wsi);
+    Sdata<int> hi = 0;
+    hsi->DtGet(hi);
+
+    mWindow = glfwCreateWindow(wi.mData, hi.mData, "My Title", NULL, NULL);
     if (!mWindow)
     {
 	// Window or context creation failed
@@ -137,6 +151,8 @@ void AGWindow::Construct()
 	glewInit();
 	// Register the window instance
 	RegisterInstance(this);
+	// Set viewport
+	glViewport(0, 0, wi.mData, hi.mData);
     }
 }
 

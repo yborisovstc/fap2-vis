@@ -38,7 +38,41 @@
 		    </para></glossdef> </glossentry>
     </glossary>
 
-    <sect1 id="ds_vdgs"><title>Vidget system</title>
+    <sect1 id="ds_wdgs"><title>Widget system</title>
+	<sect2 id="ds_wdgs_cnt"><title>Containter</title>
+	    <sect3><title>How to associate owned widgets with slots?</title>
+		<sect4><title>Intro</title>
+		    <simpara>Each type of container possesses it's ownt structure of owned widgets. We can consider the placeholder in this 
+			structure as container's slot. To arrange the owned widget the container needs to know which slot is assosiated with this
+			particular widget. Slot is specified by the set of paremeters: ordering, padding, etc.</simpara>
+		    <simpara>There is a number of approaches of assosiation the widgets to slots. Some of them are:</simpara>
+		    <itemizedlist>
+			<listitem>Don't explicitly specify slots, specifying slot is with widget itself
+			    <simpara>To include slot id into widget name or content</simpara>
+			    <simpara>The cons are that replacing of the widget breaks the layout - we need to specify the slot parameters again.</simpara>
+			</listitem>
+			<listitem>Don't explicitly specify slots, use slot connections to setup slots ordering</listitem>
+			<listitem>Specify slots explicitly, embed widget to the slot
+			    <simpara>Pros: <xref linkend="gls_irm"/> can be simply supported</simpara>
+			    <simpara>Cons: extra components in the containter.</simpara>
+			</listitem>
+			<listitem>Specify slots explicitly, connect widget to the slot
+			    <simpara>Pros: simple re-configuration</simpara>
+			    <simpara>Cons: <xref linkend="gls_irm"/> routing customization is complicate </simpara>
+			</listitem>
+		    </itemizedlist>
+		</sect4>
+	    </sect3>
+	    <sect3><title>How to establish <xref linkend="gls_irm"/> net.</title>
+		<sect4><title>Intro</title>
+		    <simpara>There is a lot of binding via ifaces between container's compositor and widgets. At least the biniding for 
+			base widgets states is required: requisition and allocation. To support the routing we can use custom routing in the following nodes:
+			container agent, slot, widget. However this routing require analysis of native hier structure in many cases.</simpara>
+		    <simpara>One of simplistic solution can be using helper interfaces for container agent and widget. These ifaces just to help
+			routing, they just need to provide primary ifaces.</simpara>
+		</sect4>
+	    </sect3>
+	</sect2>
     </sect1>
 
     <sect1 id="ds_tohandle"><title>Traceability: To handle</title>

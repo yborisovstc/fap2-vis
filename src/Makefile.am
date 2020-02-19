@@ -8,6 +8,7 @@ lib_LTLIBRARIES = libfap2vis.la
 
 libfap2vis_la_SOURCES = \
 		       mwidget.h \
+		       mcontainer.h \
 		       visenv.h \
 		       visenv.cpp \
 		       scene.h \
@@ -22,6 +23,8 @@ libfap2vis_la_SOURCES = \
 		       mdlvis.cpp \
 		       widget.h \
 		       widget.cpp \
+		       container.h \
+		       container.cpp \
 		       visrepr.h \
 		       visrepr.cpp \
 		       visprov.cpp

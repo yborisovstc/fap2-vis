@@ -1,6 +1,9 @@
 #ifndef __FAP2VIS_WIDGET_H
 #define __FAP2VIS_WIDGET_H
 
+#include "mwidget.h"
+
+#include <array>
 #include <des.h>
 
 #include <mscel.h>
@@ -14,23 +17,32 @@
  *
  * */
 // TODO Use unit based DES agent as a base
-class AVWidget : public ADes, public MSceneElem
+class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 {
+    public:
+	using TColor = struct {float r, g, b, a;};
     public:
 	static const char* Type() { return "AVWidget";};
 	static string PEType();
 	AVWidget(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
-	// From AScElem
+	virtual MIface* DoGetObj(const char *aName) override;
+	// From MACompsObserver
+	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
+	// From MSceneElem
 	virtual void Render() override;
-	// From MDesSyncable
+	// From MUnit
+	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
     public:
 	virtual void Update();
     protected:
 	virtual void Init();
     protected:
+	int GetParInt(const string& aUri);
+    protected:
 	bool mIsInitialised = false;
 	GLuint mProgram;
 	GLint mMvpLocation;
+	TColor mBgColor;
 };
 
 #endif // __FAP2VIS_WIDGET_H
