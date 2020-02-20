@@ -110,6 +110,9 @@ void AVWidget::Render()
     int wi = GetParInt("./AlcW");
     int hi = GetParInt("./AlcH");
 
+    if (iMan->Name() == "Wdg1") {
+	Logger()->Write(EInfo, this, "Render");
+    }
     // Get viewport parameters
     GLint viewport[4];
     glGetIntegerv( GL_VIEWPORT, viewport );
@@ -120,8 +123,8 @@ void AVWidget::Render()
     float wc = (float) wi;
     float hc = (float) hi;
 
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    //glClearColor(0.0, 0.0, 0.0, 0.0); // Don't clear window
+    //glClear(GL_COLOR_BUFFER_BIT);
     glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -132,6 +135,7 @@ void AVWidget::Render()
     glVertex2f(xc + wc, yc + hc);
     glVertex2f(xc + wc, yc);
     glEnd();
+
     glFlush();
     CheckGlErrors();
 }

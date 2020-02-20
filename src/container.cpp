@@ -62,6 +62,7 @@ string AVCpsCp::PEType()
     return Unit::PEType() + GUri::KParentSep + Type();
 }
 
+// TODO Why we need separate instance for each widget input? To have just one CP for all inputs
 void AVCpsCp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 {
     MUnit* host = iMan;
@@ -296,6 +297,7 @@ void AVContainer::WidgetAp::WdgPap::DtGet(Sdata<int>& aData)
 
 // Horizontal layout
 
+const string KSlot_Name = "Slot";
 const string KSlot_1_Name = "Slot_1";
 
 AVHLayout::AVHLayout(const string& aName, MUnit* aMan, MEnv* aEnv): AVContainer(aName, aMan, aEnv)
@@ -340,6 +342,20 @@ TBool AVHLayout::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& 
     return res;
 }
 
+/** @brief Notifies widgets of inp updated
+ * param[inp] aOutUri container "output" assosiated to widget input
+ * */
+void AVHLayout::NotifyWidgetOnInpUpdated(const string& aOutUri)
+{
+    MUnit* alcOut = GetNode(aOutUri);
+    __ASSERT(alcOut != NULL);
+    TIfRange rr = alcOut->GetIfi(MDesInpObserver::Type(), this);
+    for (auto it = rr.first; it != rr.second; it++) {
+	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
+	mobs->OnInpUpdated();
+    }
+}
+
 void AVHLayout::OnInpUpdated()
 {
     Logger()->Write(EInfo, this, "OnUpdated");
@@ -358,6 +374,7 @@ void AVHLayout::OnInpUpdated()
 	}
     }
     // Propagate update notification to inp observers
+    /*
     MUnit* alcWOut = GetNode("./AlcWOut");
     __ASSERT(alcWOut != NULL);
     rr = alcWOut->GetIfi(MDesInpObserver::Type(), this);
@@ -365,17 +382,44 @@ void AVHLayout::OnInpUpdated()
 	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
 	mobs->OnInpUpdated();
     }
+    */
+    NotifyWidgetOnInpUpdated("./AlcWOut");
+    NotifyWidgetOnInpUpdated("./AlcHOut");
+    NotifyWidgetOnInpUpdated("./AlcXOut");
+    NotifyWidgetOnInpUpdated("./AlcYOut");
 }
 
 int AVHLayout::GetComposedData(const string& aSlotName, TWdgPar aPar)
 {
     int res = 0;
     if (aPar == E_AlcX) {
+	int cid = GetSlotId(aSlotName);
+	if (cid > 1) {
+	    int pid = cid - 1;
+	    string psn = GetSlotName(pid);
+	    int x = GetComposedData(psn, E_AlcX);
+	    int w = GetComposedData(psn, E_AlcW);
+	    res = x + w + 1;
+	}
     } else if (aPar == E_AlcY) {
     } else if (aPar == E_AlcW) {
-	res = GetRqs(KSlot_1_Name, true);
+	res = GetRqs(aSlotName, true);
     } else if (aPar == E_AlcH) {
-	res = GetRqs(KSlot_1_Name, false);
+	res = GetRqs(aSlotName, false);
     }
     return res;
+}
+
+int AVHLayout::GetSlotId(const string& aSlotName) const
+{
+    int res = -1;
+    size_t sp = aSlotName.find_last_of('_');
+    string id = aSlotName.substr(sp + 1);
+    res = stoi(id);
+    return res;
+}
+
+string AVHLayout::GetSlotName(int aSlotId) const
+{
+    return KSlot_Name + "_" + to_string(aSlotId);
 }

@@ -23,6 +23,12 @@ ContainerMdl : Elem
             RqsWInp < WcpName = OutRqsW;
             AlcWOut : AVCpsCp;
             AlcWOut < WcpName = InpAlcW;
+            AlcHOut : AVCpsCp;
+            AlcHOut < WcpName = InpAlcH;
+            AlcXOut : AVCpsCp;
+            AlcXOut < WcpName = InpAlcX;
+            AlcYOut : AVCpsCp;
+            AlcYOut < WcpName = InpAlcY;
         }
         Slot_1 : AVSlot;
         Slot_2 : AVSlot;
