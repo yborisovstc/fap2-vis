@@ -1,4 +1,9 @@
 
+
+#include <GL/glew.h>
+#include <GL/gl.h>
+#include <GLFW/glfw3.h>
+
 #include "scene.h"
 #include "mscel.h"
 
@@ -41,6 +46,9 @@ void AGtScene::RenderScene(void)
     }
     */
 
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     MUnit* host = GetMan();
     for (int ind = 0; ind < host->CompsCount(); ind++) {
 	MUnit* comp = host->GetComp(ind);
@@ -49,6 +57,7 @@ void AGtScene::RenderScene(void)
 	    mse->Render();
 	}
     }
+    glFlush();
 }
 
 void AGtScene::Update()
@@ -56,4 +65,7 @@ void AGtScene::Update()
     ADes::Update();
 }
 
+void AGtScene::onCursorPosition(double aX, double aY)
+{
+}
 

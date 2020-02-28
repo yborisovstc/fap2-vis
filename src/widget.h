@@ -30,14 +30,16 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
 	// From MSceneElem
 	virtual void Render() override;
+	virtual void onSeCursorPosition(double aX, double aY) override;
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
-    public:
+	// From MDesSyncable
 	virtual void Update();
     protected:
 	virtual void Init();
     protected:
 	int GetParInt(const string& aUri);
+	static void CheckGlErrors();
     protected:
 	bool mIsInitialised = false;
 	GLuint mProgram;

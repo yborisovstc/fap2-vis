@@ -23,6 +23,7 @@ class AGtScene: public ADes, public MScene
 	virtual MIface *DoGetObj(const char *aName) override;
 	// From MScene
 	virtual void RenderScene(void) override;
+	virtual void onCursorPosition(double aX, double aY) override;
     public:
 	virtual void Update();
     protected:

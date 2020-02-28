@@ -21,7 +21,7 @@ Makefile
 *.so.*
 *~
 tmp
-*.log
+*.log*
 *.gcov
 *.gcda
 *.gcno

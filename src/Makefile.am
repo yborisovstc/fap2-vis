@@ -25,6 +25,10 @@ libfap2vis_la_SOURCES = \
 		       widget.cpp \
 		       container.h \
 		       container.cpp \
+		       label.h \
+		       label.cpp \
+		       agentvr.h \
+		       agentvr.cpp \
 		       visrepr.h \
 		       visrepr.cpp \
 		       visprov.cpp

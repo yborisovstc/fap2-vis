@@ -80,7 +80,7 @@ void AVWidget::Update()
     ADes::Update();
 }
 
-static void CheckGlErrors()
+void AVWidget::CheckGlErrors()
 {
     // check for errors
     const GLenum errCode = glGetError();
@@ -222,4 +222,8 @@ void AVWidget::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
     if (!done) {
 	ADes::UpdateIfi(aName, aCtx);
     }
+}
+
+void AVWidget::onSeCursorPosition(double aX, double aY)
+{
 }

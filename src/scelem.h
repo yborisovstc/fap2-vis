@@ -21,6 +21,7 @@ class AScElem: public ADes, public MSceneElem
 	virtual MIface *DoGetObj(const char *aName) override;
 	// From AScElem
 	virtual void Render() override {}
+	virtual void onSeCursorPosition(double aX, double aY) override;
 	// From MDesSyncable
     public:
 	virtual void Update();

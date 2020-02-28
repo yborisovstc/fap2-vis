@@ -57,4 +57,14 @@ FvWidgets : Elem
         $ # " Widget";
         WdgAgent : AVWidget;
     }
+    FLabel : FWidgetBase
+    {
+        $ # " Label";
+        WdgAgent : AVLabel;
+    }
+    FUnitCrp : FWidgetBase
+    {
+        $ # " Unit visual repesentation";
+        WdgAgent : AUnitCrp;
+    }
 }

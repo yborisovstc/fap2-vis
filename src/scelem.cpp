@@ -28,3 +28,6 @@ MIface *AScElem::DoGetObj(const char *aName)
     return res;
 }
 
+void AScElem::onSeCursorPosition(double aX, double aY)
+{
+}

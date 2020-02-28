@@ -1,7 +1,6 @@
-Pos: 0 -- Wrong context type
-ContainerMdl : Elem
+AvrMdl : Elem
 {
-    About = "FAP2 widget visualization system";
+    About = "Agents visual representations";
     Modules : AImports
     {
         $ + /SysComps;
@@ -9,15 +8,12 @@ ContainerMdl : Elem
         $ + /DesComps/StcInpExt;
         $ + /DesComps/StcOutExt;
         $ + /FvWidgets/FWidgetBase;
+        $ + /ContainerMdl/FContainer;
     }
-    FContainer : /*/Modules/FvWidgets/FWidgetBase
+    UnitDrp : /*/Modules/ContainerMdl/FContainer
     {
-        $ # " Container base";
-    }
-    HLayout : FContainer
-    {
-        $ # " Horisontal layout Container";
-        CntAgent : AVHLayout;
+        $ # " Unit detail representation";
+        CntAgent : AUnitDrp;
         CntAgent < {
             RqsWInp : AVCpsCp;
             RqsWInp < WcpName = OutRqsW;

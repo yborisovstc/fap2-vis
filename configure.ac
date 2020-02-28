@@ -38,6 +38,23 @@ AC_SUBST(GLEW_CFLAGS)
 AC_SUBST(GLEW_LIBS)
 
 
+PKG_CHECK_MODULES(FREETYPE2, [freetype2 >= 17.1.11], , [
+    AC_MSG_ERROR([You must have 'freetype2' dev headers (libfreetype6-dev) installed
+    ]) ])
+
+AC_SUBST(FREETYPE2_CFLAGS)
+AC_SUBST(FREETYPE2_LIBS)
+
+
+PKG_CHECK_MODULES(FTGL, [ftgl >= 2.1.3], , [
+    AC_MSG_ERROR([You must have 'ftgl' dev headers (libftgl-dev) installed
+    ]) ])
+
+AC_SUBST(FTGL_CFLAGS)
+AC_SUBST(FTGL_LIBS)
+
+
+
 
 # libgl1-mesa-dev package doesn't include pc file so cannot be processed by pkg check
 #PKG_CHECK_MODULES(GL1MESA, [libgl1-mesa-dev >= 10.1.3], , [
@@ -76,8 +93,8 @@ else
 fi
 
 
-CXXFLAGS="$CXXFLAGS $FAPWS2_CFLAGS $GLFW_CFLAGS  $GL1MESA_CFLAGS  $GLEW_CFLAGS" 
-LDFLAGS="$LDFLAGS $FAP2WS_LIBS $GLFW_LIBS $GL1MESA_LIBS $GLEW_LIBS"
+CXXFLAGS="$CXXFLAGS $FAPWS2_CFLAGS $GLFW_CFLAGS  $GL1MESA_CFLAGS  $GLEW_CFLAGS $FREETYPE2_CFLAGS $FTGL_CFLAGS" 
+LDFLAGS="$LDFLAGS $FAP2WS_LIBS $GLFW_LIBS $GL1MESA_LIBS $GLEW_LIBS $FREETYPE2_LIBS $FTGL_LIBS"
 
 AC_CONFIG_FILES([fap2vis.pc])
 

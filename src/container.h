@@ -85,6 +85,7 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
 	// From MSceneElem
 	virtual void Render() override;
+	virtual void onSeCursorPosition(double aX, double aY) override;
 	// From MDesInpObserver
 	virtual void OnInpUpdated() override {}
 	virtual MIface* MDesInpObserver_Call(const string& aSpec, string& aRes) override;
@@ -105,6 +106,7 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	TWAps mWap; /**< Widget access points */
 	TWDvgProv mRqsW; /**< Widget Width Requisition MDVarGet providers  */
 	TWDvgProv mRqsH; /**< Widget Hight Requisition MDVarGet providers  */
+	int mPadding = 0; /*!< Slot padding */
 };
 
 /** @brief Container's slot
@@ -159,7 +161,6 @@ class AVHLayout: public AVContainer
 	virtual void Update();
     protected:
 	virtual void Init();
-
 };
 
 #endif // __FAP2VIS_CONTAITER_H

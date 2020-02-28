@@ -9,6 +9,10 @@ class MScene: public MIface
     public:
 	static const char* Type() { return "MScene";};
 	virtual void RenderScene(void) = 0;
+	/** @brief Cursor position handler
+	 * @param aX, aY  cursor pos in window coordinates
+	 * */
+	virtual void onCursorPosition(double aX, double aY) = 0;
 	// From MIface
 	virtual MIface* MScene_Call(const string& aSpec, string& aRes) { return NULL;}
 	virtual string MScene_Mid() const {return "?";}

@@ -1,3 +1,6 @@
+
+#include <iostream>
+
 #include "visenv.h"
 #include <mdata.h>
 #include <iostream>
@@ -141,18 +144,22 @@ void AGWindow::Construct()
     hsi->DtGet(hi);
 
     mWindow = glfwCreateWindow(wi.mData, hi.mData, "My Title", NULL, NULL);
-    if (!mWindow)
-    {
-	// Window or context creation failed
-    } else {
+    if (mWindow != NULL) {
+	glfwSetWindowUserPointer(mWindow, this);
+	glfwSetWindowCloseCallback(mWindow, onWindowClosed);
+	glfwSetCursorPosCallback(mWindow, onCursorPosition);
 	glfwMakeContextCurrent(mWindow);
 	//gladLoadGL(glfwGetProcAddress);
-	glfwSwapInterval(1);
+	// TODO  YB!! This interval affects window refreshing. With value 1 the unitvr frame is rendered only partially
+	// To investigate
+	glfwSwapInterval(2); //YB!!
 	glewInit();
 	// Register the window instance
 	RegisterInstance(this);
 	// Set viewport
 	glViewport(0, 0, wi.mData, hi.mData);
+    } else {
+	// Window or context creation failed
     }
 }
 
@@ -194,6 +201,43 @@ void AGWindow::onWindowSizeChanged (GLFWwindow *aWnd, int aW, int aH)
 		width->DtSet(aW);
 	    }
 	}
+    }
+}
+
+void AGWindow::onWindowClosed(GLFWwindow *aWnd)
+{
+    AGWindow* wnd = reinterpret_cast<AGWindow*>(glfwGetWindowUserPointer(aWnd));
+    if (wnd != NULL) {
+	wnd->onWindowClosed();
+    }
+}
+
+void AGWindow::onCursorPosition(GLFWwindow *aWnd, double aX, double aY)
+{
+    AGWindow* wnd = reinterpret_cast<AGWindow*>(glfwGetWindowUserPointer(aWnd));
+    if (wnd != NULL) {
+	wnd->onCursorPosition(aX, aY);
+    }
+}
+
+void AGWindow::onWindowClosed()
+{
+    // Notify of closing
+    OnError(this);
+}
+
+void AGWindow::onCursorPosition(double aX, double aY)
+{
+    cout << "Cursor, X: " << aX << ", Y: " << aY << endl;
+
+    MUnit* scene = GetNode("./../Scene");
+    if (scene != NULL) {
+	MScene* mscene = (MScene*) scene->GetSIfi(MScene::Type(), this);
+	if (mscene != NULL) {
+	    mscene->onCursorPosition(aX, aY);
+	}
+    } else {
+	Logger()->Write(EErr, this, "[%s] Missing scene", GetUri().c_str());
     }
 }
 
@@ -247,43 +291,31 @@ void AGWindow::Render()
 void AGWindow::Update()
 {
     Logger()->Write(EInfo, this, "Update");
-    ADes::Update();
     if (!mWndInit) {
 	// Checking in content flag showing that the window is part of visial env but not 
 	// just base agent. If so, initialise the agent
 	// TODO [YB] To find more suitable solution
-	MUnit* host = iMan->GetMan();
-	string sCntInit = host->GetContent(KWndCnt_Init);
-	/*
-	if (sCntInit == KWndCnt_Init_Val) {
-	    Construct();
-	    mWndInit = ETrue;
-	}
-	*/
 	Construct();
+	glfwSetWindowUserPointer(mWindow, this);
 	glfwSetWindowSizeCallback(mWindow, onWindowSizeChanged);
 	mWndInit = ETrue;
-	//glfwWaitEvents();
-    } else {
-	Render();
-	glfwSwapBuffers(mWindow);
-	glfwPollEvents();
-	//glfwWaitEvents();
-	//SetUpdated();
     }
+    ADes::Update();
 }
 
 void AGWindow::Confirm()
 {
     ADes::Confirm();
+    Render();
+    glfwSwapBuffers(mWindow);
+    glfwPollEvents();
 }
 
 TBool AGWindow::OnCompChanged(MUnit& aComp, const string& aContName, TBool aModif)
 {
     if (aContName == KWndCnt_Init) {
-	Construct();
+	//Construct();
     }
-
     Unit::OnCompChanged(aComp, aContName);
 }
 

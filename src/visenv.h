@@ -59,6 +59,10 @@ class AGWindow: public ADes, public MWindow
 	void Render();
 	const GLFWwindow* RawWindow() const { return mWindow;}
 	static void onWindowSizeChanged (GLFWwindow *aWnd, int aW, int aH);
+	static void onWindowClosed(GLFWwindow *aWnd);
+	static void onCursorPosition(GLFWwindow *aWnd, double aX, double aY);
+	void onWindowClosed();
+	void onCursorPosition(double aX, double aY);
 	MUnit* Host();
 	static void RegisterInstance(AGWindow* aInst);
 	static AGWindow* FindInstance(GLFWwindow* aWnd);
@@ -67,6 +71,8 @@ class AGWindow: public ADes, public MWindow
     protected:
 	TBool mWndInit;
 	GLFWwindow* mWindow;
+	// TODO the instances mechanism seems is used just for assosiating GLFW window instance
+	// with AGWindow instance. Why don't use glfwSetWindowUserPointer for that?
 	static vector<AGWindow*> mInstances; //!< Register of instances
 };
 

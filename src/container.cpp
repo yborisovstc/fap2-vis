@@ -103,10 +103,12 @@ void AVCpsCp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 
 const string KWidgetRqsW_Name = "OutRqsW";
 const string KWidgetRqsH_Name = "OutRqsH";
+const string KCont_Padding = "Padding";
 
 AVContainer::AVContainer(const string& aName, MUnit* aMan, MEnv* aEnv): AVWidget(aName, aMan, aEnv)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
+    InsertContent(KCont_Padding);
 }
 
 string AVContainer::PEType()
@@ -241,7 +243,12 @@ void AVContainer::Init()
 
 TBool AVContainer::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
 {
-    TBool res = ETrue;
+    TBool res = EFalse;
+    if (&aComp == GetMan() && aContName == KCont_Padding) {
+	const string data = aComp.GetContent(KCont_Padding);
+	mPadding = stoi(data);
+	res = ETrue;
+    }
     return res;
 }
 
@@ -293,6 +300,9 @@ void AVContainer::WidgetAp::WdgPap::DtGet(Sdata<int>& aData)
     aData.Set(res);
 }
 
+void AVContainer::onSeCursorPosition(double aX, double aY)
+{
+}
 
 
 // Horizontal layout
@@ -338,7 +348,7 @@ void AVHLayout::Init()
 
 TBool AVHLayout::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
 {
-    TBool res = ETrue;
+    TBool res = AVContainer::HandleCompChanged(aContext, aComp, aContName);
     return res;
 }
 
@@ -399,9 +409,12 @@ int AVHLayout::GetComposedData(const string& aSlotName, TWdgPar aPar)
 	    string psn = GetSlotName(pid);
 	    int x = GetComposedData(psn, E_AlcX);
 	    int w = GetComposedData(psn, E_AlcW);
-	    res = x + w + 1;
+	    res = x + w + 2*mPadding;
+	} else {
+	    res = mPadding;
 	}
     } else if (aPar == E_AlcY) {
+	res = mPadding;
     } else if (aPar == E_AlcW) {
 	res = GetRqs(aSlotName, true);
     } else if (aPar == E_AlcH) {
