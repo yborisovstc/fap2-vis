@@ -9,6 +9,8 @@
 #include <mdes.h>
 #include "../src/visprov.h"
 #include "../src/mvisenv.h"
+#include "../src/mwindow.h"
+#include "../src/mscel.h"
 
 #include <cppunit/extensions/HelperMacros.h>
 
@@ -168,6 +170,17 @@ void Ut_avr::test_UnitDrp()
     CPPUNIT_ASSERT_MESSAGE("Fail to get env agent node", visenv != 0);
     MVisEnv* mvisenv = visenv->GetObj(mvisenv);
     CPPUNIT_ASSERT_MESSAGE("Fail to get env agent", mvisenv != 0);
+
+    // Verify getting window from widget
+    MUnit* wdga = root->GetNode("./Test/Env/Window/Scene/Drp/Slot_1/Wdg1/WdgAgent");
+    CPPUNIT_ASSERT_MESSAGE("Fail to get WdgAgent", wdga != 0);
+    MWindow* mwnd = (MWindow*) wdga->GetSIfi(MWindow::Type());
+    CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", mwnd != 0);
+    
+    // Verify resolving scene elems in container
+    MUnit* cntu = root->GetNode("./Test/Env/Window/Scene/Drp/CntAgent");
+    CPPUNIT_ASSERT_MESSAGE("Fail to get Drp", cntu != 0);
+    cntu->GetIfi(MSceneElem::Type());
 
     // Sync the state
     MUnit* esync = root->GetNode("./Test/Capsule/Sync");

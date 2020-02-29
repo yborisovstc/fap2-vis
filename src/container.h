@@ -86,6 +86,7 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	// From MSceneElem
 	virtual void Render() override;
 	virtual void onSeCursorPosition(double aX, double aY) override;
+	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MDesInpObserver
 	virtual void OnInpUpdated() override {}
 	virtual MIface* MDesInpObserver_Call(const string& aSpec, string& aRes) override;

@@ -13,6 +13,8 @@
 #include <GLFW/glfw3.h>
 
 
+class MWindow;
+
 /** @brief Widget base agent
  *
  * */
@@ -29,22 +31,35 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 	// From MACompsObserver
 	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
 	// From MSceneElem
+	virtual string MSceneElem_Mid() const { return GetUri(0, ETrue);}
 	virtual void Render() override;
 	virtual void onSeCursorPosition(double aX, double aY) override;
+	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// From MDesSyncable
 	virtual void Update();
     protected:
 	virtual void Init();
+	/** @brief Handles cursor position change
+	 * @param[in] aX, aY  Pos widget coordinates
+	 * */
+	virtual void onWdgCursorPos(int aX, int aY);
     protected:
 	int GetParInt(const string& aUri);
 	static void CheckGlErrors();
+	void GetCursorPosition(double& aX, double& aY);
+	bool IsInnerWidgetPos(double aX, double aY);
+	int WndX(int aX);
+	int WndY(int aY);
+	MWindow* Wnd();
     protected:
 	bool mIsInitialised = false;
 	GLuint mProgram;
 	GLint mMvpLocation;
 	TColor mBgColor;
+	TColor mFgColor;
 };
 
 #endif // __FAP2VIS_WIDGET_H

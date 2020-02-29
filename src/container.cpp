@@ -162,6 +162,23 @@ void AVContainer::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 	    }
 	    // Downward request, redirect to comp
 	}
+    } else if (aName == MSceneElem::Type()) {
+	// Enable local request only to isolate the whole tree layers
+	if (aCtx.empty() || (aCtx.back() == this)) {
+	    for (int ind = 0; ind < host->CompsCount(); ind++) {
+		MUnit* compu = host->GetComp(ind);
+		MVCslot* comps = compu->GetObj(comps);
+		if (comps != NULL) {
+		    if (compu->CompsCount() == 1) {
+			MUnit* wdg = compu->GetComp(0);
+			rr = wdg->GetIfi(aName, ctx);
+			InsertIfCache(aName, aCtx, wdg, rr);
+		    }
+		}
+	    }
+	} else {
+	    AVWidget::UpdateIfi(aName, aCtx);
+	}
     } else {
 	AVWidget::UpdateIfi(aName, aCtx);
     }
@@ -188,6 +205,15 @@ void AVContainer::Update()
 
 void AVContainer::Render()
 {
+
+    TIfRange rr = GetIfi(MSceneElem::Type());
+    for (auto it = rr.first; it != rr.second; it++) {
+	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
+	se->Render();
+    }
+}
+/*
+{
     MUnit* host = GetMan();
     for (int ind = 0; ind < host->CompsCount(); ind++) {
 	MUnit* compu = host->GetComp(ind);
@@ -204,6 +230,7 @@ void AVContainer::Render()
     }
 
 }
+*/
 
 void AVContainer::Init()
 {
@@ -279,12 +306,6 @@ int AVContainer::GetRqs(const string& aSlot, bool aW)
     return res;
 }
 
-/*
-   AVContainer::WidgetAp::WidgetAp(AVContainer& aHost, const string& aSlot): mHost(aHost), mSlot(aSlot), mAlcW(this, E_AlcW), mAlcH(this, E_AlcH) {
-   mAlcH.SetHost(this);
-}
-*/
-
 void* AVContainer::WidgetAp::WdgPap::DoGetDObj(const char *aName)
 {
     void* res = NULL;
@@ -302,7 +323,22 @@ void AVContainer::WidgetAp::WdgPap::DtGet(Sdata<int>& aData)
 
 void AVContainer::onSeCursorPosition(double aX, double aY)
 {
+    TIfRange rr = GetIfi(MSceneElem::Type());
+    for (auto it = rr.first; it != rr.second; it++) {
+	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
+	se->onSeCursorPosition(aX, aY);
+    }
 }
+
+void AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+    TIfRange rr = GetIfi(MSceneElem::Type());
+    for (auto it = rr.first; it != rr.second; it++) {
+	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
+	se->onMouseButton(aButton, aAction, aMods);
+    }
+}
+
 
 
 // Horizontal layout

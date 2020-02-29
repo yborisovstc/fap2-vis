@@ -6,6 +6,7 @@
 
 #include "scene.h"
 #include "mscel.h"
+#include "mwindow.h"
 
 const string KWndCnt_Init = "Init";
 const string KWndCnt_Init_Val = "Yes";
@@ -67,5 +68,38 @@ void AGtScene::Update()
 
 void AGtScene::onCursorPosition(double aX, double aY)
 {
+    MUnit* host = GetMan();
+    for (int ind = 0; ind < host->CompsCount(); ind++) {
+	MUnit* comp = host->GetComp(ind);
+	MSceneElem* mse = (MSceneElem*) comp->GetSIfi(MSceneElem::Type());
+	if (mse != NULL) {
+	    mse->onSeCursorPosition(aX, aY);
+	}
+    }
 }
 
+void AGtScene::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+    MUnit* host = GetMan();
+    for (int ind = 0; ind < host->CompsCount(); ind++) {
+	MUnit* comp = host->GetComp(ind);
+	MSceneElem* mse = (MSceneElem*) comp->GetSIfi(MSceneElem::Type());
+	if (mse != NULL) {
+	    mse->onMouseButton(aButton, aAction, aMods);
+	}
+    }
+}
+
+void AGtScene::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
+{
+    MUnit* host = iMan;
+    TIfRange rr;
+    TICacheRCtx ctx(aCtx);
+    if (aName == MWindow::Type()) {
+	// Redirect to owner
+	rr = host->GetMan()->GetIfi(aName, ctx);
+	InsertIfCache(aName, aCtx, host->GetMan(), rr);
+    } else {
+	ADes::UpdateIfi(aName, aCtx);
+    }
+}

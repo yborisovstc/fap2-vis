@@ -50,6 +50,8 @@ class AGWindow: public ADes, public MWindow
 	virtual TBool OnCompChanged(MUnit& aComp, const string& aContName = string(), TBool aModif = EFalse);
 	// From MWindow
 	virtual void Start(void);
+	virtual void GetCursorPos(double& aX, double& aY) override;
+	virtual string MWindow_Mid() const { return GetUri(0, true);}
 	// From MDesSyncable
     public:
 	virtual void Update();
@@ -61,8 +63,18 @@ class AGWindow: public ADes, public MWindow
 	static void onWindowSizeChanged (GLFWwindow *aWnd, int aW, int aH);
 	static void onWindowClosed(GLFWwindow *aWnd);
 	static void onCursorPosition(GLFWwindow *aWnd, double aX, double aY);
+	static void onMouseButton(GLFWwindow *aWnd, int aButton, int aAction, int aMods);
 	void onWindowClosed();
+	/** @brief Handles cursor position
+	 * @param[in] aX, aY screen coordinates relative to the top-left corner of the window
+	 * */
 	void onCursorPosition(double aX, double aY);
+	/** @brief Handles mouse button events
+	 * @param[in] aButton - button Id
+	 * @param[in] aAction - action: GLFW_PRESS or GLFW_RELEASE
+	 * @param[in] aMods - modes
+	 * */
+	void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods);
 	MUnit* Host();
 	static void RegisterInstance(AGWindow* aInst);
 	static AGWindow* FindInstance(GLFWwindow* aWnd);

@@ -148,6 +148,7 @@ void AGWindow::Construct()
 	glfwSetWindowUserPointer(mWindow, this);
 	glfwSetWindowCloseCallback(mWindow, onWindowClosed);
 	glfwSetCursorPosCallback(mWindow, onCursorPosition);
+	glfwSetMouseButtonCallback(mWindow, onMouseButton);
 	glfwMakeContextCurrent(mWindow);
 	//gladLoadGL(glfwGetProcAddress);
 	// TODO  YB!! This interval affects window refreshing. With value 1 the unitvr frame is rendered only partially
@@ -220,6 +221,16 @@ void AGWindow::onCursorPosition(GLFWwindow *aWnd, double aX, double aY)
     }
 }
 
+void AGWindow::onMouseButton(GLFWwindow *aWnd, int aButton, int aAction, int aMods)
+{
+    AGWindow* wnd = reinterpret_cast<AGWindow*>(glfwGetWindowUserPointer(aWnd));
+    if (wnd != NULL) {
+	TFvButton btn = aButton == GLFW_MOUSE_BUTTON_RIGHT ? EFvBtnRight : EFvBtnLeft;
+	TFvButtonAction act = aAction == GLFW_PRESS ? EFvBtnActPress : EFvBtnActRelease;
+	wnd->onMouseButton(btn, act, aMods);
+    }
+}
+    
 void AGWindow::onWindowClosed()
 {
     // Notify of closing
@@ -234,11 +245,30 @@ void AGWindow::onCursorPosition(double aX, double aY)
     if (scene != NULL) {
 	MScene* mscene = (MScene*) scene->GetSIfi(MScene::Type(), this);
 	if (mscene != NULL) {
-	    mscene->onCursorPosition(aX, aY);
+	    int width, height;
+	    glfwGetWindowSize(mWindow, &width, &height);
+	    
+	    mscene->onCursorPosition(aX, height - aY);
 	}
     } else {
 	Logger()->Write(EErr, this, "[%s] Missing scene", GetUri().c_str());
     }
+}
+
+void AGWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+    cout << "Window, onMouseButton" << endl;
+
+    MUnit* scene = GetNode("./../Scene");
+    if (scene != NULL) {
+	MScene* mscene = (MScene*) scene->GetSIfi(MScene::Type(), this);
+	if (mscene != NULL) {
+	    mscene->onMouseButton(aButton, aAction, aMods);
+	}
+    } else {
+	Logger()->Write(EErr, this, "[%s] Missing scene", GetUri().c_str());
+    }
+
 }
 
 MIface *AGWindow::DoGetObj(const char *aName)
@@ -325,4 +355,13 @@ void AGWindow::Start(void)
 	Render();
 	glfwWaitEvents();
     }
+}
+
+void AGWindow::GetCursorPos(double& aX, double& aY)
+{
+    double y = 0;
+    glfwGetCursorPos(mWindow, &aX, &y);
+    int width, height;
+    glfwGetWindowSize(mWindow, &width, &height);
+    aY = height - y;
 }

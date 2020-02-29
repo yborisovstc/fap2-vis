@@ -4,6 +4,7 @@
 #include <rdata.h>
 
 #include "widget.h"
+#include "mwindow.h"
 
 #include "deps/linmath.h" // Ref https://github.com/glfw/glfw/tree/master/deps
 
@@ -39,6 +40,7 @@ static const char* fragment_shader_text =
 "}\n";
 
 const string KCnt_BgColor = "BgColor";
+const string KCnt_FgColor = "FgColor";
 const string KCnt_Color_R = "R";
 const string KCnt_Color_G = "G";
 const string KCnt_Color_B = "B";
@@ -184,6 +186,12 @@ TBool AVWidget::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& a
 	    mBgColor.g = stof(val);
 	} else if (aContName == ContentCompId(KCnt_BgColor, KCnt_Color_B)) {
 	    mBgColor.b = stof(val);
+	} else if (aContName == ContentCompId(KCnt_FgColor, KCnt_Color_R)) {
+	    mFgColor.r = stof(val);
+	} else if (aContName == ContentCompId(KCnt_FgColor, KCnt_Color_G)) {
+	    mFgColor.g = stof(val);
+	} else if (aContName == ContentCompId(KCnt_FgColor, KCnt_Color_B)) {
+	    mFgColor.b = stof(val);
 	}
     }
     return res;
@@ -192,38 +200,97 @@ TBool AVWidget::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& a
 void AVWidget::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 {
     MUnit* host = iMan;
-    bool done = false;
-#if 0
-    if ((aCtx.size()) > 1 && aName == MDesInpObserver::Type()) {
-	MUnit* rq = aCtx.at(aCtx.size() - 2);
-	if (host->IsComp(rq)) {
-	    // Request for DES observer from internal states
-	    // Redirect to container slot if it is connected
-	    TIfRange rr;
-	    TICacheRCtx ctx(aCtx); ctx.push_back(this);
-	    MVert* hostv = host->GetObj(hostv);
-	    __ASSERT(hostv != NULL);
-	    if (hostv->PairsCount() == 1) {
-		MVert* slotv = hostv->GetPair(0);
-		__ASSERT(slotv != NULL);
-		MUnit* slotu = (MUnit*) hostv->MVert_DoGetObj(MUnit::Type());
-		__ASSERT(slotu != NULL);
-		rr = slotu->GetIfi(aName, ctx);
-		InsertIfCache(aName, aCtx, slotu, rr);
-		done = true;
-	    } else if (hostv->PairsCount() == 0) {
-		Logger()->Write(EErr, this, "Widget is not connected to slot");
-	    } else {
-		Logger()->Write(EErr, this, "Widget has multiple connections");
-	    }
-	}
-    }
-#endif
-    if (!done) {
+    TIfRange rr;
+    TICacheRCtx ctx(aCtx);
+    if (aName == MWindow::Type()) {
+	// Redirect to owner
+	rr = host->GetMan()->GetIfi(aName, ctx);
+	InsertIfCache(aName, aCtx, host->GetMan(), rr);
+    } else {
 	ADes::UpdateIfi(aName, aCtx);
     }
 }
 
 void AVWidget::onSeCursorPosition(double aX, double aY)
 {
+    // Window coordinates
+    int wc = GetParInt("./AlcW");
+    int hc = GetParInt("./AlcH");
+    int wx0 = 0, wy0 = 0, wxw = 0, wyh = 0;
+    getWndCoord(0, 0, wx0, wy0);
+    getWndCoord(wc, hc, wxw, wyh);
+    int wdX = aX - wx0;
+    int wdY = aY - wy0;
+    if (wdX >= 0 && wdX < wc && wdY >= 0 && wdY < hc) {
+	onWdgCursorPos(wdX, wdY);
+    }
 }
+
+bool AVWidget::IsInnerWidgetPos(double aX, double aY)
+{
+    int wc = GetParInt("./AlcW");
+    int hc = GetParInt("./AlcH");
+    int wx0 = 0, wy0 = 0, wxw = 0, wyh = 0;
+    getWndCoord(0, 0, wx0, wy0);
+    getWndCoord(wc, hc, wxw, wyh);
+    int wdX = aX - wx0;
+    int wdY = aY - wy0;
+    return (wdX >= 0 && wdX < wc && wdY >= 0 && wdY < hc);
+	
+}
+
+void AVWidget::onWdgCursorPos(int aX, int aY)
+{
+    cout << "Widget [" << iMan->Name() << "], cursor, X: " << aX << ", Y:" << aY << endl;
+}
+
+void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
+{
+    MUnit* host = GetMan();
+    MSceneElem* owner = (MSceneElem*) host->GetMan()->GetSIfi(MSceneElem::Type());
+    if (owner) {
+	int x = GetParInt("./AlcX");
+	int y = GetParInt("./AlcY");
+	owner->getWndCoord(x + aInpX, y + aInpY, aOutX, aOutY);
+    } else {
+	aOutX = aInpX;
+	aOutY = aInpY;
+    }
+}
+
+int AVWidget::WndX(int aX)
+{
+    int wx = 0, wy = 0;
+    getWndCoord(aX, 0, wx, wy);
+    return wx;
+}
+
+int AVWidget::WndY(int aY)
+{
+    int wx = 0, wy = 0;
+    getWndCoord(0, aY, wx, wy);
+    return wy;
+}
+
+void AVWidget::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+    double x = 0, y = 0;
+    GetCursorPosition(x, y);
+    if (IsInnerWidgetPos(x, y)) {
+	cout << "Widget [" << iMan->Name() << "], button" << endl;
+    }
+}
+
+void AVWidget::GetCursorPosition(double& aX, double& aY)
+{
+    MWindow* wnd = Wnd();
+    wnd->GetCursorPos(aX, aY);
+}
+
+
+MWindow* AVWidget::Wnd()
+{
+    MWindow* mwnd = (MWindow*) MUnit::GetSIfi(MWindow::Type());
+    return mwnd;
+}
+

@@ -36,7 +36,8 @@ testroot : Elem
                         Padding = 10;
                         Slot_1 < Wdg1 : /*/Modules/FvWidgets/FUnitCrp
                         {
-                            BgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
+                            BgColor = "{R:'0.0' G:'0.3' B:'0.0'}";
+                            FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
                             ./RqsW < {
                                 Debug.Update = y;
                                 Value = "SI 22";
@@ -54,7 +55,8 @@ testroot : Elem
                         }
                         Slot_2 < Wdg2 : /*/Modules/FvWidgets/FUnitCrp
                         {
-                            BgColor = "{R:'1.0' G:'1.0' B:'0.0'}";
+                            BgColor = "{R:'0.0' G:'0.0' B:'0.5'}";
+                            FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
                             ./RqsW < {
                                 Debug.Update = y;
                                 Value = "SI 22";

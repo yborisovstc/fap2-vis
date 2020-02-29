@@ -123,20 +123,36 @@ void AUnitCrp::Render()
     glLoadIdentity();
     glOrtho(0, (GLdouble)vp_width, 0, (GLdouble)vp_height, -1.0, 1.0);
     glLineWidth(K_LineWidth);
+
+    // Window coordinates
+    int wx0 = 0, wy0 = 0, wxw = 0, wyh = 0;
+    getWndCoord(0, 0, wx0, wy0);
+    getWndCoord(wc, hc, wxw, wyh);
+
+    // Background
+    glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
+    glBegin(GL_POLYGON);
+    glVertex2f(wx0, wy0);
+    glVertex2f(wx0, wyh);
+    glVertex2f(wxw, wyh);
+    glVertex2f(wxw, wy0);
+    glEnd();
+
     // Draw border
-    DrawLine(xc, yc, xc, yc + hc);
-    DrawLine(xc, yc + hc, xc + wc, yc + hc);
-    DrawLine(xc + wc, yc + hc, xc + wc, yc);
-    DrawLine(xc + wc, yc, xc, yc);
+    glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
+    DrawLine(wx0, wy0, wx0, wyh);
+    DrawLine(wx0, wyh, wxw, wyh);
+    DrawLine(wxw, wyh, wxw, wy0);
+    DrawLine(wxw, wy0, wx0, wy0);
     // Draw name divider
     int nameDivH = K_BFontSize + 2 * K_BPadding;
-    DrawLine(xc, yc + hc - nameDivH, xc + wc, yc + hc - nameDivH);
+    int wys = WndY(hc - nameDivH);
+    DrawLine(wx0, wys, wxw, wys);
     // Draw the name
     //FTGLPixmapFont font(KFont);
-    glRasterPos2f(xc + K_BPadding, yc + hc - nameDivH + K_BPadding);
+    glRasterPos2f(WndX(K_BPadding), WndY(hc - nameDivH + K_BPadding));
     mFont->Render(KTitle.c_str());
 
-    //glFlush();
     CheckGlErrors();
 }
 

@@ -24,6 +24,9 @@ class AGtScene: public ADes, public MScene
 	// From MScene
 	virtual void RenderScene(void) override;
 	virtual void onCursorPosition(double aX, double aY) override;
+	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	// From MUnit
+	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
     public:
 	virtual void Update();
     protected:

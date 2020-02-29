@@ -31,3 +31,12 @@ MIface *AScElem::DoGetObj(const char *aName)
 void AScElem::onSeCursorPosition(double aX, double aY)
 {
 }
+
+void AScElem::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
+{
+}
+
+void AScElem::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+}
+
