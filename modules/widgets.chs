@@ -66,5 +66,7 @@ FvWidgets : Elem
     {
         $ # " Unit visual repesentation";
         WdgAgent : AUnitCrp;
+        BgColor = "{R:'0.0' G:'0.3' B:'0.0'}";
+        FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
     }
 }

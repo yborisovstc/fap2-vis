@@ -25,8 +25,12 @@ libfap2vis_la_SOURCES = \
 		       widget.cpp \
 		       container.h \
 		       container.cpp \
+		       mvrcontroller.h \
+		       vrcontroller.h \
+		       vrcontroller.cpp \
 		       label.h \
 		       label.cpp \
+		       magentvr.h \
 		       agentvr.h \
 		       agentvr.cpp \
 		       visrepr.h \
@@ -35,6 +39,8 @@ libfap2vis_la_SOURCES = \
 
 include_HEADERS = \
 		  mwidget.h \
+		  magentvr.h \
+		  mvrcontroller.h \
 		  visenv.h
 
 

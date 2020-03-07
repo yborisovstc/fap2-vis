@@ -339,6 +339,21 @@ void AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int 
     }
 }
 
+MUnit* AVContainer::GetCntComp(const string& aCompName)
+{
+    MUnit* res = NULL;
+    MUnit* host = GetMan();
+    string uri = "./" + aCompName;
+    // Uri with "any" elem is not supported atm, so using search by slots
+    for (int ind = 0; ind < host->CompsCount() && res == nullptr; ind++) {
+	MUnit* compu = host->GetComp(ind);
+	MVCslot* comps = compu->GetObj(comps);
+	if (comps != nullptr) {
+	    res = compu->GetNode(uri);
+	}
+    }
+    return res;
+}
 
 
 // Horizontal layout
@@ -472,3 +487,36 @@ string AVHLayout::GetSlotName(int aSlotId) const
 {
     return KSlot_Name + "_" + to_string(aSlotId);
 }
+
+void AVHLayout::AddComp(const string& aName, const string& aType, const string& aHint)
+{
+    // Get last slot Id
+    MUnit* host = GetMan();
+    int lastSlotId = 0;
+    for (int ind = 0; ind < host->CompsCount(); ind++) {
+	MUnit* compu = host->GetComp(ind);
+	MVCslot* comps = compu->GetObj(comps);
+	if (comps != nullptr) {
+	    int slotId = GetSlotId(compu->Name());
+	    lastSlotId = max(lastSlotId, slotId);
+	}
+    }
+    // Add new slot first
+    MElem* hoste = host->GetObj(hoste);
+    __ASSERT(hoste);
+    string newSlotName = GetSlotName(lastSlotId + 1);
+    hoste->AppendMutation(TMut(ENt_Node, ENa_Id, newSlotName, ENa_Parent, "AVSlot"));
+    TNs ns; MutCtx mctx(NULL, ns);
+    hoste->Mutate(true, false, false, mctx);
+    string newSlotUri = "./" + newSlotName;
+    MUnit* newSlot = host->GetNode(newSlotUri);
+    __ASSERT(newSlot);
+    hoste->AppendMutation(TMut(ENt_Node, ENa_Targ, newSlotUri , ENa_Id, aName, ENa_Parent, "/*/Modules/FvWidgets/" + aType));
+    hoste->Mutate(true, false, false, mctx);
+    string newWdgUri = newSlotUri + "/" + aName;
+    MUnit* newWdg = host->GetNode(newWdgUri);
+    __ASSERT(newWdg);
+    // Invalidate Iface cache
+    InvalidateIfCache();
+}
+

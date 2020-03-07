@@ -46,7 +46,8 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_avr);
 //    CPPUNIT_TEST(test_Unit);
-    CPPUNIT_TEST(test_UnitDrp);
+//    CPPUNIT_TEST(test_UnitDrp);
+    CPPUNIT_TEST(test_VrCtrl);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -54,6 +55,7 @@ class Ut_avr : public CPPUNIT_NS::TestFixture
 private:
     void test_Unit();
     void test_UnitDrp();
+    void test_VrCtrl();
 private:
     Env* iEnv;
     AgentObserver mAgtObs;
@@ -204,3 +206,53 @@ void Ut_avr::test_UnitDrp()
     delete iEnv;
 }
 
+void Ut_avr::test_VrCtrl()
+{
+    printf("\n === VR Controller test 1\n");
+    const string specn("ut_avr_vrc_1");
+    string ext = "chs";
+    string spec = specn + string(".") + ext;
+    string log = specn + "_" + ext + ".log";
+    iEnv = new Env(spec, log);
+    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", iEnv != 0);
+    //iEnv->ImpsMgr()->ResetImportsPaths();
+    iEnv->ImpsMgr()->AddImportsPaths("../modules");
+    VisProv* visprov = new VisProv("VisProv", iEnv);
+    iEnv->AddProvider(visprov);
+    iEnv->SetObserver(&mAgtObs);
+    iEnv->ConstructSystem();
+    MUnit* root = iEnv->Root();
+    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+
+    // Set idle handler
+    MUnit* visenv = root->GetNode("./Test/Env/VisEnvAgt");
+    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent node", visenv != 0);
+    MVisEnv* mvisenv = visenv->GetObj(mvisenv);
+    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent", mvisenv != 0);
+    
+    // Verify resolving scene elems in container
+    MUnit* cntu = root->GetNode("./Test/Env/Window/Scene/Drp/CntAgent");
+    CPPUNIT_ASSERT_MESSAGE("Fail to get Drp", cntu != 0);
+    cntu->GetIfi(MSceneElem::Type());
+
+    // Sync the state
+    MUnit* esync = root->GetNode("./Test/Capsule/Sync");
+    CPPUNIT_ASSERT_MESSAGE("Fail to get input for Syncable iface", esync != 0);
+    MDesSyncable* sync = (MDesSyncable*) esync->GetSIfi(MDesSyncable::Type());
+    CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
+    sSync = sync;
+
+    const TInt ticksnum = 128;
+    //for (TInt cnt = 0; cnt < ticksnum; cnt++) {
+    while (!mAgtObs.mClose) {
+	if (sync->IsActive()) {
+	    sync->Update();
+	} else if (sync->IsUpdated()) {
+	    sync->Confirm();
+	} else {
+	    // Handle idle
+	    glfwPollEvents();
+	}
+    }
+    delete iEnv;
+}

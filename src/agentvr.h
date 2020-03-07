@@ -4,6 +4,7 @@
 
 #include "widget.h"
 #include "container.h"
+#include "magentvr.h"
 
 
 /** @brief Agent visual representation widget
@@ -24,16 +25,17 @@ class AAgentVr : public AVWidget
     protected:
 	static void DrawLine(float x1, float y1, float x2, float y2);
     protected:
-	const int K_BFontSize = 12; /**< Base metric: Base font (unit name) size. */
+	const int K_BFontSize = 18; /**< Base metric: Base font (unit name) size. */
 	const int K_BPadding = 3; /**< Base metric: Base padding */
 	const int K_LineWidth = 1; /**< Base metric: Line width */
+	const int K_MinBodyHeight = 20; /**< Minimum body height */
 };
 
 class FTPixmapFont;
 
 /** @brief Unit compact representation widget
  * */
-class AUnitCrp : public AAgentVr
+class AUnitCrp : public AAgentVr, public MVrp
 {
     public:
 	static const char* Type() { return "AUnitCrp";};
@@ -43,26 +45,48 @@ class AUnitCrp : public AAgentVr
 	virtual MIface* DoGetObj(const char *aName) override;
 	// From MSceneElem
 	virtual void Render() override;
+	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	// From MVrp
+	virtual string MVrp_Mid() const override;
+	virtual void SetEnv(MEnv* aEnv) override;
+	virtual void SetModel(const string& aMdlUri) override;
+	virtual void OnCompSelected(const MVrp* aComp) override;
+	virtual void SetCrtlBinding(const string& aCtrUri) override {}
     protected:
 	// From AVWidget
 	virtual void Init() override;
     protected:
 	// TODO to have shared font in visual env
 	FTPixmapFont* mFont;
+	MEnv* mEnv; /*!< Binded env, not owned */
+	MUnit* mMdl; /*!< Binded model, not owned */
 };
-
 
 /** @brief Unit detail representation widget
  * */
-class AUnitDrp : public AVHLayout
+class AUnitDrp : public AVHLayout, public MVrp
 {
     public:
 	static const char* Type() { return "AUnitDrp";};
 	static string PEType();
 	AUnitDrp(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual MIface* DoGetObj(const char *aName) override;
+	// From MUnit
+	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// From MSceneElem
 	virtual void Render() override;
+	// From MVrp
+	virtual string MVrp_Mid() const override;
+	virtual void SetEnv(MEnv* aEnv) override;
+	virtual void SetModel(const string& aMdlUri) override;
+	virtual void OnCompSelected(const MVrp* aComp) override;
+	virtual void SetCrtlBinding(const string& aCtrUri) override;
+    protected:
+	void CreateRp();
+    protected:
+	MEnv* mEnv; /*!< Binded env, not owned */
+	MUnit* mMdl; /*!< Binded model, not owned */
+	string mCtrBnd; /*!< Binding to controller info: URI */
 };
 
 

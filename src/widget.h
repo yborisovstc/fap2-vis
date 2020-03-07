@@ -60,6 +60,8 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 	GLint mMvpLocation;
 	TColor mBgColor;
 	TColor mFgColor;
+	static const string KCnt_BgColor;
+	static const string KCnt_FgColor;
 };
 
 #endif // __FAP2VIS_WIDGET_H

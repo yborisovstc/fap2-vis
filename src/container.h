@@ -97,7 +97,10 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	virtual int GetComposedData(const string& aSlotName, TWdgPar aPar) = 0; 
 	virtual int GetSlotId(const string& aSlotName) const = 0;
 	virtual string GetSlotName(int aSlotId) const = 0;
+	/** @brief Gets container component by name */
+	virtual MUnit* GetCntComp(const string& aCompName);
 	virtual void NotifyWidgetOnInpUpdated(const string& aOutUri) = 0;
+	virtual void AddComp(const string& aName, const string& aType, const string& aHint = string()) = 0;
     public:
 	virtual void Update();
     protected:
@@ -158,6 +161,8 @@ class AVHLayout: public AVContainer
 	virtual int GetSlotId(const string& aSlotName) const;
 	virtual string GetSlotName(int aSlotId) const;
 	virtual void NotifyWidgetOnInpUpdated(const string& aOutUri);
+	// Local
+	virtual void AddComp(const string& aName, const string& aType, const string& aHint = string()) override;
     public:
 	virtual void Update();
     protected:

@@ -1,7 +1,10 @@
 
-#include "agentvr.h"
-
+#include <iostream> 
 #include <FTGL/ftgl.h>
+
+#include "agentvr.h"
+#include "mvrcontroller.h"
+
 
 const string KCont_Text = "Text";
 
@@ -23,7 +26,11 @@ string AAgentVr::PEType()
 MIface* AAgentVr::DoGetObj(const char *aName)
 {
     MIface* res = NULL;
-    res = AVWidget::DoGetObj(aName);
+    if (strcmp(aName, MVrp::Type()) == 0) {
+	res = dynamic_cast<MVrp*>(this);
+    } else {
+	res = AVWidget::DoGetObj(aName);
+    }
     return res;
 }
 
@@ -79,7 +86,8 @@ const string KTitle = "Hellow World!";
 const string KStateContVal = "Value";
 
 
-AUnitCrp::AUnitCrp(const string& aName, MUnit* aMan, MEnv* aEnv): AAgentVr(aName, aMan, aEnv), mFont(NULL)
+AUnitCrp::AUnitCrp(const string& aName, MUnit* aMan, MEnv* aEnv): AAgentVr(aName, aMan, aEnv), mFont(NULL),
+    mEnv(nullptr), mMdl(nullptr)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
 }
@@ -150,8 +158,9 @@ void AUnitCrp::Render()
     DrawLine(wx0, wys, wxw, wys);
     // Draw the name
     //FTGLPixmapFont font(KFont);
+    const string& titleText = (mMdl != nullptr) ? mMdl->Name() : KTitle;
     glRasterPos2f(WndX(K_BPadding), WndY(hc - nameDivH + K_BPadding));
-    mFont->Render(KTitle.c_str());
+    mFont->Render(titleText.c_str());
 
     CheckGlErrors();
 }
@@ -162,9 +171,12 @@ void AUnitCrp::Init()
 
     mFont = new FTPixmapFont(KFont.c_str());
     mFont->FaceSize(K_BFontSize);
-    int adv = (int) mFont->Advance(KTitle.c_str());
+    const string& titleText = (mMdl != nullptr) ? mMdl->Name() : KTitle;
+    int adv = (int) mFont->Advance(titleText.c_str());
+    int tfh = (int) mFont->LineHeight();
     MUnit* host = GetMan();
     MUnit* rw = host->GetNode("./RqsW");
+    MUnit* rh = host->GetNode("./RqsH");
     /*
     MDVarSet* rwvs = rw->GetObj(rwvs);
     MDtSet<Sdata<int> >* rwd = (MDtSet<Sdata<int> >*) rwvs->DoGetSDObj(MDtSet<Sdata<int> >::Type());
@@ -174,15 +186,57 @@ void AUnitCrp::Init()
 	arg.mData = (int) adv;
     }
     */
+    // Requisition
     string data = "SI " + to_string(adv + 2 * K_BPadding);
     rw->ChangeCont(data, true, KStateContVal);
-    rw->DumpContent();
+    int minRh = K_MinBodyHeight + tfh + 2 * K_BPadding;
+    data = "SI " + to_string(minRh);
+    rh->ChangeCont(data, true, KStateContVal);
 }
 
+string AUnitCrp::MVrp_Mid() const
+{
+    return GetUri(NULL, true);
+}
+
+void AUnitCrp::SetEnv(MEnv* aEnv)
+{
+    __ASSERT(mEnv == nullptr && aEnv != nullptr);
+    mEnv = aEnv;
+}
+
+void AUnitCrp::SetModel(const string& aMdlUri)
+{
+    __ASSERT(mEnv != nullptr && mMdl == nullptr);
+    MUnit* mdl = mEnv->Root()->GetNode(aMdlUri);
+    __ASSERT(mdl != nullptr);
+    mMdl = mdl;
+}
+
+void AUnitCrp::OnCompSelected(const MVrp* aComp)
+{
+}
+
+void AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+    double x = 0, y = 0;
+    GetCursorPosition(x, y);
+    if (IsInnerWidgetPos(x, y)) {
+	MUnit* host = GetMan();
+	MUnit* owner = host->GetMan();
+	cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
+	MVrp* drp = dynamic_cast<MVrp*>(owner->GetSIfi(MVrp::Type()));
+	if (drp) {
+	    drp->OnCompSelected(this);
+	}
+    }
+}
+	
 
 // Unit DRP
 
-AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AVHLayout(aName, aMan, aEnv)
+AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AVHLayout(aName, aMan, aEnv),
+    mEnv(nullptr), mMdl(nullptr)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
 }
@@ -195,11 +249,89 @@ string AUnitDrp::PEType()
 MIface* AUnitDrp::DoGetObj(const char *aName)
 {
     MIface* res = NULL;
-    res = AVHLayout::DoGetObj(aName);
+    if (strcmp(aName, MVrp::Type()) == 0) {
+	res = dynamic_cast<MVrp*>(this);
+    } else {
+	res = AVHLayout::DoGetObj(aName);
+    }
     return res;
 }
 
 void AUnitDrp::Render()
 {
     AVHLayout::Render();
+}
+
+string AUnitDrp::MVrp_Mid() const
+{
+    return GetUri(NULL, true);
+}
+
+void AUnitDrp::SetEnv(MEnv* aEnv)
+{
+    __ASSERT(mEnv == nullptr && aEnv != nullptr);
+    mEnv = aEnv;
+}
+
+void AUnitDrp::SetModel(const string& aMdlUri)
+{
+    __ASSERT(mEnv != nullptr && mMdl == nullptr);
+    MUnit* mdl = mEnv->Root()->GetNode(aMdlUri);
+    __ASSERT(mdl != nullptr);
+    mMdl = mdl;
+    CreateRp();
+}
+
+void AUnitDrp::CreateRp()
+{
+    MUnit* host = GetMan();
+    for (int ind = 0; ind < mMdl->CompsCount(); ind++) {
+	MUnit* comp = mMdl->GetComp(ind);
+	string compUri = comp->GetUri(0,true);
+	AddComp(comp->Name(), "FUnitCrp");
+	MUnit* vcompu = GetCntComp(comp->Name());
+	__ASSERT(vcompu != nullptr);
+	MVrp* vcompr = dynamic_cast<MVrp*>(vcompu->GetSIfi(MVrp::Type()));
+	__ASSERT(vcompr != nullptr);
+	vcompr->SetEnv(mEnv);
+	vcompr->SetModel(compUri);
+    }
+}
+
+void AUnitDrp::OnCompSelected(const MVrp* aComp)
+{
+    MVrController* ctr = dynamic_cast<MVrController*>(MUnit::GetSIfi(MVrController::Type()));
+    if (ctr) {
+	ctr->OnRpSelected(aComp);
+    }
+}
+
+void AUnitDrp::SetCrtlBinding(const string& aCtrUri)
+{
+    __ASSERT(mCtrBnd.empty());
+    MUnit* ctru = GetNode(aCtrUri);
+    if (ctru) {
+	mCtrBnd = aCtrUri;
+    } else {
+	Logger()->Write(EErr, this, "Wrong controller binding info [%s]", aCtrUri.c_str());
+    }
+}
+
+void AUnitDrp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
+{
+    MUnit* host = iMan;
+    TIfRange rr;
+    TICacheRCtx ctx(aCtx);
+    if (aName == MVrController::Type()) {
+	// Follow binding info
+	if (!mCtrBnd.empty()) {
+	    MUnit* ctru = GetNode(mCtrBnd);
+	    if (ctru) {
+		rr = ctru->GetIfi(aName, ctx);
+		InsertIfCache(aName, aCtx, ctru, rr);
+	    }
+	}
+    } else {
+	AVHLayout::UpdateIfi(aName, aCtx);
+    }
 }
