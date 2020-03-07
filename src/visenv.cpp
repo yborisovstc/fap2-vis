@@ -230,7 +230,7 @@ void AGWindow::onMouseButton(GLFWwindow *aWnd, int aButton, int aAction, int aMo
 	wnd->onMouseButton(btn, act, aMods);
     }
 }
-    
+
 void AGWindow::onWindowClosed()
 {
     // Notify of closing
@@ -268,7 +268,6 @@ void AGWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
     } else {
 	Logger()->Write(EErr, this, "[%s] Missing scene", GetUri().c_str());
     }
-
 }
 
 MIface *AGWindow::DoGetObj(const char *aName)

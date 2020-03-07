@@ -45,11 +45,12 @@ class AUnitCrp : public AAgentVr, public MVrp
 	virtual MIface* DoGetObj(const char *aName) override;
 	// From MSceneElem
 	virtual void Render() override;
-	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MVrp
 	virtual string MVrp_Mid() const override;
 	virtual void SetEnv(MEnv* aEnv) override;
 	virtual void SetModel(const string& aMdlUri) override;
+	virtual string GetModel() const override;
 	virtual void OnCompSelected(const MVrp* aComp) override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override {}
     protected:
@@ -79,6 +80,7 @@ class AUnitDrp : public AVHLayout, public MVrp
 	virtual string MVrp_Mid() const override;
 	virtual void SetEnv(MEnv* aEnv) override;
 	virtual void SetModel(const string& aMdlUri) override;
+	virtual string GetModel() const override;
 	virtual void OnCompSelected(const MVrp* aComp) override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override;
     protected:

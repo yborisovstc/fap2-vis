@@ -30,6 +30,7 @@ AvrMdl : Elem
         }
         Slot_1 : AVSlot;
         Slot_2 : AVSlot;
+        Padding = 10;
     }
     VrController : Syst
     {

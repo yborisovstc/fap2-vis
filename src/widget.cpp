@@ -272,13 +272,14 @@ int AVWidget::WndY(int aY)
     return wy;
 }
 
-void AVWidget::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+bool AVWidget::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
     double x = 0, y = 0;
     GetCursorPosition(x, y);
     if (IsInnerWidgetPos(x, y)) {
 	cout << "Widget [" << iMan->Name() << "], button" << endl;
     }
+    return false;
 }
 
 void AVWidget::GetCursorPosition(double& aX, double& aY)

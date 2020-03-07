@@ -19,8 +19,9 @@ class MSceneElem: public MIface
 	 * @param[in] aButton - button Id
 	 * @param[in] aAction - action: GLFW_PRESS or GLFW_RELEASE
 	 * @param[in] aMods - modes
+	 * @return  Sign of the event is processed and accepted
 	 * */
-	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) = 0;
+	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) = 0;
 
 	/** @brief Gets window coordinates of the given point
 	 * @param[in] aInpX, aInpY given coordinate

@@ -35,7 +35,9 @@ class AVrController : public ADes, public MVrController, public MACompsObserver
 	virtual void Update();
     protected:
 	virtual void Init();
+	MElem* GetSceneE();
 	MVrp* GetDrp();
+	MUnit* GetDrpU();
 	MVrp* CreateDrp(const MUnit* aNode);
     protected:
 	bool mIsInitialised = false;

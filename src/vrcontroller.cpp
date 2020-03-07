@@ -1,6 +1,7 @@
 
 #include <mprov.h>
 #include <env.h>
+#include <mdes.h>
 
 #include "vrcontroller.h"
 #include "magentvr.h"
@@ -45,6 +46,21 @@ MIface* AVrController::DoGetObj(const char *aName)
     return res;
 }
 
+MUnit* AVrController::GetDrpU()
+{
+    MUnit* res = nullptr;
+    const string sceneUri = iMan->GetContent(KVrc_Scene);
+    MUnit* sceneu = GetNode(sceneUri);
+    for (int ind = 0; ind < sceneu->CompsCount(); ind++) {
+	MUnit* comp = sceneu->GetComp(ind);
+	MVrp* drp = (MVrp*) comp->GetSIfi(MVrp::Type());
+	if (drp != nullptr) {
+	    res = comp; break;
+	}
+    }
+    return res;
+}
+
 MVrp* AVrController::GetDrp()
 {
     MVrp* res = nullptr;
@@ -65,7 +81,35 @@ MVrp* AVrController::CreateDrp(const MUnit* aNode)
     MVrp* res = nullptr;
     const string sceneUri = iMan->GetContent(KVrc_Scene);
     MUnit* sceneu = GetNode(sceneUri);
+    __ASSERT(sceneu);
+    MElem* scenee = sceneu->GetObj(scenee);
+    __ASSERT(scenee);
+    string drpType = "UnitDrp";
+    scenee->AppendMutation(TMut(ENt_Node, ENa_Targ, sceneUri , ENa_Id, aNode->Name(), ENa_Parent, "/*/Modules/AvrMdl/" + drpType));
+    TNs ns; MutCtx mctx(NULL, ns);
+    scenee->Mutate(true, false, false, mctx);
+    // Activate scene, TODO to do it in Des::Mutate
+    MDesSyncable* sceneds = dynamic_cast<MDesSyncable*>(sceneu->GetSIfi(MDesSyncable::Type()));
+    __ASSERT(sceneds);
+    sceneds->SetActive();
+    // Set up created DRP
+    MVrp* drp = GetDrp();
+    assert(drp != nullptr);
+    drp->SetEnv(mEnv);
+    string mdlUri = aNode->GetUri(NULL, true); 
+    drp->SetModel(mdlUri);
+    // Bind model to root DRP
+    drp->SetCrtlBinding(GetUri(NULL, true));
     return res;
+}
+
+MElem* AVrController::GetSceneE()
+{
+    const string sceneUri = iMan->GetContent(KVrc_Scene);
+    MUnit* sceneu = GetNode(sceneUri);
+    __ASSERT(sceneu);
+    MElem* scenee = sceneu->GetObj(scenee);
+    return scenee;
 }
 
 void AVrController::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
@@ -127,16 +171,23 @@ void AVrController::CreateModel(const string& aSpecPath)
     mEnv = new Env(aSpecPath, aSpecPath + ".log");
     assert(mEnv != nullptr);
     mEnv->ConstructSystem();
-    // Bind model to root DRP
-    MVrp* drp = GetDrp();
-    assert(drp != nullptr);
-    drp->SetEnv(mEnv);
-    drp->SetModel(mEnv->Root()->GetUri(NULL, true));
-    drp->SetCrtlBinding(GetUri(NULL, true));
+    MVrp* drp = CreateDrp(mEnv->Root());
 }
 
 void AVrController::OnRpSelected(const MVrp* aRp)
 {
+    string mdlUri = aRp->GetModel();
+    MUnit* mdl = mEnv->Root()->GetNode(mdlUri);
+    __ASSERT(mdl);
+    MUnit* drp = GetDrpU();
+    __ASSERT(drp);
+    MElem* scenee = GetSceneE();
+    __ASSERT(scenee);
+    //string drpUri = drp->GetUri(NULL, true);
+    scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./" + drp->Name()));
+    TNs ns; MutCtx mctx(NULL, ns);
+    scenee->Mutate(true, false, false, mctx);
+    CreateDrp(mdl);
 }
 
 

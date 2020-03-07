@@ -44,6 +44,8 @@ TBool AAgentVr::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& a
 
 void AAgentVr::Render()
 {
+    __ASSERT(mIsInitialised);
+
     float xc = (float) GetParInt("./AlcX");
     float yc = (float) GetParInt("./AlcY");
     float wc = (float) GetParInt("./AlcW");
@@ -113,6 +115,8 @@ MIface* AUnitCrp::DoGetObj(const char *aName)
 
 void AUnitCrp::Render()
 {
+    __ASSERT(mIsInitialised);
+
     float xc = (float) GetParInt("./AlcX");
     float yc = (float) GetParInt("./AlcY");
     float wc = (float) GetParInt("./AlcW");
@@ -217,19 +221,30 @@ void AUnitCrp::OnCompSelected(const MVrp* aComp)
 {
 }
 
-void AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
-    double x = 0, y = 0;
-    GetCursorPosition(x, y);
-    if (IsInnerWidgetPos(x, y)) {
-	MUnit* host = GetMan();
-	MUnit* owner = host->GetMan();
-	cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
-	MVrp* drp = dynamic_cast<MVrp*>(owner->GetSIfi(MVrp::Type()));
-	if (drp) {
-	    drp->OnCompSelected(this);
+    bool res = false;
+    if (aButton == GLFW_MOUSE_BUTTON_LEFT && aAction == GLFW_PRESS) {
+	double x = 0, y = 0;
+	GetCursorPosition(x, y);
+	if (IsInnerWidgetPos(x, y)) {
+	    MUnit* host = GetMan();
+	    MUnit* owner = host->GetMan();
+	    cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
+	    MVrp* drp = dynamic_cast<MVrp*>(owner->GetSIfi(MVrp::Type()));
+	    if (drp) {
+		drp->OnCompSelected(this);
+		res = true;
+	    }
 	}
     }
+    return res;
+}
+
+string AUnitCrp::GetModel() const
+{
+    __ASSERT(mMdl);
+    return mMdl->GetUri(NULL, true);
 }
 	
 
@@ -335,3 +350,10 @@ void AUnitDrp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 	AVHLayout::UpdateIfi(aName, aCtx);
     }
 }
+
+string AUnitDrp::GetModel() const
+{
+    __ASSERT(mMdl);
+    return mMdl->GetUri(NULL, true);
+}
+

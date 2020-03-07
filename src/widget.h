@@ -34,7 +34,7 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 	virtual string MSceneElem_Mid() const { return GetUri(0, ETrue);}
 	virtual void Render() override;
 	virtual void onSeCursorPosition(double aX, double aY) override;
-	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;

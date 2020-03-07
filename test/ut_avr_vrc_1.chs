@@ -37,10 +37,6 @@ testroot : Elem
                 Scene : /testroot/Modules/GVisComps/Scene
                 {
                     $ # "Visualisation scene";
-                    Drp : /*/Modules/AvrMdl/UnitDrp
-                    {
-                        Padding = 10;
-                    }
                 }
             }
             EnvWidth : AStatec;

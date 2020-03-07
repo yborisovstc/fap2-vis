@@ -330,13 +330,16 @@ void AVContainer::onSeCursorPosition(double aX, double aY)
     }
 }
 
-void AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+bool AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
+    bool res = false;
     TIfRange rr = GetIfi(MSceneElem::Type());
-    for (auto it = rr.first; it != rr.second; it++) {
+    // Redirect to comps till the event gets accepted
+    for (auto it = rr.first; it != rr.second && !res; it++) {
 	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
-	se->onMouseButton(aButton, aAction, aMods);
+	res = se->onMouseButton(aButton, aAction, aMods);
     }
+    return res;
 }
 
 MUnit* AVContainer::GetCntComp(const string& aCompName)

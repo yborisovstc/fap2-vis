@@ -36,7 +36,8 @@ void AScElem::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
 {
 }
 
-void AScElem::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+bool AScElem::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
+    return false;
 }
 

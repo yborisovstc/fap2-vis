@@ -22,7 +22,7 @@ class AScElem: public ADes, public MSceneElem
 	// From AScElem
 	virtual void Render() override {}
 	virtual void onSeCursorPosition(double aX, double aY) override;
-	virtual void onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	virtual void getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY) override;
 	// From MDesSyncable
     public:
