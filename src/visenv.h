@@ -51,6 +51,7 @@ class AGWindow: public ADes, public MWindow
 	// From MWindow
 	virtual void Start(void);
 	virtual void GetCursorPos(double& aX, double& aY) override;
+	virtual void GetFbSize(int* aW, int* aH) const override;
 	virtual string MWindow_Mid() const { return GetUri(0, true);}
 	// From MDesSyncable
     public:
@@ -90,7 +91,17 @@ class AGWindow: public ADes, public MWindow
 
 inline MUnit* AGWindow::Host() {return iMan == NULL ? NULL : iMan;}
 
-
+/** @brief Launcher agent
+ * */
+class AVDesLauncher: public ADesLauncher
+{
+    public:
+	static const char* Type() { return "AVDesLauncher";};
+	static string PEType();
+	AVDesLauncher(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	// From ADesLauncher
+	virtual void OnIdle() override;
+};
 
 #endif
 

@@ -10,6 +10,8 @@
 #include "label.h"
 #include "agentvr.h"
 #include "vrcontroller.h"
+#include "button.h"
+#include "vlayout.h"
 
 
 const string KModulesPath = "/usr/share/grayb/modules/";
@@ -18,7 +20,7 @@ const string KModulesPath = "/usr/share/grayb/modules/";
 const ProvBase::TFReg VisProv::mReg ( {
     Item<AVisEnv>(), Item<AScElem>(), Item<ASceRect>(), Item<AMdlVis>(), Item<AVisRepr>(), Item<AGWindow>(), Item<AGtScene>(),
     Item<AVWidget>(), Item<AVHLayout>(), Item<AVSlot>(), Item<AVCpsCp>(), Item<AUnitCrp>(), Item<AVLabel>(), Item<AUnitDrp>(),
-    Item<AVrController>(), Item<TrModelCreated>()
+    Item<AVrController>(), Item<TrModelCreated>(), Item<AButton>(), Item<AVLayout>(), Item<AVDesLauncher>()
 });
 
 VisProv::VisProv(const string& aName, MEnv* aEnv): ProvBase(aName, aEnv)

@@ -46,6 +46,7 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 	 * @param[in] aX, aY  Pos widget coordinates
 	 * */
 	virtual void onWdgCursorPos(int aX, int aY);
+	static void DrawLine(float x1, float y1, float x2, float y2);
     protected:
 	int GetParInt(const string& aUri);
 	static void CheckGlErrors();

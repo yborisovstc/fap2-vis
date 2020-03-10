@@ -88,19 +88,24 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	virtual void onSeCursorPosition(double aX, double aY) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MDesInpObserver
-	virtual void OnInpUpdated() override {}
+	virtual void OnInpUpdated() override;
 	virtual MIface* MDesInpObserver_Call(const string& aSpec, string& aRes) override;
 	virtual string MDesInpObserver_Mid() const override;
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// Local
 	virtual int GetComposedData(const string& aSlotName, TWdgPar aPar) = 0; 
-	virtual int GetSlotId(const string& aSlotName) const = 0;
-	virtual string GetSlotName(int aSlotId) const = 0;
+	virtual int GetSlotId(const string& aSlotName) const;
+	virtual string GetSlotName(int aSlotId) const;
+	virtual int GetNextSlot(int aSlotId) const;
+	virtual int GetLastSlot();
 	/** @brief Gets container component by name */
 	virtual MUnit* GetCntComp(const string& aCompName);
-	virtual void NotifyWidgetOnInpUpdated(const string& aOutUri) = 0;
-	virtual void AddComp(const string& aName, const string& aType, const string& aHint = string()) = 0;
+	/** @brief Notifies widgets of inp updated
+	 * param[inp] aOutUri container "output" assosiated to widget input
+	 * */
+	virtual void NotifyWidgetOnInpUpdated(const string& aOutUri);
+	virtual void AddComp(const string& aName, const string& aType, const string& aHint = string());
     public:
 	virtual void Update();
     protected:
@@ -154,15 +159,8 @@ class AVHLayout: public AVContainer
 	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
 	// From MSceneElem
 	virtual void Render() override;
-	// From MDesInpObserver
-	virtual void OnInpUpdated() override;
 	// From AVContainer
 	virtual int GetComposedData(const string& aSlotName, TWdgPar aPar) override; 
-	virtual int GetSlotId(const string& aSlotName) const;
-	virtual string GetSlotName(int aSlotId) const;
-	virtual void NotifyWidgetOnInpUpdated(const string& aOutUri);
-	// Local
-	virtual void AddComp(const string& aName, const string& aType, const string& aHint = string()) override;
     public:
 	virtual void Update();
     protected:

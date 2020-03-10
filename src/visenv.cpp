@@ -62,7 +62,7 @@ string AVisEnv::PEType()
 MIface *AVisEnv::DoGetObj(const char *aName)
 {
     MIface* res = NULL;
-    if (aName == MVisEnv::Type()) {
+    if (strcmp(aName, MVisEnv::Type()) == 0) {
 	res = dynamic_cast<MVisEnv*>(this);
     } else {
 	res = ADes::DoGetObj(aName);
@@ -364,3 +364,33 @@ void AGWindow::GetCursorPos(double& aX, double& aY)
     glfwGetWindowSize(mWindow, &width, &height);
     aY = height - y;
 }
+
+void AGWindow::GetFbSize(int* aW, int* aH) const
+{
+    __ASSERT(mWindow);
+    glfwGetWindowSize(mWindow, aW, aH);
+}
+
+
+
+
+
+
+string AVDesLauncher::PEType()
+{
+    return ADesLauncher::PEType() + GUri::KParentSep + Type();
+}
+
+AVDesLauncher::AVDesLauncher(const string& aName, MUnit* aMan, MEnv* aEnv): ADesLauncher(aName, aMan, aEnv)
+{
+    // TODO agent creation mechanism doesn't work if des.h:ADesLauncher is derived from Unit. Root cause
+    // is that Unit based agents instances don't provide their type correctly because type getter isn't virtual
+    // As for Elem it simulates virtual getter by storing type in instance specific data (chromo)
+    SetCrAttr(PEType(), aName);
+}
+
+void AVDesLauncher::OnIdle()
+{
+    glfwPollEvents();
+}
+

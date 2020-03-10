@@ -100,6 +100,7 @@ void AVCpsCp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 
 // Container
 
+const string KSlot_Name = "Slot";
 
 const string KWidgetRqsW_Name = "OutRqsW";
 const string KWidgetRqsH_Name = "OutRqsH";
@@ -358,11 +359,103 @@ MUnit* AVContainer::GetCntComp(const string& aCompName)
     return res;
 }
 
+string AVContainer::GetSlotName(int aSlotId) const
+{
+    return KSlot_Name + "_" + to_string(aSlotId);
+}
+
+int AVContainer::GetSlotId(const string& aSlotName) const
+{
+    int res = -1;
+    size_t sp = aSlotName.find_last_of('_');
+    string id = aSlotName.substr(sp + 1);
+    res = stoi(id);
+    return res;
+}
+
+int AVContainer::GetNextSlot(int aSlotId) const
+{
+    return aSlotId + 1;
+}
+
+int AVContainer::GetLastSlot()
+{
+    MUnit* host = GetMan();
+    int lastSlotId = 0;
+    for (int ind = 0; ind < host->CompsCount(); ind++) {
+	MUnit* compu = host->GetComp(ind);
+	MVCslot* comps = compu->GetObj(comps);
+	if (comps != nullptr) {
+	    int slotId = GetSlotId(compu->Name());
+	    lastSlotId = max(lastSlotId, slotId);
+	}
+    }
+    return lastSlotId;
+}
+
+void AVContainer::AddComp(const string& aName, const string& aType, const string& aHint)
+{
+    MUnit* host = GetMan();
+    int lastSlotId = GetLastSlot();
+    // Add new slot first
+    MElem* hoste = host->GetObj(hoste);
+    __ASSERT(hoste);
+    string newSlotName = GetSlotName(lastSlotId + 1);
+    hoste->AppendMutation(TMut(ENt_Node, ENa_Id, newSlotName, ENa_Parent, "AVSlot"));
+    TNs ns; MutCtx mctx(NULL, ns);
+    hoste->Mutate(true, false, false, mctx);
+    string newSlotUri = "./" + newSlotName;
+    MUnit* newSlot = host->GetNode(newSlotUri);
+    __ASSERT(newSlot);
+    hoste->AppendMutation(TMut(ENt_Node, ENa_Targ, newSlotUri , ENa_Id, aName, ENa_Parent, "/*/Modules/FvWidgets/" + aType));
+    hoste->Mutate(true, false, false, mctx);
+    string newWdgUri = newSlotUri + "/" + aName;
+    MUnit* newWdg = host->GetNode(newWdgUri);
+    __ASSERT(newWdg);
+    // Invalidate Iface cache
+    InvalidateIfCache();
+}
+
+void AVContainer::NotifyWidgetOnInpUpdated(const string& aOutUri)
+{
+    MUnit* alcOut = GetNode(aOutUri);
+    __ASSERT(alcOut != NULL);
+    TIfRange rr = alcOut->GetIfi(MDesInpObserver::Type(), this);
+    for (auto it = rr.first; it != rr.second; it++) {
+	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
+	mobs->OnInpUpdated();
+    }
+}
+
+void AVContainer::OnInpUpdated()
+{
+    Logger()->Write(EInfo, this, "OnUpdated");
+    MUnit* rqsInpW = GetNode("./RqsWInp");
+    __ASSERT(rqsInpW != NULL);
+    TIfRange rr = rqsInpW->GetIfi(MDVarGet::Type(), this);
+    for (auto it = rr.first; it != rr.second; it++) {
+	MDVarGet* dvg = (MDVarGet*) (*it);
+	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
+	if (dg != NULL) {
+	    Sdata<int> arg;
+	    dg->DtGet(arg);
+	    string dis;
+	    arg.ToString(dis);
+	    Logger()->Write(EInfo, this, "Requisition W: %s", dis.c_str());
+	}
+    }
+    // Propagate update notification to inp observers
+    NotifyWidgetOnInpUpdated("./AlcWOut");
+    NotifyWidgetOnInpUpdated("./AlcHOut");
+    NotifyWidgetOnInpUpdated("./AlcXOut");
+    NotifyWidgetOnInpUpdated("./AlcYOut");
+}
+
+
+
 
 // Horizontal layout
 
-const string KSlot_Name = "Slot";
-const string KSlot_1_Name = "Slot_1";
 
 AVHLayout::AVHLayout(const string& aName, MUnit* aMan, MEnv* aEnv): AVContainer(aName, aMan, aEnv)
 {
@@ -406,53 +499,6 @@ TBool AVHLayout::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& 
     return res;
 }
 
-/** @brief Notifies widgets of inp updated
- * param[inp] aOutUri container "output" assosiated to widget input
- * */
-void AVHLayout::NotifyWidgetOnInpUpdated(const string& aOutUri)
-{
-    MUnit* alcOut = GetNode(aOutUri);
-    __ASSERT(alcOut != NULL);
-    TIfRange rr = alcOut->GetIfi(MDesInpObserver::Type(), this);
-    for (auto it = rr.first; it != rr.second; it++) {
-	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
-	mobs->OnInpUpdated();
-    }
-}
-
-void AVHLayout::OnInpUpdated()
-{
-    Logger()->Write(EInfo, this, "OnUpdated");
-    MUnit* rqsInpW = GetNode("./RqsWInp");
-    __ASSERT(rqsInpW != NULL);
-    TIfRange rr = rqsInpW->GetIfi(MDVarGet::Type(), this);
-    for (auto it = rr.first; it != rr.second; it++) {
-	MDVarGet* dvg = (MDVarGet*) (*it);
-	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
-	if (dg != NULL) {
-	    Sdata<int> arg;
-	    dg->DtGet(arg);
-	    string dis;
-	    arg.ToString(dis);
-	    Logger()->Write(EInfo, this, "Requisition W: %s", dis.c_str());
-	}
-    }
-    // Propagate update notification to inp observers
-    /*
-    MUnit* alcWOut = GetNode("./AlcWOut");
-    __ASSERT(alcWOut != NULL);
-    rr = alcWOut->GetIfi(MDesInpObserver::Type(), this);
-    for (auto it = rr.first; it != rr.second; it++) {
-	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
-	mobs->OnInpUpdated();
-    }
-    */
-    NotifyWidgetOnInpUpdated("./AlcWOut");
-    NotifyWidgetOnInpUpdated("./AlcHOut");
-    NotifyWidgetOnInpUpdated("./AlcXOut");
-    NotifyWidgetOnInpUpdated("./AlcYOut");
-}
-
 int AVHLayout::GetComposedData(const string& aSlotName, TWdgPar aPar)
 {
     int res = 0;
@@ -475,51 +521,5 @@ int AVHLayout::GetComposedData(const string& aSlotName, TWdgPar aPar)
 	res = GetRqs(aSlotName, false);
     }
     return res;
-}
-
-int AVHLayout::GetSlotId(const string& aSlotName) const
-{
-    int res = -1;
-    size_t sp = aSlotName.find_last_of('_');
-    string id = aSlotName.substr(sp + 1);
-    res = stoi(id);
-    return res;
-}
-
-string AVHLayout::GetSlotName(int aSlotId) const
-{
-    return KSlot_Name + "_" + to_string(aSlotId);
-}
-
-void AVHLayout::AddComp(const string& aName, const string& aType, const string& aHint)
-{
-    // Get last slot Id
-    MUnit* host = GetMan();
-    int lastSlotId = 0;
-    for (int ind = 0; ind < host->CompsCount(); ind++) {
-	MUnit* compu = host->GetComp(ind);
-	MVCslot* comps = compu->GetObj(comps);
-	if (comps != nullptr) {
-	    int slotId = GetSlotId(compu->Name());
-	    lastSlotId = max(lastSlotId, slotId);
-	}
-    }
-    // Add new slot first
-    MElem* hoste = host->GetObj(hoste);
-    __ASSERT(hoste);
-    string newSlotName = GetSlotName(lastSlotId + 1);
-    hoste->AppendMutation(TMut(ENt_Node, ENa_Id, newSlotName, ENa_Parent, "AVSlot"));
-    TNs ns; MutCtx mctx(NULL, ns);
-    hoste->Mutate(true, false, false, mctx);
-    string newSlotUri = "./" + newSlotName;
-    MUnit* newSlot = host->GetNode(newSlotUri);
-    __ASSERT(newSlot);
-    hoste->AppendMutation(TMut(ENt_Node, ENa_Targ, newSlotUri , ENa_Id, aName, ENa_Parent, "/*/Modules/FvWidgets/" + aType));
-    hoste->Mutate(true, false, false, mctx);
-    string newWdgUri = newSlotUri + "/" + aName;
-    MUnit* newWdg = host->GetNode(newWdgUri);
-    __ASSERT(newWdg);
-    // Invalidate Iface cache
-    InvalidateIfCache();
 }
 

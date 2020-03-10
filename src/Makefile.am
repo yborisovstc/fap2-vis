@@ -25,11 +25,15 @@ libfap2vis_la_SOURCES = \
 		       widget.cpp \
 		       container.h \
 		       container.cpp \
+		       vlayout.h \
+		       vlayout.cpp \
 		       mvrcontroller.h \
 		       vrcontroller.h \
 		       vrcontroller.cpp \
 		       label.h \
 		       label.cpp \
+		       button.h \
+		       button.cpp \
 		       magentvr.h \
 		       agentvr.h \
 		       agentvr.cpp \

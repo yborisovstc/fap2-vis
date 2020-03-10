@@ -62,6 +62,11 @@ FvWidgets : Elem
         $ # " Label";
         WdgAgent : AVLabel;
     }
+    FButton : FWidgetBase
+    {
+        $ # " Button";
+        WdgAgent : AButton;
+    }
     FUnitCrp : FWidgetBase
     {
         $ # " Unit visual repesentation";

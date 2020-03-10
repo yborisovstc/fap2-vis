@@ -5,9 +5,15 @@ SUBDIRS = src test
 
 modulesdir = $(pkgdatadir)/modules
 dist_modules_DATA = \
-	     modules/widgets.xml
+	     modules/widgets.chs \
+	     modules/container.chs \
+	     modules/avr.chs \
+	     modules/viscomps.chs
 
 
 EXTRA_DIST = \
-	     modules/widgets.xml
+	     modules/widgets.chs \
+	     modules/container.chs \
+	     modules/avr.chs \
+	     modules/viscomps.chs
 
