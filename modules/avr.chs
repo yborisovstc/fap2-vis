@@ -28,8 +28,6 @@ AvrMdl : Elem
             ModelSynced : AStatec;
             ModelSynced < Value = "SB false";
         }
-        Slot_1 : AVSlot;
-        Slot_2 : AVSlot;
         Padding = 10;
     }
     VrController : Syst

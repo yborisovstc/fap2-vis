@@ -13,8 +13,12 @@ testroot : Elem
         $ + /GVisComps/Scene;
         $ + /GVisComps/SceRect;
         $ + /FvWidgets/FUnitCrp;
+        $ + /FvWidgets/FButton;
         $ + /AvrMdl/UnitDrp;
         $ + /AvrMdl/VrController;
+        $ + /ContainerMdl/VLayout;
+        $ + /ContainerMdl/HLayout;
+        $ + /ContainerMdl/Alignment;
     }
     Comps : Elem;
     Test : /testroot/Modules/DesComps/Des
@@ -23,7 +27,7 @@ testroot : Elem
         Controller : /testroot/Modules/AvrMdl/VrController;
         Controller < {
             ModelPath < Value = "SS ./ut_vrc1_mdl.chs";
-            Scene = /testroot/Test/Env/Window/Scene;
+            DrpMp = /testroot/Test/Env/Window/Scene/VBox/Slot_2/ModelView;
         }
         Env : /testroot/Modules/GVisComps/VisEnv
         {
@@ -36,7 +40,39 @@ testroot : Elem
                 Heigth < Value = "SI 800";
                 Scene : /testroot/Modules/GVisComps/Scene
                 {
-                    $ # "Visualisation scene";
+                    VBox : /*/Modules/ContainerMdl/VLayout
+                    {
+                        About = "Application view main vertical layout";
+                        Slot_1 : AVSlot;
+                        Slot_1 < Toolbar : /*/Modules/ContainerMdl/HLayout
+                        {
+                            About = "Application toolbar";
+                            Padding = 2;
+                            Slot_1 : AVSlot;
+                            ./Slot_1 < Btn1 : /*/Modules/FvWidgets/FButton
+                            {
+                                Text = "Button 1";
+                                BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
+                                FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
+                            }
+                            Slot_2 : AVSlot;
+                            ./Slot_2 < Btn2 : /*/Modules/FvWidgets/FButton
+                            {
+                                Text = "Button 2";
+                                BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
+                                FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
+                            }
+                            Slot_3 : AVSlot;
+                            ./Slot_3 < Btn2 : /*/Modules/FvWidgets/FButton
+                            {
+                                Text = "Button 3";
+                                BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
+                                FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
+                            }
+                        }
+                        Slot_2 : AVSlot;
+                        Slot_2 < ModelView : /*/Modules/ContainerMdl/Alignment;
+                    }
                 }
             }
             EnvWidth : AStatec;

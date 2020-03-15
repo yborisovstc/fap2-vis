@@ -101,6 +101,12 @@ void AVCpsCp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 // Container
 
 const string KSlot_Name = "Slot";
+const string KRqW_Uri = "./RqsW";
+const string KRqH_Uri = "./RqsH";
+const string KRqWInp_Uri = KRqW_Uri + "./Inp" ;
+const string KRqHInp_Uri = KRqH_Uri + "./Inp" ;
+const string KCompRqWInp_Uri = "./RqsWInp";
+const string KCompRqHInp_Uri = "./RqsHInp";
 
 const string KWidgetRqsW_Name = "OutRqsW";
 const string KWidgetRqsH_Name = "OutRqsH";
@@ -160,6 +166,14 @@ void AVContainer::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 		    MDVarGet* papdvg = dynamic_cast<MDVarGet*>(pap);
 		    InsertIfCache(aName, aCtx, this, papdvg);
 		}
+	    } else if (rqs == GetRqsInp(true)) {
+		// Request from W requisition
+		MIface* r = dynamic_cast<MDVarGet*>(&mTrRecW);
+		InsertIfCache(aName, aCtx, this, r);
+	    } else if (rqs == GetRqsInp(false)) {
+		// Request from H requisition
+		MIface* r = dynamic_cast<MDVarGet*>(&mTrRecH);
+		InsertIfCache(aName, aCtx, this, r);
 	    }
 	    // Downward request, redirect to comp
 	}
@@ -180,6 +194,30 @@ void AVContainer::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 	} else {
 	    AVWidget::UpdateIfi(aName, aCtx);
 	}
+	/*
+    } else if (aName == MDesInpObserver::Type()) {
+	// Bind component's requisition outputs to container requisition states
+	if (!aCtx.empty()) {
+	    MUnit* rqs = aCtx.back(); // Slot
+	    MVCslot* rqss = rqs->GetObj(rqss);
+	    if (rqss != NULL) {
+		if (rqss != NULL) {
+		    if (rqs->CompsCount() == 1) {
+			MUnit* wdg = rqs->GetComp(0);
+			MUnit* prov = NULL;
+			if (wdg->Name() == "RqsW") {
+			    MUnit* prov = GetNode("./RqsW/Inp");
+			} else if (wdg->Name() == "RqsH") {
+			    MUnit* prov = GetNode("./RqsH/Inp");
+			}
+			rr = prov->GetIfi(aName, ctx);
+			InsertIfCache(aName, aCtx, prov, rr);
+		    }
+		}
+
+	    }
+	}
+	*/
     } else {
 	AVWidget::UpdateIfi(aName, aCtx);
     }
@@ -261,7 +299,6 @@ void AVContainer::Init()
 		} else {
 		    Logger()->Write(EErr, this, "Cannot find widget output [%s]", KWidgetRqsH_Name.c_str());
 		}
-
 	    } else {
 		Logger()->Write(EErr, this, "Slot components != 1");
 	    }
@@ -291,7 +328,21 @@ string AVContainer::MDesInpObserver_Mid() const
     return GetUri(NULL, ETrue);
 }
 
-int AVContainer::GetRqs(const string& aSlot, bool aW)
+MUnit* AVContainer::GetCompRqsInp(bool aW)
+{
+    MUnit* res = NULL;
+    res = GetNode(aW ? KCompRqWInp_Uri : KCompRqHInp_Uri);
+    return res;
+}
+
+MUnit* AVContainer::GetRqsInp(bool aW)
+{
+    MUnit* res = NULL;
+    res = GetNode(aW ? KRqWInp_Uri: KRqHInp_Uri);
+    return res;
+}
+
+int AVContainer::GetCompRqs(const string& aSlot, bool aW)
 {
     int res = 0;
     TWDvgProv& reg = (aW ? mRqsW : mRqsH);    
@@ -321,6 +372,41 @@ void AVContainer::WidgetAp::WdgPap::DtGet(Sdata<int>& aData)
     int res = mHost->mHost.GetComposedData(mHost->mSlot, mPar);
     aData.Set(res);
 }
+
+
+// Transition of requisition
+
+void* AVContainer::TrReq::DoGetDObj(const char *aName)
+{
+    void* res = NULL;
+    if (aName == MDtGet<Sdata<int> >::Type()) {
+	res = dynamic_cast<MDtGet<Sdata<int> >*>(this);
+    }
+    return res;
+}
+
+void AVContainer::TrReq::DtGet(Sdata<int>& aData)
+{
+    int res = mHost->mPadding;
+    MUnit* inp = mHost->GetCompRqsInp(mW);
+    __ASSERT(inp);
+    TIfRange rr = inp->GetIfi(MDVarGet::Type());
+    for (auto it = rr.first; it != rr.second; it++) {
+	MDVarGet* dvg = dynamic_cast<MDVarGet*>(*it);
+	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
+	int idata = 0;
+	if (dg != NULL) {
+	    Sdata<int> arg;
+	    dg->DtGet(arg);
+	    idata = arg.mData;
+	}
+	res += idata + mHost->mPadding;
+    }
+    aData.Set(res);
+}
+
+
+
 
 void AVContainer::onSeCursorPosition(double aX, double aY)
 {
@@ -429,7 +515,7 @@ void AVContainer::NotifyWidgetOnInpUpdated(const string& aOutUri)
 
 void AVContainer::OnInpUpdated()
 {
-    Logger()->Write(EInfo, this, "OnUpdated");
+    Logger()->Write(EInfo, this, "OnInpUpdated");
     MUnit* rqsInpW = GetNode("./RqsWInp");
     __ASSERT(rqsInpW != NULL);
     TIfRange rr = rqsInpW->GetIfi(MDVarGet::Type(), this);
@@ -516,9 +602,9 @@ int AVHLayout::GetComposedData(const string& aSlotName, TWdgPar aPar)
     } else if (aPar == E_AlcY) {
 	res = mPadding;
     } else if (aPar == E_AlcW) {
-	res = GetRqs(aSlotName, true);
+	res = GetCompRqs(aSlotName, true);
     } else if (aPar == E_AlcH) {
-	res = GetRqs(aSlotName, false);
+	res = GetCompRqs(aSlotName, false);
     }
     return res;
 }

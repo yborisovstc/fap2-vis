@@ -52,7 +52,6 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	    public:
 		friend WdgPap;
 		WidgetAp(AVContainer& aHost, const string& aSlot): mHost(aHost), mSlot(aSlot) {}
-		//WidgetAp(AVContainer& aHost, const string& aSlot);
 		WidgetAp(const WidgetAp& aSrc): mHost(aSrc.mHost), mSlot(aSrc.mSlot) {}
 	    protected:
 		// From MDesInpObserver
@@ -67,6 +66,21 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 		WdgPap mAlcH = WdgPap(this, E_AlcH);
 		WdgPap mAlcX = WdgPap(this, E_AlcX);
 		WdgPap mAlcY = WdgPap(this, E_AlcY);
+	};
+    public:
+/** @brief Transition of requisition
+ * */
+	class TrReq: public MDVarGet, public MDtGet<Sdata<int>> {
+	    public:
+		TrReq(AVContainer* aHost, bool aW): mHost(aHost), mW(aW) {}
+		// From MDVarGet
+		virtual void *DoGetDObj(const char *aName) override;
+		virtual string VarGetIfid() override {return string();}
+		// From MDtGet
+		virtual void DtGet(Sdata<int>& aData) override;
+	    protected:
+		AVContainer* mHost;
+		bool mW; /*!< Sign of width transtion, otherwise height */
 	};
     public:
 	/** @brief Widget apps registry, key - slot name
@@ -110,12 +124,19 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	virtual void Update();
     protected:
 	virtual void Init();
-	int GetRqs(const string& aSlot, bool aW);
+	/** @brief Gets input of comps requistion **/
+	MUnit* GetCompRqsInp(bool aW);
+	/** @brief Gets requisision **/
+	MUnit* GetRqsInp(bool aW);
+	/** @brief Gets component requisision **/
+	int GetCompRqs(const string& aSlot, bool aW);
     protected:
 	TWAps mWap; /**< Widget access points */
 	TWDvgProv mRqsW; /**< Widget Width Requisition MDVarGet providers  */
 	TWDvgProv mRqsH; /**< Widget Hight Requisition MDVarGet providers  */
 	int mPadding = 0; /*!< Slot padding */
+	TrReq mTrRecW = TrReq(this, true); /*!< Transition of requisition */
+	TrReq mTrRecH = TrReq(this, false); /*!< Transition of requisition */
 };
 
 /** @brief Container's slot

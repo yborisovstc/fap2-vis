@@ -1,35 +1,35 @@
 
 #include "mwindow.h"
-#include "vlayout.h"
+#include "scrolledbox.h"
 
 
-AVLayout::AVLayout(const string& aName, MUnit* aMan, MEnv* aEnv): AVContainer(aName, aMan, aEnv)
+AScrBox::AScrBox(const string& aName, MUnit* aMan, MEnv* aEnv): AVContainer(aName, aMan, aEnv)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
 }
 
-string AVLayout::PEType()
+string AScrBox::PEType()
 {
     return AVContainer::PEType() + GUri::KParentSep + Type();
 }
 
-void AVLayout::Render()
+void AScrBox::Render()
 {
     AVContainer::Render();
 }
 
-void AVLayout::Init()
+void AScrBox::Init()
 {
     AVContainer::Init();
 }
 
-TBool AVLayout::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AScrBox::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
 {
     TBool res = AVContainer::HandleCompChanged(aContext, aComp, aContName);
     return res;
 }
 
-int AVLayout::GetComposedData(const string& aSlotName, TWdgPar aPar)
+int AScrBox::GetComposedData(const string& aSlotName, TWdgPar aPar)
 {
     int res = 0;
     int wndWidth = 0, wndHeight = 0;

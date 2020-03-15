@@ -35,6 +35,7 @@ testroot : Elem
                         Padding = 20;
                         AlcW < Value = "SI 220";
                         AlcH < Value = "SI 330";
+                        Slot_1 : AVSlot;
                         Slot_1 < Wdg1 : /*/Modules/FvWidgets/FWidget
                         {
                             BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
@@ -53,6 +54,7 @@ testroot : Elem
                             ./W1IncrW/Out ~ ./RqsW/Inp;
                             ./RqsW ~ ./W1IncrW/Inp;
                         }
+                        Slot_2 : AVSlot;
                         Slot_2 < Wdg2 : /*/Modules/FvWidgets/FWidget
                         {
                             BgColor = "{R:'1.0' G:'0.0' B:'0.0'}";

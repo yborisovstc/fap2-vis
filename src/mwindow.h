@@ -1,6 +1,7 @@
 #ifndef __FAP2VIS_MWINDOW_H
 #define __FAP2VIS_MWINDOW_H
 
+#include <miface.h>
 
 /** @brief Window interface
  * */

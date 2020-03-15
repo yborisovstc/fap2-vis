@@ -27,6 +27,10 @@ libfap2vis_la_SOURCES = \
 		       container.cpp \
 		       vlayout.h \
 		       vlayout.cpp \
+		       alignment.h \
+		       alignment.cpp \
+		       scrolledbox.h \
+		       scrolledbox.cpp \
 		       mvrcontroller.h \
 		       vrcontroller.h \
 		       vrcontroller.cpp \

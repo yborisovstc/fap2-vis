@@ -35,7 +35,14 @@ class AVrController : public ADes, public MVrController, public MACompsObserver
 	virtual void Update();
     protected:
 	virtual void Init();
-	MElem* GetSceneE();
+	/** @brief Gets DRP mounitng point - container MUnit */
+	MUnit* GetDrpMpcU();
+	/** @brief Gets DRP mounitng point - container MElem */
+	MElem* GetDrpMpcE();
+	/** @brief Gets DRP mounitng point MUnit */
+	MUnit* GetDrpMpU();
+	/** @brief Gets mounting point URI */
+	string GetDrpMpUri() const;
 	MVrp* GetDrp();
 	MUnit* GetDrpU();
 	MVrp* CreateDrp(const MUnit* aNode);

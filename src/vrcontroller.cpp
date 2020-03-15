@@ -10,14 +10,14 @@
 
 const string KVrc_ModelPath = "";
 
-/** @brief Content: scene URI */
-const string KVrc_Scene = "Scene";
+/** @brief Content: DRP mounting point */
+const string KVrc_DrpMp = "DrpMp";
 
 AVrController::AVrController(const string& aName, MUnit* aMan, MEnv* aEnv): ADes(aName, aMan, aEnv), mEnv(NULL)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
     InsertContent(KVrc_ModelPath);
-    InsertContent(KVrc_Scene);
+    InsertContent(KVrc_DrpMp);
 }
 
 AVrController::~AVrController()
@@ -49,10 +49,9 @@ MIface* AVrController::DoGetObj(const char *aName)
 MUnit* AVrController::GetDrpU()
 {
     MUnit* res = nullptr;
-    const string sceneUri = iMan->GetContent(KVrc_Scene);
-    MUnit* sceneu = GetNode(sceneUri);
-    for (int ind = 0; ind < sceneu->CompsCount(); ind++) {
-	MUnit* comp = sceneu->GetComp(ind);
+    MUnit* mpu = GetDrpMpU();
+    for (int ind = 0; ind < mpu->CompsCount(); ind++) {
+	MUnit* comp = mpu->GetComp(ind);
 	MVrp* drp = (MVrp*) comp->GetSIfi(MVrp::Type());
 	if (drp != nullptr) {
 	    res = comp; break;
@@ -61,10 +60,16 @@ MUnit* AVrController::GetDrpU()
     return res;
 }
 
+string AVrController::GetDrpMpUri() const
+{
+    string cntUri = iMan->GetContent(KVrc_DrpMp);
+    return cntUri + "/Slot_1";
+}
+
 MVrp* AVrController::GetDrp()
 {
     MVrp* res = nullptr;
-    const string sceneUri = iMan->GetContent(KVrc_Scene);
+    const string sceneUri = GetDrpMpUri();
     MUnit* sceneu = GetNode(sceneUri);
     for (int ind = 0; ind < sceneu->CompsCount(); ind++) {
 	MUnit* comp = sceneu->GetComp(ind);
@@ -79,13 +84,13 @@ MVrp* AVrController::GetDrp()
 MVrp* AVrController::CreateDrp(const MUnit* aNode)
 {
     MVrp* res = nullptr;
-    const string sceneUri = iMan->GetContent(KVrc_Scene);
-    MUnit* sceneu = GetNode(sceneUri);
+    MUnit* sceneu = GetDrpMpcU();
     __ASSERT(sceneu);
     MElem* scenee = sceneu->GetObj(scenee);
     __ASSERT(scenee);
     string drpType = "UnitDrp";
-    scenee->AppendMutation(TMut(ENt_Node, ENa_Targ, sceneUri , ENa_Id, aNode->Name(), ENa_Parent, "/*/Modules/AvrMdl/" + drpType));
+    const string drpmpUri = GetDrpMpUri();
+    scenee->AppendMutation(TMut(ENt_Node, ENa_Targ, drpmpUri , ENa_Id, aNode->Name(), ENa_Parent, "/*/Modules/AvrMdl/" + drpType));
     TNs ns; MutCtx mctx(NULL, ns);
     scenee->Mutate(true, false, false, mctx);
     // Activate scene, TODO to do it in Des::Mutate
@@ -103,9 +108,25 @@ MVrp* AVrController::CreateDrp(const MUnit* aNode)
     return res;
 }
 
-MElem* AVrController::GetSceneE()
+MUnit* AVrController::GetDrpMpcU()
 {
-    const string sceneUri = iMan->GetContent(KVrc_Scene);
+    MUnit* res = NULL;
+    const string sceneUri = iMan->GetContent(KVrc_DrpMp);
+    res = GetNode(sceneUri);
+    return res;
+}
+
+MUnit* AVrController::GetDrpMpU()
+{
+    MUnit* res = NULL;
+    const string mpUri = GetDrpMpUri();
+    res = GetNode(mpUri);
+    return res;
+}
+
+MElem* AVrController::GetDrpMpcE()
+{
+    const string sceneUri = iMan->GetContent(KVrc_DrpMp);
     MUnit* sceneu = GetNode(sceneUri);
     __ASSERT(sceneu);
     MElem* scenee = sceneu->GetObj(scenee);
@@ -145,7 +166,7 @@ TBool AVrController::HandleCompChanged(MUnit& aContext, MUnit& aComp, const stri
 	if (aContName == KVrc_ModelPath) {
 	    string val = aComp.GetContent(KVrc_ModelPath);
 	    res = true;
-	} else if (aContName == KVrc_Scene) {
+	} else if (aContName == KVrc_DrpMp) {
 	    res = true;
 	}
     }
@@ -181,10 +202,10 @@ void AVrController::OnRpSelected(const MVrp* aRp)
     __ASSERT(mdl);
     MUnit* drp = GetDrpU();
     __ASSERT(drp);
-    MElem* scenee = GetSceneE();
+    MElem* scenee = GetDrpMpcE();
     __ASSERT(scenee);
     //string drpUri = drp->GetUri(NULL, true);
-    scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./" + drp->Name()));
+    scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./Slot_1/" + drp->Name()));
     TNs ns; MutCtx mctx(NULL, ns);
     scenee->Mutate(true, false, false, mctx);
     CreateDrp(mdl);

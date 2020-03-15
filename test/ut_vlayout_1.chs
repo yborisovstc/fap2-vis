@@ -16,6 +16,7 @@ testroot : Elem
         $ + /FvWidgets/FButton;
         $ + /ContainerMdl/VLayout;
         $ + /ContainerMdl/HLayout;
+        $ + /ContainerMdl/Alignment;
     }
     Launcher : AVDesLauncher;
     Launcher < Path = /testroot/Test;
@@ -39,23 +40,9 @@ testroot : Elem
                         AlcW < Value = "SI 220";
                         AlcH < Value = "SI 330";
                         Slot_1 : AVSlot;
-                        Slot_1 < Btn1 : /*/Modules/FvWidgets/FButton
+                        Slot_1 < HBox : /*/Modules/ContainerMdl/HLayout
                         {
-                            Text = "Button 1";
-                            BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
-                            FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
-                        }
-                        Slot_2 : AVSlot;
-                        Slot_2 < Btn2 : /*/Modules/FvWidgets/FButton
-                        {
-                            Text = "Button 2";
-                            BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
-                            FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
-                        }
-                        Slot_3 : AVSlot;
-                        Slot_3 < HBox : /*/Modules/ContainerMdl/HLayout
-                        {
-                            Padding = 20;
+                            Padding = 2;
                             Slot_1 : AVSlot;
                             ./Slot_1 < Btn1 : /*/Modules/FvWidgets/FButton
                             {
@@ -65,6 +52,30 @@ testroot : Elem
                             }
                             Slot_2 : AVSlot;
                             ./Slot_2 < Btn2 : /*/Modules/FvWidgets/FButton
+                            {
+                                Text = "Button 2";
+                                BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
+                                FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
+                            }
+                            Slot_3 : AVSlot;
+                            ./Slot_3 < Btn2 : /*/Modules/FvWidgets/FButton
+                            {
+                                Text = "Button 3";
+                                BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
+                                FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
+                            }
+                        }
+                        Slot_2 : AVSlot;
+                        Slot_2 < Btn1 : /*/Modules/FvWidgets/FButton
+                        {
+                            Text = "Button 1";
+                            BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
+                            FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
+                        }
+                        Slot_3 : AVSlot;
+                        Slot_3 < Align : /*/Modules/ContainerMdl/Alignment
+                        {
+                            ./Slot_1 < Btn2 : /*/Modules/FvWidgets/FButton
                             {
                                 Text = "Button 2";
                                 BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
