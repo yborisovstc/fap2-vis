@@ -118,6 +118,15 @@ AGWindow::AGWindow(const string& aName, MUnit* aMan, MEnv* aEnv): ADes(aName, aM
     mWindow(NULL)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
+    if (!mWndInit) {
+	// Checking in content flag showing that the window is part of visial env but not 
+	// just base agent. If so, initialise the agent
+	// TODO [YB] To find more suitable solution
+	Construct();
+	glfwSetWindowUserPointer(mWindow, this);
+	glfwSetWindowSizeCallback(mWindow, onWindowSizeChanged);
+	mWndInit = ETrue;
+    }
 }
 
 string AGWindow::PEType()
@@ -129,6 +138,8 @@ void AGWindow::Construct()
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+    /*
     MUnit* host = GetMan();
 
     MUnit* wu = host->GetNode("./Width");
@@ -142,7 +153,10 @@ void AGWindow::Construct()
     MDtGet<Sdata<int>>* hsi = hvg->GetDObj(wsi);
     Sdata<int> hi = 0;
     hsi->DtGet(hi);
+    */
 
+    Sdata<int> wi = 640;
+    Sdata<int> hi = 480;
     mWindow = glfwCreateWindow(wi.mData, hi.mData, "My Title", NULL, NULL);
     if (mWindow != NULL) {
 	glfwSetWindowUserPointer(mWindow, this);
@@ -306,6 +320,7 @@ void AGWindow::OnUpdated_H(int aOldData)
 
 void AGWindow::Render()
 {
+    Logger()->Write(EInfo, this, "Render");
     MUnit* scene = GetNode("./../Scene");
     if (scene != NULL) {
 	MScene* mscene = (MScene*) scene->GetSIfi(MScene::Type(), this);
@@ -320,20 +335,12 @@ void AGWindow::Render()
 void AGWindow::Update()
 {
     Logger()->Write(EInfo, this, "Update");
-    if (!mWndInit) {
-	// Checking in content flag showing that the window is part of visial env but not 
-	// just base agent. If so, initialise the agent
-	// TODO [YB] To find more suitable solution
-	Construct();
-	glfwSetWindowUserPointer(mWindow, this);
-	glfwSetWindowSizeCallback(mWindow, onWindowSizeChanged);
-	mWndInit = ETrue;
-    }
     ADes::Update();
 }
 
 void AGWindow::Confirm()
 {
+    Logger()->Write(EInfo, this, "Confirm");
     ADes::Confirm();
     Render();
     glfwSwapBuffers(mWindow);
@@ -367,8 +374,11 @@ void AGWindow::GetCursorPos(double& aX, double& aY)
 
 void AGWindow::GetFbSize(int* aW, int* aH) const
 {
-    __ASSERT(mWindow);
-    glfwGetWindowSize(mWindow, aW, aH);
+    if (mWindow) {
+	glfwGetWindowSize(mWindow, aW, aH);
+    } else {
+	*aW = -1; *aH = -1;
+    }
 }
 
 

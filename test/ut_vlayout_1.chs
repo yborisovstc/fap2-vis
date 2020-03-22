@@ -34,7 +34,7 @@ testroot : Elem
                 Scene : /testroot/Modules/GVisComps/Scene
                 {
                     $ # "Visualisation scene";
-                    Cnt1 : /*/Modules/ContainerMdl/VLayout
+                    VBox : /*/Modules/ContainerMdl/VLayout
                     {
                         Padding = 20;
                         AlcW < Value = "SI 220";
@@ -53,7 +53,7 @@ testroot : Elem
                             Slot_2 : AVSlot;
                             ./Slot_2 < Btn2 : /*/Modules/FvWidgets/FButton
                             {
-                                Text = "Button 2";
+                                Text = "Button 2 test";
                                 BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
                                 FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
                             }

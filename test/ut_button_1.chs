@@ -36,12 +36,14 @@ testroot : Elem
                         Padding = 20;
                         AlcW < Value = "SI 220";
                         AlcH < Value = "SI 330";
+                        Slot_1 : AVSlot;
                         Slot_1 < Btn1 : /*/Modules/FvWidgets/FButton
                         {
                             Text = "Button 1";
                             BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
                             FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
                         }
+                        Slot_2 : AVSlot;
                         Slot_2 < Btn2 : /*/Modules/FvWidgets/FButton
                         {
                             Text = "Button 2";
@@ -63,27 +65,4 @@ testroot : Elem
         EnvHeight < Value = "SI 480";
         Title < Value = "SS Title";
     }
-    $ # " Increasing size of widget";
-    WdgWidth : AStatec;
-    WdgWidth < {
-        Debug.Update = y;
-        Value = "SI 40";
-    }
-    WdgHeight : AStatec;
-    WdgHeight < {
-        Debug.Update = y;
-        Value = "SI 60";
-    }
-    IncrW : ATrcAddVar;
-    IncrH : ATrcAddVar;
-    IncrData : AStatec;
-    IncrData < Value = "SI 1";
-    IncrData ~ ./IncrW/Inp;
-    ./IncrW/Out ~ ./WdgWidth/Inp;
-    WdgWidth ~ ./IncrW/Inp;
-    IncrData ~ ./IncrH/Inp;
-    ./IncrH/Out ~ ./WdgHeight/Inp;
-    WdgHeight ~ ./IncrH/Inp;
-    $ # "WdgWidth ~ ./Env/Window/Scene/Cnt1/InpAlcW";
-    $ # "WdgHeight ~ ./Env/Window/Scene/Cnt1/InpAlcH";
 }

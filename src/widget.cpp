@@ -75,11 +75,17 @@ MIface* AVWidget::DoGetObj(const char *aName)
 void AVWidget::Update()
 {
     Logger()->Write(EInfo, this, "Update");
+    ADes::Update();
+}
+
+void AVWidget::Confirm()
+{
+    Logger()->Write(EInfo, this, "Confirm");
+    ADes::Confirm();
     if (!mIsInitialised) {
 	Init();
 	mIsInitialised = true;
     }
-    ADes::Update();
 }
 
 void AVWidget::CheckGlErrors()

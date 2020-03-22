@@ -34,14 +34,16 @@ int AAlignment::GetComposedData(const string& aSlotName, TWdgPar aPar)
     int res = 0;
     int wndWidth = 0, wndHeight = 0;
     Wnd()->GetFbSize(&wndWidth, &wndHeight);
-    if (aPar == E_AlcX) {
-	res = mPadding;
-    } else if (aPar == E_AlcY) {
-	res = mPadding;
-    } else if (aPar == E_AlcW) {
-	res = GetCompRqs(aSlotName, true);
-    } else if (aPar == E_AlcH) {
-	res = GetCompRqs(aSlotName, false);
+    if (wndWidth >0 && wndHeight > 0) {
+	if (aPar == E_AlcX) {
+	    res = mPadding;
+	} else if (aPar == E_AlcY) {
+	    res = mPadding;
+	} else if (aPar == E_AlcW) {
+	    res = GetCompRqs(aSlotName, true);
+	} else if (aPar == E_AlcH) {
+	    res = GetCompRqs(aSlotName, false);
+	}
     }
     return res;
 }

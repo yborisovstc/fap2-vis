@@ -43,7 +43,7 @@ class AgentObserver: public MAgentObserver
 class Ut_cnt : public CPPUNIT_NS::TestFixture
 {
     CPPUNIT_TEST_SUITE(Ut_cnt);
-    // CPPUNIT_TEST(test_Base);
+    //CPPUNIT_TEST(test_Base);
     CPPUNIT_TEST(testVlayout1);
     CPPUNIT_TEST_SUITE_END();
     public:

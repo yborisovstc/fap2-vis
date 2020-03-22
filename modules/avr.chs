@@ -9,22 +9,13 @@ AvrMdl : Elem
         $ + /DesComps/StcOutExt;
         $ + /FvWidgets/FWidgetBase;
         $ + /ContainerMdl/FContainer;
+        $ + /ContainerMdl/HLayoutBase;
     }
-    UnitDrp : /*/Modules/ContainerMdl/FContainer
+    UnitDrp : /*/Modules/ContainerMdl/HLayoutBase
     {
         $ # " Unit detail representation";
         CntAgent : AUnitDrp;
         CntAgent < {
-            RqsWInp : AVCpsCp;
-            RqsWInp < WcpName = OutRqsW;
-            AlcWOut : AVCpsCp;
-            AlcWOut < WcpName = InpAlcW;
-            AlcHOut : AVCpsCp;
-            AlcHOut < WcpName = InpAlcH;
-            AlcXOut : AVCpsCp;
-            AlcXOut < WcpName = InpAlcX;
-            AlcYOut : AVCpsCp;
-            AlcYOut < WcpName = InpAlcY;
             ModelSynced : AStatec;
             ModelSynced < Value = "SB false";
         }
@@ -35,6 +26,7 @@ AvrMdl : Elem
         $ # " Visual representation controller";
         AVrc : AVrController;
         ModelPath : AStatec;
+        ModelPath < Value = "SS none";
         ModelCreated : AStatec;
         ModelCreated < Value = "SB false";
         TrsModelCreated : TrModelCreated;

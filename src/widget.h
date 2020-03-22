@@ -39,7 +39,8 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// From MDesSyncable
-	virtual void Update();
+	virtual void Update() override;
+	virtual void Confirm() override;
     protected:
 	virtual void Init();
 	/** @brief Handles cursor position change

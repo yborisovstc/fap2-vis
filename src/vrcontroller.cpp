@@ -105,6 +105,7 @@ MVrp* AVrController::CreateDrp(const MUnit* aNode)
     drp->SetModel(mdlUri);
     // Bind model to root DRP
     drp->SetCrtlBinding(GetUri(NULL, true));
+    Logger()->Write(EInfo, this, "Model cteated: %s", drpmpUri .c_str());
     return res;
 }
 

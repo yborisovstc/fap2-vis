@@ -34,7 +34,15 @@ FvWidgets : Elem
         }
         $ # " Requisition";
         RqsW : AStatec;
+        RqsW < {
+            Debug.Update = y;
+            Value = "SI 0";
+        }
         RqsH : AStatec;
+        RqsH < {
+            Debug.Update = y;
+            Value = "SI 0";
+        }
         $ # " Inputs";
         $ # " Inputs: Allocation";
         InpAlcX : /*/Modules/DesComps/StcInpExt;

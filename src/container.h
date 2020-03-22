@@ -119,10 +119,15 @@ class AVContainer: public AVWidget, public MDesInpObserver_Imd
 	 * param[inp] aOutUri container "output" assosiated to widget input
 	 * */
 	virtual void NotifyWidgetOnInpUpdated(const string& aOutUri);
+	/** @brief Notifies requisitions of inp updated
+	 * param[inp] aW sign of W requisition, otherwise H
+	 * */
+	void NotifyReqsOnInpUpdated(bool aW);
 	virtual void AddComp(const string& aName, const string& aType, const string& aHint = string());
     public:
 	virtual void Update();
     protected:
+	inline MUnit* Host() { return iMan;}
 	virtual void Init();
 	/** @brief Gets input of comps requistion **/
 	MUnit* GetCompRqsInp(bool aW);
@@ -154,17 +159,69 @@ class AVSlot: public Vertu, public MVCslot
 
 
 /** @brief Container compositor input
- * Connection point like node customizing IRM path to widget outputs
+ * Binided to components outputs
  * */
-class AVCpsCp: public Unit
+class AVCpsCpInp: public ConnPointMcu
 {
     public:
-	static const char* Type() { return "AVCpsCp";};
+	static const char* Type() { return "AVCpsCpInp";};
 	static string PEType();
-	AVCpsCp(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	AVCpsCpInp(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 };
+
+/** @brief Container compositor output
+ * Binided to components inputs
+ * */
+class AVCpsCpOut: public ConnPointMcu
+{
+    public:
+	static const char* Type() { return "AVCpsCpOut";};
+	static string PEType();
+	AVCpsCpOut(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	// From MUnit
+	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
+};
+
+/** @brief Transition of container requistion state, base */
+class TrCntReq: public ATrcBase, public MDVarGet, public MDtGet<Sdata<int> >  {
+    public:
+	static const char* Type() { return "TrCntReq";};
+	static string PEType();
+	TrCntReq(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	virtual MIface* DoGetObj(const char *aName) override;
+	// From MDVarGet
+	virtual string MDVarGet_Mid() const {return GetUri(NULL, ETrue);}
+	virtual string VarGetIfid(){ return MDtGet<Sdata<bool> >::Type();}
+	virtual void *DoGetDObj(const char *aName);
+	// From MDtGet<Sdata<int>>
+	//virtual void DtGet(Sdata<int>& aData) override;
+};
+
+
+/** @brief Transition of container requistion state, sum of inputs
+ * */
+class TrReqSum: public TrCntReq  {
+    public:
+	static const char* Type() { return "TrReqSum";};
+	static string PEType();
+	TrReqSum(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	// From MDtGet<Sdata<int>>
+	virtual void DtGet(Sdata<int>& aData) override;
+};
+
+/** @brief Transition of container requistion state, Max of inputs
+ * */
+class TrReqMax: public TrCntReq  {
+    public:
+	static const char* Type() { return "TrReqMax";};
+	static string PEType();
+	TrReqMax(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	// From MDtGet<Sdata<int>>
+	virtual void DtGet(Sdata<int>& aData) override;
+};
+
 
 
 /** @brief Horisontal layout containter agent
@@ -187,6 +244,7 @@ class AVHLayout: public AVContainer
     protected:
 	virtual void Init();
 };
+
 
 #endif // __FAP2VIS_CONTAITER_H
 

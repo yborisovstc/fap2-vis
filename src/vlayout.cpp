@@ -34,24 +34,26 @@ int AVLayout::GetComposedData(const string& aSlotName, TWdgPar aPar)
     int res = 0;
     int wndWidth = 0, wndHeight = 0;
     Wnd()->GetFbSize(&wndWidth, &wndHeight);
-    if (aPar == E_AlcX) {
-	res = mPadding;
-    } else if (aPar == E_AlcY) {
-	int cid = GetSlotId(aSlotName);
-	if (cid > 1) {
-	    int pid = cid - 1;
-	    string psn = GetSlotName(pid);
-	    int y = GetComposedData(psn, E_AlcY);
-	    int h = GetComposedData(psn, E_AlcH);
-	    res = y - (h + 2*mPadding);
-	} else {
-	    int h = GetCompRqs(aSlotName, false);
-	    res = wndHeight - (h + 2*mPadding);
+    if (wndWidth >0 && wndHeight > 0) {
+	if (aPar == E_AlcX) {
+	    res = mPadding;
+	} else if (aPar == E_AlcY) {
+	    int cid = GetSlotId(aSlotName);
+	    if (cid > 1) {
+		int pid = cid - 1;
+		string psn = GetSlotName(pid);
+		int y = GetComposedData(psn, E_AlcY);
+		int h = GetCompRqs(aSlotName, false);
+		res = y - (h + 2*mPadding);
+	    } else {
+		int h = GetCompRqs(aSlotName, false);
+		res = wndHeight - (h + 2*mPadding);
+	    }
+	} else if (aPar == E_AlcW) {
+	    res = GetCompRqs(aSlotName, true);
+	} else if (aPar == E_AlcH) {
+	    res = GetCompRqs(aSlotName, false);
 	}
-    } else if (aPar == E_AlcW) {
-	res = GetCompRqs(aSlotName, true);
-    } else if (aPar == E_AlcH) {
-	res = GetCompRqs(aSlotName, false);
     }
     return res;
 }

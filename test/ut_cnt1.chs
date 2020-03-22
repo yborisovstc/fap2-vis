@@ -76,17 +76,17 @@ testroot : Elem
                     }
                 }
             }
+            EnvWidth : AStatec;
+            EnvHeight : AStatec;
+            Title : AStatec;
+            EnvWidth ~ ./Window/Inp_W;
+            EnvHeight ~ ./Window/Inp_H;
+            Title ~ ./Window/Inp_Title;
         }
-        EnvWidth : AStatec;
-        EnvHeight : AStatec;
-        Title : AStatec;
-        EnvWidth ~ ./Window/Inp_W;
-        EnvHeight ~ ./Window/Inp_H;
-        Title ~ ./Window/Inp_Title;
+        ./Env/EnvWidth < Value = "SI 640";
+        ./Env/EnvHeight < Value = "SI 480";
+        ./Env/Title < Value = "SS Title";
     }
-    ./Env/EnvWidth < Value = "SI 640";
-    ./Env/EnvHeight < Value = "SI 480";
-    ./Env/Title < Value = "SS Title";
     $ # " Increasing size of widget";
     WdgWidth : AStatec;
     WdgWidth < {
