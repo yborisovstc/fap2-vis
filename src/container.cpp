@@ -185,6 +185,13 @@ TrCntReq::TrCntReq(const string& aName, MUnit* aMan, MEnv* aEnv): ATrcBase(aName
     __ASSERT(res);
     res = cp->ChangeCont("{Provided:'MDesInpObserver' Required:'MDVarGet'}");
     __ASSERT(res);
+    // Padding input
+    Unit* padd_cp = Provider()->CreateNode("ConnPointMcu", "Padding", this, iEnv);
+    __ASSERT(padd_cp != NULL);
+    res = AppendComp(padd_cp);
+    __ASSERT(res);
+    res = padd_cp->ChangeCont("{Provided:'MDesInpObserver' Required:'MDVarGet'}");
+    __ASSERT(res);
 }
 
 string TrCntReq::PEType()
@@ -228,9 +235,11 @@ string TrReqSum::PEType()
 void TrReqSum::DtGet(Sdata<int>& aData)
 {
     int res = 0;
+    // Sum of inputs data
     MUnit* inp = GetNode("./Inp");
     __ASSERT(inp);
     TIfRange rr = inp->GetIfi(MDVarGet::Type(), this);
+    int count = 0;
     for (auto it = rr.first; it != rr.second; it++) {
 	MDVarGet* dvg = (MDVarGet*) (*it);
 	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
@@ -238,6 +247,19 @@ void TrReqSum::DtGet(Sdata<int>& aData)
 	    Sdata<int> arg;
 	    dg->DtGet(arg);
 	    res += arg.mData;
+	}
+	count++;
+    }
+    // Padding
+    MUnit* pinp = GetNode("./Padding");
+    __ASSERT(pinp);
+    MDVarGet* pinpd = dynamic_cast<MDVarGet*>(pinp->GetSIfi(MDVarGet::Type(), this));
+    if (pinpd) {
+	MDtGet<Sdata<int> >* pinpdg = pinpd->GetDObj(pinpdg);
+	if (pinpdg != NULL) {
+	    Sdata<int> arg;
+	    pinpdg->DtGet(arg);
+	    res = res + arg.mData * (count + 1);
 	}
     }
     aData.mData = res;
@@ -269,6 +291,18 @@ void TrReqMax::DtGet(Sdata<int>& aData)
 	    Sdata<int> arg;
 	    dg->DtGet(arg);
 	    res = max(res, arg.mData);
+	}
+    }
+    // Padding
+    MUnit* pinp = GetNode("./Padding");
+    __ASSERT(pinp);
+    MDVarGet* pinpd = dynamic_cast<MDVarGet*>(pinp->GetSIfi(MDVarGet::Type(), this));
+    if (pinpd) {
+	MDtGet<Sdata<int> >* pinpdg = pinpd->GetDObj(pinpdg);
+	if (pinpdg != NULL) {
+	    Sdata<int> arg;
+	    pinpdg->DtGet(arg);
+	    res = res + arg.mData * 2;
 	}
     }
     aData.mData = res;
@@ -584,9 +618,10 @@ bool AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int 
     bool res = false;
     TIfRange rr = GetIfi(MSceneElem::Type());
     // Redirect to comps till the event gets accepted
-    for (auto it = rr.first; it != rr.second && !res; it++) {
+    for (auto it = rr.first; it != rr.second; it++) {
 	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
 	res = se->onMouseButton(aButton, aAction, aMods);
+	if (res) break;
     }
     return res;
 }

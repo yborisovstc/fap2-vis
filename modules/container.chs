@@ -15,6 +15,9 @@ ContainerMdl : Elem
         $ # " Container base";
         RqsW < Debug.Update = y;
         RqsH < Debug.Update = y;
+        # = " Padding value";
+        Padding : AStatec;
+        Padding < Value = "SI 10";
         # = " Inputs binded to components requisition outputs";
         RqsWInp : AVCpsCpInp;
         RqsWInp < WcpName = OutRqsW;
@@ -45,8 +48,10 @@ ContainerMdl : Elem
         TrRqsW : TrReqSum;
         RqsWInp ~ ./TrRqsW/Inp;
         ./TrRqsW/Out ~ ./RqsW/Inp;
+        Padding ~ ./TrRqsW/Padding;
         TrRqsH : TrReqMax;
         RqsHInp ~ ./TrRqsH/Inp;
+        Padding ~ ./TrRqsH/Padding;
         ./TrRqsH/Out ~ ./RqsH/Inp;
     }
     HLayout : HLayoutBase
@@ -60,9 +65,11 @@ ContainerMdl : Elem
         CntAgent : AVLayout;
         TrRqsW : TrReqMax;
         RqsWInp ~ ./TrRqsW/Inp;
+        Padding ~ ./TrRqsW/Padding;
         ./TrRqsW/Out ~ ./RqsW/Inp;
         TrRqsH : TrReqSum;
         RqsHInp ~ ./TrRqsH/Inp;
+        Padding ~ ./TrRqsH/Padding;
         ./TrRqsH/Out ~ ./RqsH/Inp;
     }
     Alignment : FContainer
@@ -72,9 +79,11 @@ ContainerMdl : Elem
         Slot_1 : AVSlot;
         TrRqsW : TrReqMax;
         RqsWInp ~ ./TrRqsW/Inp;
+        Padding ~ ./TrRqsW/Padding;
         ./TrRqsW/Out ~ ./RqsW/Inp;
         TrRqsH : TrReqMax;
         RqsHInp ~ ./TrRqsH/Inp;
+        Padding ~ ./TrRqsH/Padding;
         ./TrRqsH/Out ~ ./RqsH/Inp;
     }
 }

@@ -224,7 +224,7 @@ void AUnitCrp::OnCompSelected(const MVrp* aComp)
 bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
     bool res = false;
-    if (aButton == GLFW_MOUSE_BUTTON_LEFT && aAction == GLFW_PRESS) {
+    if (aButton == EFvBtnLeft && aAction == EFvBtnActPress) {
 	double x = 0, y = 0;
 	GetCursorPosition(x, y);
 	if (IsInnerWidgetPos(x, y)) {
