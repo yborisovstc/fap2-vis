@@ -215,14 +215,12 @@ void AVrController::OnRpSelected(const MVrp* aRp)
 
 
 
-TrModelCreated::TrModelCreated(const string& aName, MUnit* aMan, MEnv* aEnv): ATrcBase(aName, aMan, aEnv)
+TrModelCreated::TrModelCreated(const string& aName, MUnit* aMan, MEnv* aEnv): ATrcVar(aName, aMan, aEnv)
 {
     iName = aName.empty() ? ATrcBase::GetType(PEType()) : aName;
-    TBool res = mOut->ChangeCont("{Provided:'MDVarGet'}");
-    __ASSERT(res);
     Unit* cp = Provider()->CreateNode("ConnPointMcu", "Inp", this, iEnv);
     __ASSERT(cp != NULL);
-    res = AppendComp(cp);
+    bool res = AppendComp(cp);
     __ASSERT(res);
     res = cp->ChangeCont("{Provided:'MDesInpObserver' Required:'MDVarGet'}");
     __ASSERT(res);

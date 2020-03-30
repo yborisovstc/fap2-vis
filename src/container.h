@@ -185,18 +185,14 @@ class AVCpsCpOut: public ConnPointMcu
 };
 
 /** @brief Transition of container requistion state, base */
-class TrCntReq: public ATrcBase, public MDVarGet, public MDtGet<Sdata<int> >  {
+class TrCntReq: public ATrcVar, public MDtGet<Sdata<int> >  {
     public:
 	static const char* Type() { return "TrCntReq";};
 	static string PEType();
 	TrCntReq(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual MIface* DoGetObj(const char *aName) override;
 	// From MDVarGet
-	virtual string MDVarGet_Mid() const {return GetUri(NULL, ETrue);}
-	virtual string VarGetIfid(){ return MDtGet<Sdata<bool> >::Type();}
-	virtual void *DoGetDObj(const char *aName);
-	// From MDtGet<Sdata<int>>
-	//virtual void DtGet(Sdata<int>& aData) override;
+	virtual void *DoGetDObj(const char *aName) override;
 };
 
 

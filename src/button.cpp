@@ -19,6 +19,11 @@ AButton::~AButton()
 {
 }
 
+MUnit* AButton::GetStatePressed()
+{
+    return iMan->GetNode("./Pressed");
+}
+
 string AButton::PEType()
 {
     return AVWidget::PEType() + GUri::KParentSep + Type();
@@ -48,6 +53,8 @@ bool AButton::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 	    MUnit* host = GetMan();
 	    MUnit* owner = host->GetMan();
 	    cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
+	    MUnit* spressed = GetStatePressed();
+	    spressed->ChangeCont("SB true", true, KStateContVal);
 	}
     }
     return res;

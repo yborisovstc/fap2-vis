@@ -1,3 +1,4 @@
+Pos: 0 -- Wrong context type
 FvWidgets : Elem
 {
     About = "FAP2 widget visualization system";
@@ -74,6 +75,21 @@ FvWidgets : Elem
     {
         $ # " Button";
         WdgAgent : AButton;
+        Pressed : AStatec;
+        Pressed < Debug.Update = y;
+        Pressed < Value = "SB false";
+        Delay : AStatec;
+        Delay < Value = "SB false";
+        ./Delay/Inp ~ Pressed;
+        IsPressed : AStatec;
+        IsPressed < Debug.Update = y;
+        IsPressed < Value = "SB false";
+        And : ATrcAndVar;
+        ./IsPressed/Inp ~ And;
+        ./And/Inp ~ Pressed;
+        No : ATrcNegVar;
+        ./And/Inp ~ No;
+        ./No/Inp ~ Delay;
     }
     FUnitCrp : FWidgetBase
     {

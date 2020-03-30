@@ -47,12 +47,12 @@ ContainerMdl : Elem
         $ # " Horisontal layout Container base";
         TrRqsW : TrReqSum;
         RqsWInp ~ ./TrRqsW/Inp;
-        ./TrRqsW/Out ~ ./RqsW/Inp;
+        ./TrRqsW ~ ./RqsW/Inp;
         Padding ~ ./TrRqsW/Padding;
         TrRqsH : TrReqMax;
         RqsHInp ~ ./TrRqsH/Inp;
         Padding ~ ./TrRqsH/Padding;
-        ./TrRqsH/Out ~ ./RqsH/Inp;
+        ./TrRqsH ~ ./RqsH/Inp;
     }
     HLayout : HLayoutBase
     {
@@ -66,11 +66,11 @@ ContainerMdl : Elem
         TrRqsW : TrReqMax;
         RqsWInp ~ ./TrRqsW/Inp;
         Padding ~ ./TrRqsW/Padding;
-        ./TrRqsW/Out ~ ./RqsW/Inp;
+        ./TrRqsW ~ ./RqsW/Inp;
         TrRqsH : TrReqSum;
         RqsHInp ~ ./TrRqsH/Inp;
         Padding ~ ./TrRqsH/Padding;
-        ./TrRqsH/Out ~ ./RqsH/Inp;
+        ./TrRqsH ~ ./RqsH/Inp;
     }
     Alignment : FContainer
     {
@@ -80,10 +80,10 @@ ContainerMdl : Elem
         TrRqsW : TrReqMax;
         RqsWInp ~ ./TrRqsW/Inp;
         Padding ~ ./TrRqsW/Padding;
-        ./TrRqsW/Out ~ ./RqsW/Inp;
+        ./TrRqsW ~ ./RqsW/Inp;
         TrRqsH : TrReqMax;
         RqsHInp ~ ./TrRqsH/Inp;
         Padding ~ ./TrRqsH/Padding;
-        ./TrRqsH/Out ~ ./RqsH/Inp;
+        ./TrRqsH ~ ./RqsH/Inp;
     }
 }

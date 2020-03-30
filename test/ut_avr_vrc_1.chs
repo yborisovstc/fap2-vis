@@ -49,9 +49,9 @@ testroot : Elem
                             About = "Application toolbar";
                             Padding = 2;
                             Slot_1 : AVSlot;
-                            ./Slot_1 < Btn1 : /*/Modules/FvWidgets/FButton
+                            ./Slot_1 < BtnUp : /*/Modules/FvWidgets/FButton
                             {
-                                Text = "Button 1";
+                                Text = Up;
                                 BgColor = "{R:'0.0' G:'0.0' B:'1.0'}";
                                 FgColor = "{R:'1.0' G:'1.0' B:'1.0'}";
                             }

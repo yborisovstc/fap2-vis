@@ -30,7 +30,10 @@ AvrMdl : Elem
         ModelCreated : AStatec;
         ModelCreated < Value = "SB false";
         TrsModelCreated : TrModelCreated;
-        ./TrsModelCreated/Out ~ ./ModelCreated/Inp;
+        TrsModelCreated ~ ./ModelCreated/Inp;
         ModelPath ~ ./TrsModelCreated/Inp;
+        $ # " Cursor";
+        Cursor : AStatec;
+        BtnUpInp : StcOutExt;
     }
 }

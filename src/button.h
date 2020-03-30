@@ -27,6 +27,7 @@ class AButton : public AVWidget
     protected:
 	// TODO to have shared font in visual env
 	FTPixmapFont* mFont;
+	MUnit* GetStatePressed();
     protected:
 	const int K_BFontSize = 18; /**< Base metric: Base font (unit name) size. */
 	const int K_BPadding = 5; /**< Base metric: Base padding */

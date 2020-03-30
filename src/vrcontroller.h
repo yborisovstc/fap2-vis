@@ -52,15 +52,15 @@ class AVrController : public ADes, public MVrController, public MACompsObserver
 };
 
 /** @brief Transition of ModelCreated state */
-class TrModelCreated: public ATrcBase, public MDVarGet, public MDtGet<Sdata<bool> >  {
+class TrModelCreated: public ATrcVar, public MDtGet<Sdata<bool> >  {
     public:
 	static const char* Type() { return "TrModelCreated";};
 	static string PEType();
 	TrModelCreated(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual MIface* DoGetObj(const char *aName) override;
 	// From MDVarGet
-	virtual string VarGetIfid(){ return MDtGet<Sdata<bool> >::Type();}
-	virtual void *DoGetDObj(const char *aName);
+	virtual string VarGetIfid() override { return MDtGet<Sdata<bool> >::Type();}
+	virtual void *DoGetDObj(const char *aName) override;
 	// From MDtGet<Sdata<bool>>
 	virtual void DtGet(Sdata<bool>& aData) override;
 };
