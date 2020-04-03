@@ -7,6 +7,7 @@
 #include "scene.h"
 #include "mscel.h"
 #include "mwindow.h"
+#include "mcontainer.h"
 
 const string KWndCnt_Init = "Init";
 const string KWndCnt_Init_Val = "Yes";
@@ -99,6 +100,11 @@ void AGtScene::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 	// Redirect to owner
 	rr = host->GetMan()->GetIfi(aName, ctx);
 	InsertIfCache(aName, aCtx, host->GetMan(), rr);
+    } else if (aName == MViewMgr::Type() && !aCtx.empty() && iMan->IsComp(aCtx.front())) {
+	    // For view manager redirect upward
+	    host = iMan->GetMan();
+	    rr = host->GetIfi(aName, ctx);
+	    InsertIfCache(aName, aCtx, host, rr);
     } else {
 	ADes::UpdateIfi(aName, aCtx);
     }

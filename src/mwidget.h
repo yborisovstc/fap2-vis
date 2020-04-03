@@ -14,10 +14,10 @@ class MVCcomp: public MIface
 	static const char* Type() { return "MVCcomp";};
 	//virtual MUnit* IfProv() = 0;
 	// From MIface
-	virtual MIface* MVisRepr_Call(const string& aSpec, string& aRes) { return NULL;}
-	virtual string MVisRepr_Mid() const {return "?";}
-	MIface* Call(const string& aSpec, string& aRes) override {return MVisRepr_Call(aSpec, aRes);}
-	string Mid() const override { return MVisRepr_Mid();}
+	virtual MIface* MVCcomp_Call(const string& aSpec, string& aRes) { return NULL;}
+	virtual string MVCcomp_Mid() const {return "?";}
+	MIface* Call(const string& aSpec, string& aRes) override {return MVCcomp_Call(aSpec, aRes);}
+	string Mid() const override { return MVCcomp_Mid();}
 };
 
 #endif

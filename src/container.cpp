@@ -426,6 +426,11 @@ void AVContainer::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 		}
 	    }
 	}
+    } else if (aName == MViewMgr::Type() && !aCtx.empty() && iMan->IsComp(aCtx.back())) {
+	    // For view manager redirect upward
+	    host = iMan->GetMan();
+	    rr = host->GetIfi(aName, ctx);
+	    InsertIfCache(aName, aCtx, host, rr);
     } else {
 	AVWidget::UpdateIfi(aName, aCtx);
     }

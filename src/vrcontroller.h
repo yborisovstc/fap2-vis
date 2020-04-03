@@ -27,6 +27,8 @@ class AVrController : public ADes, public MVrController, public MACompsObserver
 	virtual string MVrController_Mid() const { return GetUri(NULL, true);}
 	virtual void CreateModel(const string& aSpecPath) override;
 	virtual void OnRpSelected(const MVrp* aRp) override;
+	virtual MUnit* ModelRoot() override;
+	virtual void ApplyCursor(const string& aCursor) override;
 	// From MACompsObserver
 	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
 	// From MUnit
@@ -64,5 +66,35 @@ class TrModelCreated: public ATrcVar, public MDtGet<Sdata<bool> >  {
 	// From MDtGet<Sdata<bool>>
 	virtual void DtGet(Sdata<bool>& aData) override;
 };
+
+/** @brief Transition of Cursor state */
+class TrCursor: public ATrcVar, public MDtGet<Sdata<string>>  {
+    public:
+	static const char* Type() { return "TrCursor";};
+	static string PEType();
+	TrCursor(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	virtual MIface* DoGetObj(const char *aName) override;
+	// From MDVarGet
+	virtual string VarGetIfid() override { return MDtGet<Sdata<string>>::Type();}
+	virtual void *DoGetDObj(const char *aName) override;
+	// From MDtGet<Sdata<bool>>
+	virtual void DtGet(Sdata<string>& aData) override;
+};
+
+
+/** @brief Transition of CursorApplied state */
+class TrCursorApplied: public ATrcVar, public MDtGet<Sdata<string>>  {
+    public:
+	static const char* Type() { return "TrCursorApplied";};
+	static string PEType();
+	TrCursorApplied(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	virtual MIface* DoGetObj(const char *aName) override;
+	// From MDVarGet
+	virtual string VarGetIfid() override { return MDtGet<Sdata<string>>::Type();}
+	virtual void *DoGetDObj(const char *aName) override;
+	// From MDtGet<Sdata<bool>>
+	virtual void DtGet(Sdata<string>& aData) override;
+};
+
 
 #endif

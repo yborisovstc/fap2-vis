@@ -105,13 +105,6 @@ void Ut_wdg::test_Base()
     CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
     sSync = sync;
 
-    /*
-    // Set GLES idle handler
-    mvisenv->SetOnIdleHandler(OnIdle);
-    // Start vis env loop
-    mvisenv->Start();
-    */
-
     const TInt ticksnum = 128;
     for (TInt cnt = 0; cnt < ticksnum; cnt++) {
 	if (sync->IsActive()) {

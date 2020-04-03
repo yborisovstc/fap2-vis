@@ -19,5 +19,24 @@ class MVCslot: public MIface
 	string Mid() const override { return MVCslot_Mid();}
 };
 
+
+/** @brief Visual representation view interface
+ * View is the part of standard view-model app architecture
+ * This is upper-layer agent managing the view
+ * */
+class MViewMgr: public MIface, public MIfaceProv
+{
+    public:
+	static const char* Type() { return "MViewMgr";};
+	// From MIfaceProv
+	MIface* DoGetIface(const string& aName) override { return MViewMgr_DoGetIface(aName);}
+	virtual MIface* MViewMgr_DoGetIface(const string& aName) = 0;
+	// From MIface
+	virtual MIface* Call(const string& aSpec, string& aRes) override {return NULL;}
+	virtual string Uid() const { return Mid() + "%" + Type();}
+	virtual string MViewMgr_Mid() const { return "?";}
+	virtual string Mid() const override { return MViewMgr_Mid();}
+};
+
 #endif
 

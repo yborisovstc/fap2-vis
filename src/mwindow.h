@@ -9,7 +9,6 @@ class MWindow: public MIface
 {
     public:
 	static const char* Type() { return "MWindow";};
-	virtual void Start(void) = 0;
 	/** @brief Gets cursor position */
 	virtual void GetCursorPos(double& aX, double& aY) = 0;
 	/** @brief Gets size of window in pixels (actually framebuffer size) */

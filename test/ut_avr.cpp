@@ -224,12 +224,6 @@ void Ut_avr::test_VrCtrl()
     MUnit* root = iEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
-    // Set idle handler
-    MUnit* visenv = root->GetNode("./Test/Env/VisEnvAgt");
-    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent node", visenv != 0);
-    MVisEnv* mvisenv = visenv->GetObj(mvisenv);
-    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent", mvisenv != 0);
-    
 #if 0
     // Verify resolving scene elems in container
     MUnit* cntu = root->GetNode("./Test/Env/Window/Scene/Drp/CntAgent");
@@ -244,6 +238,10 @@ void Ut_avr::test_VrCtrl()
     CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
     sSync = sync;
 
+    bool run = iEnv->RunSystem();
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+#if 0
     const TInt ticksnum = 128;
     //for (TInt cnt = 0; cnt < ticksnum; cnt++) {
     while (!mAgtObs.mClose) {
@@ -256,5 +254,6 @@ void Ut_avr::test_VrCtrl()
 	    glfwPollEvents();
 	}
     }
+#endif
     delete iEnv;
 }

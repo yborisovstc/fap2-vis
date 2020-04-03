@@ -78,18 +78,9 @@ FvWidgets : Elem
         Pressed : AStatec;
         Pressed < Debug.Update = y;
         Pressed < Value = "SB false";
-        Delay : AStatec;
-        Delay < Value = "SB false";
-        ./Delay/Inp ~ Pressed;
-        IsPressed : AStatec;
-        IsPressed < Debug.Update = y;
-        IsPressed < Value = "SB false";
-        And : ATrcAndVar;
-        ./IsPressed/Inp ~ And;
-        ./And/Inp ~ Pressed;
-        No : ATrcNegVar;
-        ./And/Inp ~ No;
-        ./No/Inp ~ Delay;
+        PressedReset : AStatec;
+        PressedReset < Value = "SB false";
+        ./Pressed/Inp ~ PressedReset;
     }
     FUnitCrp : FWidgetBase
     {

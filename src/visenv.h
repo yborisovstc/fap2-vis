@@ -14,7 +14,7 @@ using namespace std;
 class GLFWwindow;
 
 // Visual environment
-class AVisEnv:  public ADes, public MVisEnv
+class AVisEnv:  public Unit, public MVisEnv
 {
     public:
 	static const char* Type() { return "AVisEnv";};
@@ -25,15 +25,9 @@ class AVisEnv:  public ADes, public MVisEnv
 	virtual MIface *DoGetObj(const char *aName) override;
 	// From MElem
 	virtual TBool OnCompChanged(MUnit& aComp, const string& aContName = string(), TBool aModif = EFalse);
-	// From MVisEnv
-	virtual void SetOnIdleHandler(TIdleHandler aHandler) override;
-	virtual void Start(void) override;
-	void Display(void);
     protected:
 	void Construct();
 	static const string mCont_Init;
-    protected:
-	TIdleHandler mIdleHandler;
 };
 
 
@@ -49,7 +43,6 @@ class AGWindow: public ADes, public MWindow
 	// From MElem
 	virtual TBool OnCompChanged(MUnit& aComp, const string& aContName = string(), TBool aModif = EFalse);
 	// From MWindow
-	virtual void Start(void);
 	virtual void GetCursorPos(double& aX, double& aY) override;
 	virtual void GetFbSize(int* aW, int* aH) const override;
 	virtual string MWindow_Mid() const { return GetUri(0, true);}

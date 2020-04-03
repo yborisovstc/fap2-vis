@@ -17,29 +17,12 @@ using namespace std;
 const string AVisEnv::mCont_Init = "Init";
 
 
-static AVisEnv* sEnv = NULL;
-
-AVisEnv::AVisEnv(const string& aName, MUnit* aMan, MEnv* aEnv): ADes(aName, aMan, aEnv), mIdleHandler(NULL)
+AVisEnv::AVisEnv(const string& aName, MUnit* aMan, MEnv* aEnv): Unit(aName, aMan, aEnv)
 {
     // For native agt (aName is empty) set type as name. For inherited agent set given name
     iName = aName.empty() ? GetType(PEType()) : aName;
     // Don't construct native agent here. Only heirs needs to be constructed fully.
     //Construct();
-}
-
-void renderFunction(void)
-{
-    glClearColor(0.0, 0.0, 0.0, 0.0);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glColor3f(1.0, 1.0, 1.0);
-    glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
-    glBegin(GL_POLYGON);
-    glVertex2f(-0.5, -0.5);
-    glVertex2f(-0.5, 0.5);
-    glVertex2f(0.5, 0.5);
-    glVertex2f(0.5, -0.5);
-    glEnd();
-    glFlush();
 }
 
 void AVisEnv::Construct()
@@ -65,7 +48,7 @@ MIface *AVisEnv::DoGetObj(const char *aName)
     if (strcmp(aName, MVisEnv::Type()) == 0) {
 	res = dynamic_cast<MVisEnv*>(this);
     } else {
-	res = ADes::DoGetObj(aName);
+	res = Unit::DoGetObj(aName);
     }
     return res;
 }
@@ -77,33 +60,6 @@ TBool AVisEnv::OnCompChanged(MUnit& aComp, const string& aContName, TBool aModif
     }
 
     Unit::OnCompChanged(aComp, aContName);
-}
-
-void AVisEnv::SetOnIdleHandler(TIdleHandler aHandler)
-{
-    __ASSERT(mIdleHandler == NULL);
-    mIdleHandler = aHandler;
-    //glutIdleFunc(mIdleHandler);
-}
-
-void AVisEnv::Display(void)
-{
-}
-
-void Render()
-{
-    sEnv->Display();
-}
-
-void AVisEnv::Start(void)
-{
-    MUnit* wnd = GetNode("./../Window");
-    if (wnd != NULL) {
-	MWindow* mwnd = (MWindow*) wnd->GetSIfi(MWindow::Type(), this);
-	if (mwnd != NULL) {
-	    mwnd->Start();
-	}
-    }
 }
 
 
@@ -353,14 +309,6 @@ TBool AGWindow::OnCompChanged(MUnit& aComp, const string& aContName, TBool aModi
 	//Construct();
     }
     Unit::OnCompChanged(aComp, aContName);
-}
-
-void AGWindow::Start(void)
-{
-    while (!glfwWindowShouldClose(mWindow)) {
-	Render();
-	glfwWaitEvents();
-    }
 }
 
 void AGWindow::GetCursorPos(double& aX, double& aY)

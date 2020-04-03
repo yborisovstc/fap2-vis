@@ -176,6 +176,7 @@ TBool AVrController::HandleCompChanged(MUnit& aContext, MUnit& aComp, const stri
 
 void AVrController::Update()
 {
+    Logger()->Write(EInfo, this, "Update");
     ADes::Update();
 }
 
@@ -193,7 +194,7 @@ void AVrController::CreateModel(const string& aSpecPath)
     mEnv = new Env(aSpecPath, aSpecPath + ".log");
     assert(mEnv != nullptr);
     mEnv->ConstructSystem();
-    MVrp* drp = CreateDrp(mEnv->Root());
+    //MVrp* drp = CreateDrp(mEnv->Root());
 }
 
 void AVrController::OnRpSelected(const MVrp* aRp)
@@ -212,8 +213,33 @@ void AVrController::OnRpSelected(const MVrp* aRp)
     CreateDrp(mdl);
 }
 
+MUnit* AVrController::ModelRoot()
+{
+    MUnit* res = NULL;
+    if (mEnv) {
+	res = mEnv->Root();
+    }
+    return res;
+}
+
+void AVrController::ApplyCursor(const string& aCursor)
+{
+    MUnit* mdl = mEnv->Root()->GetNode(aCursor);
+    __ASSERT(mdl);
+    MUnit* drp = GetDrpU();
+    if (drp) {
+	// DRP already exists, remove
+	MElem* scenee = GetDrpMpcE();
+	__ASSERT(scenee);
+	scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./Slot_1/" + drp->Name()));
+	TNs ns; MutCtx mctx(NULL, ns);
+	scenee->Mutate(true, false, false, mctx);
+    }
+    CreateDrp(mdl);
+}
 
 
+// Transition
 
 TrModelCreated::TrModelCreated(const string& aName, MUnit* aMan, MEnv* aEnv): ATrcVar(aName, aMan, aEnv)
 {
@@ -234,12 +260,10 @@ string TrModelCreated::PEType()
 MIface* TrModelCreated::DoGetObj(const char *aName)
 {
     MIface* res = NULL;
-    if (strcmp(aName, MDVarGet::Type()) == 0) {
-	res = dynamic_cast<MDVarGet*>(this);
-    } else if (strcmp(aName, MDtGet<Sdata<bool>>::Type()) == 0) {
+    if (strcmp(aName, MDtGet<Sdata<bool>>::Type()) == 0) {
 	res = dynamic_cast<MDtGet<Sdata<bool>>*>(this);
     } else {
-	res = ATrcBase::DoGetObj(aName);
+	res = ATrcVar::DoGetObj(aName);
     }
     return res;
 }
@@ -264,7 +288,144 @@ void TrModelCreated::DtGet(Sdata<bool>& aData)
 	MVrController* ctr = dynamic_cast<MVrController*>(iMan->GetSIfi(MVrController::Type()));
 	__ASSERT(ctr);
 	ctr->CreateModel(modelPath.mData);
+	res = true;
     }
     aData.mData = res;
+}
 
+
+// Transition of Cursor
+
+TrCursor::TrCursor(const string& aName, MUnit* aMan, MEnv* aEnv): ATrcVar(aName, aMan, aEnv)
+{
+    iName = aName.empty() ? ATrcBase::GetType(PEType()) : aName;
+    Unit* cp = Provider()->CreateNode("CpStatecInp", "InpCmdUp", this, iEnv);
+    __ASSERT(cp != NULL);
+    bool res = AppendComp(cp);
+    __ASSERT(res);
+    Unit* cpCursor = Provider()->CreateNode("CpStatecInp", "InpCursor", this, iEnv);
+    __ASSERT(cpCursor != NULL);
+    res = AppendComp(cpCursor);
+    __ASSERT(res);
+    Unit* cpMdlCreated = Provider()->CreateNode("CpStatecInp", "InpMdlCreated", this, iEnv);
+    __ASSERT(cpMdlCreated != NULL);
+    res = AppendComp(cpMdlCreated);
+    __ASSERT(res);
+    Unit* cpNodeSelected = Provider()->CreateNode("CpStatecInp", "InpNodeSelected", this, iEnv);
+    __ASSERT(cpNodeSelected != NULL);
+    res = AppendComp(cpNodeSelected);
+    __ASSERT(res);
+}
+
+string TrCursor::PEType()
+{
+    return ATrcBase::PEType() + GUri::KParentSep + Type();
+}
+
+MIface* TrCursor::DoGetObj(const char *aName)
+{
+    MIface* res = NULL;
+    if (strcmp(aName, MDtGet<Sdata<bool>>::Type()) == 0) {
+	res = dynamic_cast<MDtGet<Sdata<string>>*>(this);
+    } else {
+	res = ATrcVar::DoGetObj(aName);
+    }
+    return res;
+}
+
+void* TrCursor::DoGetDObj(const char *aName)
+{
+    MIface* res = NULL;
+    if (strcmp(aName, MDtGet<Sdata<string>>::Type()) == 0) res = dynamic_cast<MDtGet<Sdata<string>>*>(this);
+    return res;
+}
+
+void TrCursor::DtGet(Sdata<string>& aData)
+{
+    bool res = false;
+    bool cmdUp = false;
+    string cursor;
+    string nodeSelected;
+    bool mdlCreated = false;
+    res = DtGetSdataInp(cmdUp, "InpCmdUp");
+    res = res && DtGetSdataInp(cursor, "InpCursor");
+    res = res && DtGetSdataInp(mdlCreated, "InpMdlCreated");
+    res = res && DtGetSdataInp(nodeSelected, "InpNodeSelected");
+    if (res) {
+	GUri crsUri(cursor);
+	if (crsUri.IsNil()) {
+	    if (mdlCreated) {
+		MVrController* ctr = dynamic_cast<MVrController*>(iMan->GetSIfi(MVrController::Type()));
+		__ASSERT(ctr);
+		MUnit* mdlRoot = ctr->ModelRoot();
+		if (mdlRoot) {
+		    string mdlRootUri = mdlRoot->GetUri(NULL, true);
+		    aData = mdlRootUri;
+		}
+	    }
+	} else { // crsUri.IsNil()
+	    GUri nodeSelectedUri(nodeSelected);
+	    if (!nodeSelectedUri.IsNil() && nodeSelected != cursor) {
+		aData = nodeSelected;
+	    } else if (cmdUp) {
+		GUri cursorUri(cursor);
+		cursorUri.RemoveLastElem();
+		aData.mData = cursorUri;
+	    }
+	}
+    } else {
+	Logger()->Write(EErr, this, "Error getting inputs");
+    }
+}
+
+
+// Transition of CursorApplied
+
+TrCursorApplied::TrCursorApplied(const string& aName, MUnit* aMan, MEnv* aEnv): ATrcVar(aName, aMan, aEnv)
+{
+    iName = aName.empty() ? ATrcBase::GetType(PEType()) : aName;
+    Unit* cp = Provider()->CreateNode("CpStatecInp", "Inp", this, iEnv);
+    __ASSERT(cp != NULL);
+    bool res = AppendComp(cp);
+    __ASSERT(res);
+}
+
+string TrCursorApplied::PEType()
+{
+    return ATrcBase::PEType() + GUri::KParentSep + Type();
+}
+
+MIface* TrCursorApplied::DoGetObj(const char *aName)
+{
+    MIface* res = NULL;
+    if (strcmp(aName, MDtGet<Sdata<bool>>::Type()) == 0) {
+	res = dynamic_cast<MDtGet<Sdata<string>>*>(this);
+    } else {
+	res = ATrcVar::DoGetObj(aName);
+    }
+    return res;
+}
+
+void* TrCursorApplied::DoGetDObj(const char *aName)
+{
+    MIface* res = NULL;
+    if (strcmp(aName, MDtGet<Sdata<string>>::Type()) == 0) res = dynamic_cast<MDtGet<Sdata<string>>*>(this);
+    return res;
+}
+
+void TrCursorApplied::DtGet(Sdata<string>& aData)
+{
+    bool res = false;
+    string cursor;
+    res = DtGetSdataInp(cursor, "Inp");
+    GUri cursorUri(cursor);
+    if (res && !cursorUri.IsNil()) {
+	GUri crsUri(cursor);
+	MVrController* ctr = dynamic_cast<MVrController*>(iMan->GetSIfi(MVrController::Type()));
+	__ASSERT(ctr);
+	ctr->ApplyCursor(cursor);
+	aData = cursor;
+    } else {
+	Logger()->Write(EErr, this, "Error getting inputs");
+    }
 }

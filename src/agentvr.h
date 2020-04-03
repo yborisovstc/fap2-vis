@@ -51,7 +51,6 @@ class AUnitCrp : public AAgentVr, public MVrp
 	virtual void SetEnv(MEnv* aEnv) override;
 	virtual void SetModel(const string& aMdlUri) override;
 	virtual string GetModel() const override;
-	virtual void OnCompSelected(const MVrp* aComp) override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override {}
     protected:
 	// From AVWidget
@@ -81,7 +80,6 @@ class AUnitDrp : public AVHLayout, public MVrp
 	virtual void SetEnv(MEnv* aEnv) override;
 	virtual void SetModel(const string& aMdlUri) override;
 	virtual string GetModel() const override;
-	virtual void OnCompSelected(const MVrp* aComp) override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override;
     protected:
 	void CreateRp();
@@ -91,6 +89,29 @@ class AUnitDrp : public AVHLayout, public MVrp
 	string mCtrBnd; /*!< Binding to controller info: URI */
 };
 
+
+/** @brief Agents Visual representation view manager
+ * */
+class AVrpView : public Unit, public MVrpView, public MViewMgr, public MAgent
+{
+    public:
+	static const char* Type() { return "AVrpView";};
+	static string PEType();
+	AVrpView(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	virtual MIface* DoGetObj(const char *aName) override;
+	// From MAgent
+	MIface* MAgent_DoGetIface(const string& aName) override;
+	// From MVrpView
+	virtual void OnCompSelected(const MVrp* aComp) override;
+	// From MViewMgr/MIfaceProv
+	virtual MIface* MViewMgr_DoGetIface(const string& aName) override;
+    protected:
+	void CreateRp();
+    protected:
+	MEnv* mEnv; /*!< Binded env, not owned */
+	MUnit* mMdl; /*!< Binded model, not owned */
+	string mCtrBnd; /*!< Binding to controller info: URI */
+};
 
 #endif
 

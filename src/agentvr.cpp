@@ -217,10 +217,6 @@ void AUnitCrp::SetModel(const string& aMdlUri)
     mMdl = mdl;
 }
 
-void AUnitCrp::OnCompSelected(const MVrp* aComp)
-{
-}
-
 bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
     bool res = false;
@@ -231,10 +227,13 @@ bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
 	    MUnit* host = GetMan();
 	    MUnit* owner = host->GetMan();
 	    cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
-	    MVrp* drp = dynamic_cast<MVrp*>(owner->GetSIfi(MVrp::Type()));
-	    if (drp) {
-		drp->OnCompSelected(this);
-		res = true;
+	    MViewMgr* view = dynamic_cast<MViewMgr*>(owner->GetSIfi(MViewMgr::Type()));
+	    if (view) {
+		MVrpView* vrpView = dynamic_cast<MVrpView*>(view->DoGetIface(MVrpView::Type()));
+		if (vrpView) {
+		    vrpView->OnCompSelected(this);
+		    res = true;
+		}
 	    }
 	}
     }
@@ -313,14 +312,6 @@ void AUnitDrp::CreateRp()
     }
 }
 
-void AUnitDrp::OnCompSelected(const MVrp* aComp)
-{
-    MVrController* ctr = dynamic_cast<MVrController*>(MUnit::GetSIfi(MVrController::Type()));
-    if (ctr) {
-	ctr->OnRpSelected(aComp);
-    }
-}
-
 void AUnitDrp::SetCrtlBinding(const string& aCtrUri)
 {
     __ASSERT(mCtrBnd.empty());
@@ -357,3 +348,55 @@ string AUnitDrp::GetModel() const
     return mMdl->GetUri(NULL, true);
 }
 
+
+// Agents Visual representation view manager
+
+
+AVrpView::AVrpView(const string& aName, MUnit* aMan, MEnv* aEnv): Unit(aName, aMan, aEnv)
+{
+    iName = aName.empty() ? GetType(PEType()) : aName;
+}
+
+string AVrpView::PEType()
+{
+    return Unit::PEType() + GUri::KParentSep + Type();
+}
+
+MIface* AVrpView::DoGetObj(const char *aName)
+{
+    MIface* res = NULL;
+    if (strcmp(aName, MVrpView::Type()) == 0) {
+	res = dynamic_cast<MVrpView*>(this);
+    } else if (strcmp(aName, MViewMgr::Type()) == 0) {
+	res = dynamic_cast<MViewMgr*>(this);
+    } else if (strcmp(aName, MAgent::Type()) == 0) {
+	res = dynamic_cast<MAgent*>(this);
+    } else {
+	res = Unit::DoGetObj(aName);
+    }
+    return res;
+}
+
+MIface* AVrpView::MAgent_DoGetIface(const string& aUid)
+{
+    MIface* res = NULL;
+    if (aUid == MUnit::Type())
+	res = dynamic_cast<MUnit*>(this);
+    return res;
+}
+
+void AVrpView::OnCompSelected(const MVrp* aComp)
+{
+    string selUri = aComp->GetModel();
+    MElem* eowner = iMan->GetObj(eowner);
+    eowner->AppendMutation(TMut(ENt_Cont, ENa_Targ, "./NodeSelected", ENa_Id, "Value", ENa_MutVal, "SS " + selUri));
+    TNs ns; MutCtx mctx(NULL, ns);
+    eowner->Mutate(true, false, false, mctx);
+}
+
+MIface* AVrpView::MViewMgr_DoGetIface(const string& aName)
+{
+    MIface* res = NULL;
+    if (aName == MVrpView::Type()) res = dynamic_cast<MVrpView*>(this);
+    return res;
+}
