@@ -227,7 +227,7 @@ bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
 	    MUnit* host = GetMan();
 	    MUnit* owner = host->GetMan();
 	    cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
-	    MViewMgr* view = dynamic_cast<MViewMgr*>(owner->GetSIfi(MViewMgr::Type()));
+	    MViewMgr* view = owner->GetSIfit(view);
 	    if (view) {
 		MVrpView* vrpView = dynamic_cast<MVrpView*>(view->DoGetIface(MVrpView::Type()));
 		if (vrpView) {
@@ -305,7 +305,7 @@ void AUnitDrp::CreateRp()
 	AddComp(comp->Name(), "FUnitCrp");
 	MUnit* vcompu = GetCntComp(comp->Name());
 	__ASSERT(vcompu != nullptr);
-	MVrp* vcompr = dynamic_cast<MVrp*>(vcompu->GetSIfi(MVrp::Type()));
+	MVrp* vcompr = vcompu->GetSIfit(vcompr);
 	__ASSERT(vcompr != nullptr);
 	vcompr->SetEnv(mEnv);
 	vcompr->SetModel(compUri);

@@ -421,7 +421,7 @@ void TrCursorApplied::DtGet(Sdata<string>& aData)
     GUri cursorUri(cursor);
     if (res && !cursorUri.IsNil()) {
 	GUri crsUri(cursor);
-	MVrController* ctr = dynamic_cast<MVrController*>(iMan->GetSIfi(MVrController::Type()));
+	MVrController* ctr = iMan->GetSIfit(ctr);
 	__ASSERT(ctr);
 	ctr->ApplyCursor(cursor);
 	aData = cursor;

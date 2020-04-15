@@ -19,7 +19,7 @@ class MWindow;
  *
  * */
 // TODO Use unit based DES agent as a base
-class AVWidget : public ADes, public MSceneElem, public MACompsObserver
+class AVWidget : public ADes, public MSceneElem, public MACompsObserver, public MVCcomp
 {
     public:
 	using TColor = struct {float r, g, b, a;};
@@ -41,6 +41,8 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver
 	// From MDesSyncable
 	virtual void Update() override;
 	virtual void Confirm() override;
+	// From MVCcomp
+	virtual string MVCcomp_Mid() const {return GetUri(NULL, true);}
     protected:
 	virtual void Init();
 	/** @brief Handles cursor position change

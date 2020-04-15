@@ -38,6 +38,10 @@ libfap2vis_la_SOURCES = \
 		       label.cpp \
 		       button.h \
 		       button.cpp \
+		       containerl.h \
+		       containerl.cpp \
+		       vlayoutl.h \
+		       vlayoutl.cpp \
 		       magentvr.h \
 		       agentvr.h \
 		       agentvr.cpp \

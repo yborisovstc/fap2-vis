@@ -18,6 +18,7 @@ class MVCcomp: public MIface
 	virtual string MVCcomp_Mid() const {return "?";}
 	MIface* Call(const string& aSpec, string& aRes) override {return MVCcomp_Call(aSpec, aRes);}
 	string Mid() const override { return MVCcomp_Mid();}
+	virtual string Uid() const { return Mid() + "%" + Type();}
 };
 
 #endif

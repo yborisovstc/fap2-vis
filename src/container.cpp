@@ -323,18 +323,18 @@ const string KWidgetRqsW_Name = "OutRqsW";
 const string KWidgetRqsH_Name = "OutRqsH";
 const string KCont_Padding = "Padding";
 
-AVContainer::AVContainer(const string& aName, MUnit* aMan, MEnv* aEnv): AVWidget(aName, aMan, aEnv)
+AVContainerBase::AVContainerBase(const string& aName, MUnit* aMan, MEnv* aEnv): AVWidget(aName, aMan, aEnv)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
     InsertContent(KCont_Padding);
 }
 
-string AVContainer::PEType()
+string AVContainerBase::PEType()
 {
     return AVWidget::PEType() + GUri::KParentSep + Type();
 }
 
-MIface* AVContainer::DoGetObj(const char *aName)
+MIface* AVContainerBase::DoGetObj(const char *aName)
 {
     MIface* res = NULL;
     if (strcmp(aName, MSceneElem::Type()) == 0) {
@@ -345,6 +345,175 @@ MIface* AVContainer::DoGetObj(const char *aName)
 	res = AVWidget::DoGetObj(aName);
     }
     return res;
+}
+
+void AVContainerBase::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
+{
+    MUnit* host = iMan;
+    TIfRange rr;
+    TICacheRCtx ctx(aCtx); ctx.push_back(this);
+    if (aName == MViewMgr::Type() && !aCtx.empty() && iMan->IsComp(aCtx.back())) {
+	// For view manager redirect upward
+	host = iMan->GetMan();
+	rr = host->GetIfi(aName, ctx);
+	InsertIfCache(aName, aCtx, host, rr);
+    } else {
+	AVWidget::UpdateIfi(aName, aCtx);
+    }
+}
+
+void AVContainerBase::Update()
+{
+    AVWidget::Update();
+}
+
+void AVContainerBase::Render()
+{
+    TIfRange rr = GetIfi(MSceneElem::Type());
+    for (auto it = rr.first; it != rr.second; it++) {
+	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
+	se->Render();
+    }
+}
+
+void AVContainerBase::Init()
+{
+    AVWidget::Init();
+}
+
+TBool AVContainerBase::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+{
+    TBool res = EFalse;
+    if (&aComp == GetMan() && aContName == KCont_Padding) {
+	const string data = aComp.GetContent(KCont_Padding);
+	mPadding = stoi(data);
+	res = ETrue;
+    }
+    return res;
+}
+
+
+MIface* AVContainerBase::MDesInpObserver_Call(const string& aSpec, string& aRes)
+{
+    return NULL;
+}
+
+string AVContainerBase::MDesInpObserver_Mid() const
+{
+    return GetUri(NULL, ETrue);
+}
+
+MUnit* AVContainerBase::GetCompRqsInp(bool aW)
+{
+    MUnit* res = NULL;
+    res = Host()->GetNode(aW ? KCompRqWInp_Uri : KCompRqHInp_Uri);
+    return res;
+}
+
+MUnit* AVContainerBase::GetRqsInp(bool aW)
+{
+    MUnit* res = NULL;
+    res = Host()->GetNode(aW ? KRqWInp_Uri: KRqHInp_Uri);
+    return res;
+}
+
+void* AVContainerBase::WidgetAp::WdgPap::DoGetDObj(const char *aName)
+{
+    void* res = NULL;
+    if (aName == MDtGet<Sdata<int> >::Type()) {
+	res = dynamic_cast<MDtGet<Sdata<int> >*>(this);
+    }
+    return res;
+}
+
+void AVContainerBase::WidgetAp::WdgPap::DtGet(Sdata<int>& aData)
+{
+    int res = mHost->mHost.GetComposedData(mHost->mSlot, mPar);
+    aData.Set(res);
+}
+
+
+
+
+void AVContainerBase::onSeCursorPosition(double aX, double aY)
+{
+    TIfRange rr = GetIfi(MSceneElem::Type());
+    for (auto it = rr.first; it != rr.second; it++) {
+	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
+	se->onSeCursorPosition(aX, aY);
+    }
+}
+
+bool AVContainerBase::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
+{
+    bool res = false;
+    TIfRange rr = GetIfi(MSceneElem::Type());
+    // Redirect to comps till the event gets accepted
+    for (auto it = rr.first; it != rr.second; it++) {
+	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
+	res = se->onMouseButton(aButton, aAction, aMods);
+	if (res) break;
+    }
+    return res;
+}
+
+void AVContainerBase::NotifyWidgetOnInpUpdated(const string& aOutUri)
+{
+    MUnit* alcOut = Host()->GetNode(aOutUri);
+    __ASSERT(alcOut != NULL);
+    TIfRange rr = alcOut->GetIfi(MDesInpObserver::Type(), this);
+    for (auto it = rr.first; it != rr.second; it++) {
+	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
+	mobs->OnInpUpdated();
+    }
+}
+
+void AVContainerBase::NotifyReqsOnInpUpdated(bool aW)
+{
+    MUnit* rqinp = GetRqsInp(aW); 
+    __ASSERT(rqinp);
+    MDesInpObserver* rqinpo = dynamic_cast<MDesInpObserver*>(rqinp->GetSIfi(MDesInpObserver::Type()));
+    __ASSERT(rqinpo);
+    rqinpo->OnInpUpdated();
+}
+
+void AVContainerBase::OnInpUpdated()
+{
+    Logger()->Write(EInfo, this, "OnInpUpdated");
+    MUnit* rqsInpW = GetCompRqsInp(true);
+    __ASSERT(rqsInpW != NULL);
+    TIfRange rr = rqsInpW->GetIfi(MDVarGet::Type(), this);
+    for (auto it = rr.first; it != rr.second; it++) {
+	MDVarGet* dvg = (MDVarGet*) (*it);
+	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
+	if (dg != NULL) {
+	    Sdata<int> arg;
+	    dg->DtGet(arg);
+	    string dis;
+	    arg.ToString(dis);
+	    Logger()->Write(EInfo, this, "Requisition W: %s", dis.c_str());
+	}
+    }
+    // Propagate update notification to inp observers
+    NotifyReqsOnInpUpdated(true);
+    NotifyReqsOnInpUpdated(false);
+    NotifyWidgetOnInpUpdated("./AlcWOut");
+    NotifyWidgetOnInpUpdated("./AlcHOut");
+    NotifyWidgetOnInpUpdated("./AlcXOut");
+    NotifyWidgetOnInpUpdated("./AlcYOut");
+}
+
+
+// Widgets containter agent using approach of embedding widgets in slot
+
+AVContainer::AVContainer(const string& aName, MUnit* aMan, MEnv* aEnv): AVContainerBase(aName, aMan, aEnv)
+{
+    iName = aName.empty() ? GetType(PEType()) : aName;
+}
+
+string AVContainer::PEType()
+{
+    return AVContainerBase::PEType() + GUri::KParentSep + Type();
 }
 
 void AVContainer::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
@@ -377,14 +546,6 @@ void AVContainer::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 		    MDVarGet* papdvg = dynamic_cast<MDVarGet*>(pap);
 		    InsertIfCache(aName, aCtx, this, papdvg);
 		}
-	    } else if (rqs == GetRqsInp(true)) {
-		// Request from W requisition
-		MIface* r = dynamic_cast<MDVarGet*>(&mTrRecW);
-		InsertIfCache(aName, aCtx, this, r);
-	    } else if (rqs == GetRqsInp(false)) {
-		// Request from H requisition
-		MIface* r = dynamic_cast<MDVarGet*>(&mTrRecH);
-		InsertIfCache(aName, aCtx, this, r);
 	    }
 	    // Downward request, redirect to comp
 	}
@@ -426,228 +587,9 @@ void AVContainer::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 		}
 	    }
 	}
-    } else if (aName == MViewMgr::Type() && !aCtx.empty() && iMan->IsComp(aCtx.back())) {
-	    // For view manager redirect upward
-	    host = iMan->GetMan();
-	    rr = host->GetIfi(aName, ctx);
-	    InsertIfCache(aName, aCtx, host, rr);
     } else {
-	AVWidget::UpdateIfi(aName, aCtx);
+	AVContainerBase::UpdateIfi(aName, aCtx);
     }
-}
-
-void AVContainer::Update()
-{
-    AVWidget::Update();
-}
-
-void AVContainer::Render()
-{
-
-    TIfRange rr = GetIfi(MSceneElem::Type());
-    for (auto it = rr.first; it != rr.second; it++) {
-	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
-	se->Render();
-    }
-}
-/*
-{
-    MUnit* host = GetMan();
-    for (int ind = 0; ind < host->CompsCount(); ind++) {
-	MUnit* compu = host->GetComp(ind);
-	MVCslot* comps = compu->GetObj(comps);
-	if (comps != NULL) {
-	    if (compu->CompsCount() == 1) {
-		MUnit* wdg = compu->GetComp(0);
-		MSceneElem* mse = (MSceneElem*) wdg->GetSIfi(MSceneElem::Type());
-		if (mse != NULL) {
-		    mse->Render();
-		}
-	    }
-	}
-    }
-
-}
-*/
-
-void AVContainer::Init()
-{
-    AVWidget::Init();
-    // Set up widget requisition representations 
-    // Iterating thru slots
-    MUnit* host = iMan;
-    for (auto ind = 0; ind < host->CompsCount(); ind++) {
-	MUnit* compu = host->GetComp(ind);
-	MVCslot* comps = compu->GetObj(comps);
-	if (comps != NULL) {
-	    if (compu->CompsCount() == 1) {
-		MUnit* widget = compu->GetComp(0);
-		// Width
-		MUnit* outp = widget->GetNode("./" + KWidgetRqsW_Name );
-		if (outp != NULL) {
-		    MDVarGet* outpd = (MDVarGet*) outp->GetSIfi(MDVarGet::Type(), this);
-		    mRqsW.emplace(compu->Name(), outpd);
-		} else {
-		    Logger()->Write(EErr, this, "Cannot find widget output [%s]", KWidgetRqsW_Name.c_str());
-		}
-		// Hight
-		outp = widget->GetNode("./" + KWidgetRqsH_Name );
-		if (outp != NULL) {
-		    MDVarGet* outpd = (MDVarGet*) outp->GetSIfi(MDVarGet::Type(), this);
-		    mRqsH.emplace(compu->Name(), outpd);
-		} else {
-		    Logger()->Write(EErr, this, "Cannot find widget output [%s]", KWidgetRqsH_Name.c_str());
-		}
-	    } else {
-		Logger()->Write(EErr, this, "Slot components != 1");
-	    }
-	}
-    }
-}
-
-TBool AVContainer::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
-{
-    TBool res = EFalse;
-    if (&aComp == GetMan() && aContName == KCont_Padding) {
-	const string data = aComp.GetContent(KCont_Padding);
-	mPadding = stoi(data);
-	res = ETrue;
-    }
-    return res;
-}
-
-
-MIface* AVContainer::MDesInpObserver_Call(const string& aSpec, string& aRes)
-{
-    return NULL;
-}
-
-string AVContainer::MDesInpObserver_Mid() const
-{
-    return GetUri(NULL, ETrue);
-}
-
-MUnit* AVContainer::GetCompRqsInp(bool aW)
-{
-    MUnit* res = NULL;
-    res = Host()->GetNode(aW ? KCompRqWInp_Uri : KCompRqHInp_Uri);
-    return res;
-}
-
-MUnit* AVContainer::GetRqsInp(bool aW)
-{
-    MUnit* res = NULL;
-    res = Host()->GetNode(aW ? KRqWInp_Uri: KRqHInp_Uri);
-    return res;
-}
-
-int AVContainer::GetCompRqs(const string& aSlot, bool aW)
-{
-    int res = 0;
-    TWDvgProv& reg = (aW ? mRqsW : mRqsH);    
-    if (reg.count(aSlot) > 0) {
-	MDVarGet* dvg = (aW ? mRqsW : mRqsH).at(aSlot);
-	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
-	if (dg != NULL) {
-	    Sdata<int> arg;
-	    dg->DtGet(arg);
-	    res = arg.mData;
-	}
-    }
-    return res;
-}
-
-void* AVContainer::WidgetAp::WdgPap::DoGetDObj(const char *aName)
-{
-    void* res = NULL;
-    if (aName == MDtGet<Sdata<int> >::Type()) {
-	res = dynamic_cast<MDtGet<Sdata<int> >*>(this);
-    }
-    return res;
-}
-
-void AVContainer::WidgetAp::WdgPap::DtGet(Sdata<int>& aData)
-{
-    int res = mHost->mHost.GetComposedData(mHost->mSlot, mPar);
-    aData.Set(res);
-}
-
-
-// Transition of requisition
-
-void* AVContainer::TrReq::DoGetDObj(const char *aName)
-{
-    void* res = NULL;
-    if (aName == MDtGet<Sdata<int> >::Type()) {
-	res = dynamic_cast<MDtGet<Sdata<int> >*>(this);
-    }
-    return res;
-}
-
-void AVContainer::TrReq::DtGet(Sdata<int>& aData)
-{
-    int res = mHost->mPadding;
-    MUnit* inp = mHost->GetCompRqsInp(mW);
-    __ASSERT(inp);
-    TIfRange rr = inp->GetIfi(MDVarGet::Type());
-    for (auto it = rr.first; it != rr.second; it++) {
-	MDVarGet* dvg = dynamic_cast<MDVarGet*>(*it);
-	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
-	int idata = 0;
-	if (dg != NULL) {
-	    Sdata<int> arg;
-	    dg->DtGet(arg);
-	    idata = arg.mData;
-	}
-	res += idata + mHost->mPadding;
-    }
-    aData.Set(res);
-}
-
-
-
-
-void AVContainer::onSeCursorPosition(double aX, double aY)
-{
-    TIfRange rr = GetIfi(MSceneElem::Type());
-    for (auto it = rr.first; it != rr.second; it++) {
-	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
-	se->onSeCursorPosition(aX, aY);
-    }
-}
-
-bool AVContainer::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
-{
-    bool res = false;
-    TIfRange rr = GetIfi(MSceneElem::Type());
-    // Redirect to comps till the event gets accepted
-    for (auto it = rr.first; it != rr.second; it++) {
-	MSceneElem* se = dynamic_cast<MSceneElem*>(*it);
-	res = se->onMouseButton(aButton, aAction, aMods);
-	if (res) break;
-    }
-    return res;
-}
-
-MUnit* AVContainer::GetCntComp(const string& aCompName)
-{
-    MUnit* res = NULL;
-    MUnit* host = GetMan();
-    string uri = "./" + aCompName;
-    // Uri with "any" elem is not supported atm, so using search by slots
-    for (int ind = 0; ind < host->CompsCount() && res == nullptr; ind++) {
-	MUnit* compu = host->GetComp(ind);
-	MVCslot* comps = compu->GetObj(comps);
-	if (comps != nullptr) {
-	    res = compu->GetNode(uri);
-	}
-    }
-    return res;
-}
-
-string AVContainer::GetSlotName(int aSlotId) const
-{
-    return KSlot_Name + "_" + to_string(aSlotId);
 }
 
 int AVContainer::GetSlotId(const string& aSlotName) const
@@ -657,6 +599,11 @@ int AVContainer::GetSlotId(const string& aSlotName) const
     string id = aSlotName.substr(sp + 1);
     res = stoi(id);
     return res;
+}
+
+string AVContainer::GetSlotName(int aSlotId) const
+{
+    return KSlot_Name + "_" + to_string(aSlotId);
 }
 
 int AVContainer::GetNextSlot(int aSlotId) const
@@ -677,6 +624,22 @@ int AVContainer::GetLastSlot()
 	}
     }
     return lastSlotId;
+}
+
+MUnit* AVContainer::GetCntComp(const string& aCompName)
+{
+    MUnit* res = NULL;
+    MUnit* host = GetMan();
+    string uri = "./" + aCompName;
+    // Uri with "any" elem is not supported atm, so using search by slots
+    for (int ind = 0; ind < host->CompsCount() && res == nullptr; ind++) {
+	MUnit* compu = host->GetComp(ind);
+	MVCslot* comps = compu->GetObj(comps);
+	if (comps != nullptr) {
+	    res = compu->GetNode(uri);
+	}
+    }
+    return res;
 }
 
 void AVContainer::AddComp(const string& aName, const string& aType, const string& aHint)
@@ -702,51 +665,31 @@ void AVContainer::AddComp(const string& aName, const string& aType, const string
     InvalidateIfCache();
 }
 
-void AVContainer::NotifyWidgetOnInpUpdated(const string& aOutUri)
+int AVContainer::GetCompRqs(const string& aSlot, bool aW)
 {
-    MUnit* alcOut = Host()->GetNode(aOutUri);
-    __ASSERT(alcOut != NULL);
-    TIfRange rr = alcOut->GetIfi(MDesInpObserver::Type(), this);
-    for (auto it = rr.first; it != rr.second; it++) {
-	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
-	mobs->OnInpUpdated();
-    }
-}
-
-void AVContainer::NotifyReqsOnInpUpdated(bool aW)
-{
-    MUnit* rqinp = GetRqsInp(aW); 
-    __ASSERT(rqinp);
-    MDesInpObserver* rqinpo = dynamic_cast<MDesInpObserver*>(rqinp->GetSIfi(MDesInpObserver::Type()));
-    __ASSERT(rqinpo);
-    rqinpo->OnInpUpdated();
-}
-
-void AVContainer::OnInpUpdated()
-{
-    Logger()->Write(EInfo, this, "OnInpUpdated");
-    MUnit* rqsInpW = GetCompRqsInp(true);
-    __ASSERT(rqsInpW != NULL);
-    TIfRange rr = rqsInpW->GetIfi(MDVarGet::Type(), this);
-    for (auto it = rr.first; it != rr.second; it++) {
-	MDVarGet* dvg = (MDVarGet*) (*it);
+    int res = 0;
+    MUnit* slotu = iMan->GetNode("./" + aSlot);
+    MUnit* widget = slotu->GetComp(0);
+    MUnit* outp = widget->GetNode("./" + (aW ? KWidgetRqsW_Name : KWidgetRqsH_Name));
+    if (outp != NULL) {
+	MDVarGet* dvg = outp->GetSIfit(dvg, this);
 	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
 	if (dg != NULL) {
 	    Sdata<int> arg;
 	    dg->DtGet(arg);
-	    string dis;
-	    arg.ToString(dis);
-	    Logger()->Write(EInfo, this, "Requisition W: %s", dis.c_str());
+	    res = arg.mData;
 	}
+    } else {
+	Logger()->Write(EErr, this, "Cannot find widget output [%s]", KWidgetRqsW_Name.c_str());
     }
-    // Propagate update notification to inp observers
-    NotifyReqsOnInpUpdated(true);
-    NotifyReqsOnInpUpdated(false);
-    NotifyWidgetOnInpUpdated("./AlcWOut");
-    NotifyWidgetOnInpUpdated("./AlcHOut");
-    NotifyWidgetOnInpUpdated("./AlcXOut");
-    NotifyWidgetOnInpUpdated("./AlcYOut");
+    return res;
 }
+
+
+
+
+
+
 
 
 

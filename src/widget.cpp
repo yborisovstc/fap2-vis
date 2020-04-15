@@ -66,6 +66,8 @@ MIface* AVWidget::DoGetObj(const char *aName)
 	res = dynamic_cast<MSceneElem*>(this);
     } else if (strcmp(aName, MACompsObserver::Type()) == 0) {
 	res = dynamic_cast<MACompsObserver*>(this);
+    } else if (strcmp(aName, MVCcomp::Type()) == 0) {
+	res = dynamic_cast<MVCcomp*>(this);
     } else {
 	res = ADes::DoGetObj(aName);
     }

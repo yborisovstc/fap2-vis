@@ -121,13 +121,16 @@ void AButton::Init()
     const string btnText = iMan->GetContent(KCont_Text);
     int adv = (int) mFont->Advance(btnText.c_str());
     int tfh = (int) mFont->LineHeight();
+    float llx, lly, llz, urx, ury, urz;
+    mFont->BBox(btnText.c_str(), llx, lly, llz, urx, ury, urz);
     MUnit* host = GetMan();
     MUnit* rw = host->GetNode("./RqsW");
     MUnit* rh = host->GetNode("./RqsH");
     // Requisition
     string data = "SI " + to_string(adv + 2 * K_BPadding);
     rw->ChangeCont(data, true, KStateContVal);
-    int minRh = tfh + 2 * K_BPadding;
+    //int minRh = tfh + 2 * K_BPadding;
+    int minRh = (int) ury + 2 * K_BPadding;
     data = "SI " + to_string(minRh);
     rh->ChangeCont(data, true, KStateContVal);
 }
