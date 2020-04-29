@@ -3,6 +3,7 @@
 #include <FTGL/ftgl.h>
 
 #include "button.h"
+#include "mwindow.h"
 
 const string KCont_Text = "Text";
 const string KStateContVal = "Value";
@@ -84,29 +85,33 @@ void AButton::Render()
     glLineWidth(K_LineWidth);
 
     // Window coordinates
-    int wx0 = 0, wy0 = 0, wxw = 0, wyh = 0;
-    getWndCoord(0, 0, wx0, wy0);
-    getWndCoord(wc, hc, wxw, wyh);
+    int wlx = 0, wty = 0, wrx = 0, wby = 0;
+    getWndCoord(0, 0, wlx, wty);
+    getWndCoord(wc, hc, wrx, wby);
+    int wndWidth = 0, wndHeight = 0;
+    Wnd()->GetFbSize(&wndWidth, &wndHeight);
+    int wwty = wndHeight - wty;
+    int wwby = wwty - hc;
 
     // Background
     glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
     glBegin(GL_POLYGON);
-    glVertex2f(wx0, wy0);
-    glVertex2f(wx0, wyh);
-    glVertex2f(wxw, wyh);
-    glVertex2f(wxw, wy0);
+    glVertex2f(wlx, wwty);
+    glVertex2f(wlx, wwby);
+    glVertex2f(wrx, wwty);
+    glVertex2f(wrx, wwby);
     glEnd();
 
     // Draw border
     glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
-    DrawLine(wx0, wy0, wx0, wyh);
-    DrawLine(wx0, wyh, wxw, wyh);
-    DrawLine(wxw, wyh, wxw, wy0);
-    DrawLine(wxw, wy0, wx0, wy0);
+    DrawLine(wlx, wwty, wlx, wwby);
+    DrawLine(wlx, wwby, wrx, wwby);
+    DrawLine(wrx, wwby, wrx, wwty);
+    DrawLine(wrx, wwty, wlx, wwty);
     // Draw the name
     //FTGLPixmapFont font(KFont);
     const string btnText = iMan->GetContent(KCont_Text);
-    glRasterPos2f(WndX(K_BPadding), WndY(K_BPadding));
+    glRasterPos2f(wlx + K_BPadding, wwby + K_BPadding);
     mFont->Render(btnText.c_str());
 
     CheckGlErrors();
@@ -127,7 +132,9 @@ void AButton::Init()
     MUnit* rw = host->GetNode("./RqsW");
     MUnit* rh = host->GetNode("./RqsH");
     // Requisition
-    string data = "SI " + to_string(adv + 2 * K_BPadding);
+    //string data = "SI " + to_string(adv + 2 * K_BPadding);
+    int minRw = (int) urx + 2 * K_BPadding;
+    string data = "SI " + to_string(minRw);
     rw->ChangeCont(data, true, KStateContVal);
     //int minRh = tfh + 2 * K_BPadding;
     int minRh = (int) ury + 2 * K_BPadding;

@@ -74,15 +74,6 @@ AGWindow::AGWindow(const string& aName, MUnit* aMan, MEnv* aEnv): ADes(aName, aM
     mWindow(NULL)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
-    if (!mWndInit) {
-	// Checking in content flag showing that the window is part of visial env but not 
-	// just base agent. If so, initialise the agent
-	// TODO [YB] To find more suitable solution
-	Construct();
-	glfwSetWindowUserPointer(mWindow, this);
-	glfwSetWindowSizeCallback(mWindow, onWindowSizeChanged);
-	mWndInit = ETrue;
-    }
 }
 
 string AGWindow::PEType()
@@ -90,30 +81,26 @@ string AGWindow::PEType()
     return ADes::PEType() + GUri::KParentSep + Type();
 }
 
+int AGWindow::GetParInt(const string& aUri)
+{
+    int res = 0;
+    MUnit* host = GetMan();
+    MUnit* pu = host->GetNode(aUri);
+    MDVarGet* pvg = pu->GetObj(pvg);
+    MDtGet<Sdata<int>>* psi = pvg->GetDObj(psi);
+    Sdata<int> pi = 0;
+    psi->DtGet(pi);
+    return pi.mData;
+}
+
 void AGWindow::Construct()
 {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    /*
-    MUnit* host = GetMan();
-
-    MUnit* wu = host->GetNode("./Width");
-    MDVarGet* wvg = wu->GetObj(wvg);
-    MDtGet<Sdata<int>>* wsi = wvg->GetDObj(wsi);
-    Sdata<int> wi = 0;
-    wsi->DtGet(wi);
-
-    MUnit* hu = host->GetNode("./Heigth");
-    MDVarGet* hvg = hu->GetObj(wvg);
-    MDtGet<Sdata<int>>* hsi = hvg->GetDObj(wsi);
-    Sdata<int> hi = 0;
-    hsi->DtGet(hi);
-    */
-
-    Sdata<int> wi = 640;
-    Sdata<int> hi = 480;
-    mWindow = glfwCreateWindow(wi.mData, hi.mData, "My Title", NULL, NULL);
+    int width = GetParInt("./Width");
+    int height = GetParInt("./Height");
+    mWindow = glfwCreateWindow(width, height, "My Title", NULL, NULL);
     if (mWindow != NULL) {
 	glfwSetWindowUserPointer(mWindow, this);
 	glfwSetWindowCloseCallback(mWindow, onWindowClosed);
@@ -128,7 +115,7 @@ void AGWindow::Construct()
 	// Register the window instance
 	RegisterInstance(this);
 	// Set viewport
-	glViewport(0, 0, wi.mData, hi.mData);
+	glViewport(0, 0, width, height);
     } else {
 	// Window or context creation failed
     }
@@ -209,7 +196,7 @@ void AGWindow::onWindowClosed()
 
 void AGWindow::onCursorPosition(double aX, double aY)
 {
-    cout << "Cursor, X: " << aX << ", Y: " << aY << endl;
+    //cout << "Cursor, X: " << aX << ", Y: " << aY << endl;
 
     MUnit* scene = GetNode("./../Scene");
     if (scene != NULL) {
@@ -250,29 +237,6 @@ MIface *AGWindow::DoGetObj(const char *aName)
     }
     return res;
 }
-/*
-void AGWindow::OnUpdated_X(int aOldData)
-{
-}
-
-void AGWindow::OnUpdated_Y(int aOldData)
-{
-}
-
-void AGWindow::OnUpdated_W(int aOldData)
-{
-    if (mWindow != NULL) {
-	gdk_window_resize(mWindow, iW, iH);
-    }
-}
-
-void AGWindow::OnUpdated_H(int aOldData)
-{
-    if (mWindow != NULL) {
-	gdk_window_resize(mWindow, iW, iH);
-    }
-}
-*/
 
 void AGWindow::Render()
 {
@@ -297,6 +261,12 @@ void AGWindow::Update()
 void AGWindow::Confirm()
 {
     Logger()->Write(EInfo, this, "Confirm");
+    if (!mWndInit) {
+	Construct();
+	glfwSetWindowUserPointer(mWindow, this);
+	glfwSetWindowSizeCallback(mWindow, onWindowSizeChanged);
+	mWndInit = ETrue;
+    }
     ADes::Confirm();
     Render();
     glfwSwapBuffers(mWindow);

@@ -4,6 +4,7 @@
 
 #include "agentvr.h"
 #include "mvrcontroller.h"
+#include "mwindow.h"
 
 
 const string KCont_Text = "Text";
@@ -137,33 +138,37 @@ void AUnitCrp::Render()
     glLineWidth(K_LineWidth);
 
     // Window coordinates
-    int wx0 = 0, wy0 = 0, wxw = 0, wyh = 0;
-    getWndCoord(0, 0, wx0, wy0);
-    getWndCoord(wc, hc, wxw, wyh);
+    int wlx = 0, wty = 0, wrx = 0, wby = 0;
+    getWndCoord(0, 0, wlx, wty);
+    getWndCoord(wc, hc, wrx, wby);
+    int wndWidth = 0, wndHeight = 0;
+    Wnd()->GetFbSize(&wndWidth, &wndHeight);
+    int wwty = wndHeight - wty;
+    int wwby = wwty - hc;
 
     // Background
     glColor3f(mBgColor.r, mBgColor.g, mBgColor.b);
     glBegin(GL_POLYGON);
-    glVertex2f(wx0, wy0);
-    glVertex2f(wx0, wyh);
-    glVertex2f(wxw, wyh);
-    glVertex2f(wxw, wy0);
+    glVertex2f(wlx, wwty);
+    glVertex2f(wlx, wwby);
+    glVertex2f(wrx, wwty);
+    glVertex2f(wrx, wwby);
     glEnd();
 
     // Draw border
     glColor3f(mFgColor.r, mFgColor.g, mFgColor.b);
-    DrawLine(wx0, wy0, wx0, wyh);
-    DrawLine(wx0, wyh, wxw, wyh);
-    DrawLine(wxw, wyh, wxw, wy0);
-    DrawLine(wxw, wy0, wx0, wy0);
+    DrawLine(wlx, wwty, wlx, wwby);
+    DrawLine(wlx, wwby, wrx, wwby);
+    DrawLine(wrx, wwby, wrx, wwty);
+    DrawLine(wrx, wwty, wlx, wwty);
     // Draw name divider
     int nameDivH = K_BFontSize + 2 * K_BPadding;
-    int wys = WndY(hc - nameDivH);
-    DrawLine(wx0, wys, wxw, wys);
+    int wys = wwty - nameDivH;
+    DrawLine(wlx, wys, wrx, wys);
     // Draw the name
     //FTGLPixmapFont font(KFont);
     const string& titleText = (mMdl != nullptr) ? mMdl->Name() : KTitle;
-    glRasterPos2f(WndX(K_BPadding), WndY(hc - nameDivH + K_BPadding));
+    glRasterPos2f(wlx + K_BPadding, wys + K_BPadding);
     mFont->Render(titleText.c_str());
 
     CheckGlErrors();
@@ -181,15 +186,6 @@ void AUnitCrp::Init()
     MUnit* host = GetMan();
     MUnit* rw = host->GetNode("./RqsW");
     MUnit* rh = host->GetNode("./RqsH");
-    /*
-    MDVarSet* rwvs = rw->GetObj(rwvs);
-    MDtSet<Sdata<int> >* rwd = (MDtSet<Sdata<int> >*) rwvs->DoGetSDObj(MDtSet<Sdata<int> >::Type());
-    if (rwd != NULL) {
-	Sdata<int> arg;
-	rwd->DtSet(arg);
-	arg.mData = (int) adv;
-    }
-    */
     // Requisition
     string data = "SI " + to_string(adv + 2 * K_BPadding);
     rw->ChangeCont(data, true, KStateContVal);
@@ -227,7 +223,7 @@ bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
 	    MUnit* host = GetMan();
 	    MUnit* owner = host->GetMan();
 	    cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
-	    MViewMgr* view = owner->GetSIfit(view);
+	    MViewMgr* view = owner->GetSIfit(view, this);
 	    if (view) {
 		MVrpView* vrpView = dynamic_cast<MVrpView*>(view->DoGetIface(MVrpView::Type()));
 		if (vrpView) {
@@ -249,7 +245,7 @@ string AUnitCrp::GetModel() const
 
 // Unit DRP
 
-AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AVHLayout(aName, aMan, aEnv),
+AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AHLayoutL(aName, aMan, aEnv),
     mEnv(nullptr), mMdl(nullptr)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
@@ -257,7 +253,7 @@ AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AVHLayout(aNam
 
 string AUnitDrp::PEType()
 {
-    return AVHLayout::PEType() + GUri::KParentSep + Type();
+    return AHLayoutL::PEType() + GUri::KParentSep + Type();
 }
 
 MIface* AUnitDrp::DoGetObj(const char *aName)
@@ -266,14 +262,14 @@ MIface* AUnitDrp::DoGetObj(const char *aName)
     if (strcmp(aName, MVrp::Type()) == 0) {
 	res = dynamic_cast<MVrp*>(this);
     } else {
-	res = AVHLayout::DoGetObj(aName);
+	res = AHLayoutL::DoGetObj(aName);
     }
     return res;
 }
 
 void AUnitDrp::Render()
 {
-    AVHLayout::Render();
+    AHLayoutL::Render();
 }
 
 string AUnitDrp::MVrp_Mid() const
@@ -302,8 +298,8 @@ void AUnitDrp::CreateRp()
     for (int ind = 0; ind < mMdl->CompsCount(); ind++) {
 	MUnit* comp = mMdl->GetComp(ind);
 	string compUri = comp->GetUri(0,true);
-	AddComp(comp->Name(), "FUnitCrp");
-	MUnit* vcompu = GetCntComp(comp->Name());
+	AddWidget(comp->Name(), "FUnitCrp");
+	MUnit* vcompu = host->GetNode("./" + comp->Name());
 	__ASSERT(vcompu != nullptr);
 	MVrp* vcompr = vcompu->GetSIfit(vcompr);
 	__ASSERT(vcompr != nullptr);
@@ -338,7 +334,7 @@ void AUnitDrp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 	    }
 	}
     } else {
-	AVHLayout::UpdateIfi(aName, aCtx);
+	AHLayoutL::UpdateIfi(aName, aCtx);
     }
 }
 

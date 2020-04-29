@@ -14,6 +14,8 @@ class AVLayoutL: public AVContainerL
 	static const char* Type() { return "AVLayoutL";};
 	static string PEType();
 	AVLayoutL(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	// From AVContainer
+	virtual void AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
 };
 
 #endif // __FAP2VIS_VLAYOUTL_H

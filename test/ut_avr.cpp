@@ -209,7 +209,7 @@ void Ut_avr::test_UnitDrp()
 void Ut_avr::test_VrCtrl()
 {
     printf("\n === VR Controller test 1\n");
-    const string specn("ut_avr_vrc_1");
+    const string specn("ut_avr_vrc_1l");
     string ext = "chs";
     string spec = specn + string(".") + ext;
     string log = specn + "_" + ext + ".log";
@@ -224,13 +224,6 @@ void Ut_avr::test_VrCtrl()
     MUnit* root = iEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
-#if 0
-    // Verify resolving scene elems in container
-    MUnit* cntu = root->GetNode("./Test/Env/Window/Scene/Drp/CntAgent");
-    CPPUNIT_ASSERT_MESSAGE("Fail to get Drp", cntu != 0);
-    cntu->GetIfi(MSceneElem::Type());
-#endif
-
     // Sync the state
     MUnit* esync = root->GetNode("./Test/Capsule/Sync");
     CPPUNIT_ASSERT_MESSAGE("Fail to get input for Syncable iface", esync != 0);
@@ -241,19 +234,5 @@ void Ut_avr::test_VrCtrl()
     bool run = iEnv->RunSystem();
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
-#if 0
-    const TInt ticksnum = 128;
-    //for (TInt cnt = 0; cnt < ticksnum; cnt++) {
-    while (!mAgtObs.mClose) {
-	if (sync->IsActive()) {
-	    sync->Update();
-	} else if (sync->IsUpdated()) {
-	    sync->Confirm();
-	} else {
-	    // Handle idle
-	    glfwPollEvents();
-	}
-    }
-#endif
     delete iEnv;
 }

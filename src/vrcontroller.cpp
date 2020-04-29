@@ -5,6 +5,7 @@
 
 #include "vrcontroller.h"
 #include "magentvr.h"
+#include "mcontainer.h"
 
 
 
@@ -63,7 +64,7 @@ MUnit* AVrController::GetDrpU()
 string AVrController::GetDrpMpUri() const
 {
     string cntUri = iMan->GetContent(KVrc_DrpMp);
-    return cntUri + "/Slot_1";
+    return cntUri;
 }
 
 MVrp* AVrController::GetDrp()
@@ -90,9 +91,15 @@ MVrp* AVrController::CreateDrp(const MUnit* aNode)
     __ASSERT(scenee);
     string drpType = "UnitDrp";
     const string drpmpUri = GetDrpMpUri();
+
+    MContainer* mpc = sceneu->GetSIfit(mpc);
+    __ASSERT(mpc);
+    mpc->AddWidget(aNode->Name(), "/*/Modules/AvrMdl/UnitDrp");
+#if 0
     scenee->AppendMutation(TMut(ENt_Node, ENa_Targ, drpmpUri , ENa_Id, aNode->Name(), ENa_Parent, "/*/Modules/AvrMdl/" + drpType));
     TNs ns; MutCtx mctx(NULL, ns);
     scenee->Mutate(true, false, false, mctx);
+#endif
     // Activate scene, TODO to do it in Des::Mutate
     MDesSyncable* sceneds = dynamic_cast<MDesSyncable*>(sceneu->GetSIfi(MDesSyncable::Type()));
     __ASSERT(sceneds);
@@ -207,7 +214,7 @@ void AVrController::OnRpSelected(const MVrp* aRp)
     MElem* scenee = GetDrpMpcE();
     __ASSERT(scenee);
     //string drpUri = drp->GetUri(NULL, true);
-    scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./Slot_1/" + drp->Name()));
+    scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./" + drp->Name()));
     TNs ns; MutCtx mctx(NULL, ns);
     scenee->Mutate(true, false, false, mctx);
     CreateDrp(mdl);
@@ -231,7 +238,7 @@ void AVrController::ApplyCursor(const string& aCursor)
 	// DRP already exists, remove
 	MElem* scenee = GetDrpMpcE();
 	__ASSERT(scenee);
-	scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./Slot_1/" + drp->Name()));
+	scenee->AppendMutation(TMut(ENt_Rm, ENa_MutNode, "./" + drp->Name()));
 	TNs ns; MutCtx mctx(NULL, ns);
 	scenee->Mutate(true, false, false, mctx);
     }

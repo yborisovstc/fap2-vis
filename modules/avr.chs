@@ -1,4 +1,3 @@
-Pos: 0 -- Wrong context type
 AvrMdl : Elem
 {
     About = "Agents visual representations";
@@ -9,10 +8,9 @@ AvrMdl : Elem
         $ + /DesComps/StcInpExt;
         $ + /DesComps/StcOutExt;
         $ + /FvWidgets/FWidgetBase;
-        $ + /ContainerMdl/FContainer;
-        $ + /ContainerMdl/HLayoutBase;
+        $ + /ContainerModL/FHLayoutLBase;
     }
-    UnitDrp : /*/Modules/ContainerMdl/HLayoutBase
+    UnitDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
         $ # " Unit detail representation";
         CntAgent : AUnitDrp;

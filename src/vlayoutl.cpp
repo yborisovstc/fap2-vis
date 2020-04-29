@@ -13,4 +13,6 @@ string AVLayoutL::PEType()
     return AVContainerL::PEType() + GUri::KParentSep + Type();
 }
 
-
+void AVLayoutL::AddWidget(const string& aName, const string& aType, const string& aHint)
+{
+}

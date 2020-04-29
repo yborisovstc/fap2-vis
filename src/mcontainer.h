@@ -38,5 +38,21 @@ class MViewMgr: public MIface, public MIfaceProv
 	virtual string Mid() const override { return MViewMgr_Mid();}
 };
 
+
+/** @brief Container interface
+ * */
+class MContainer: public MIface
+{
+    public:
+	static const char* Type() { return "MContainer";};
+	/** @brief Creates widget of given type and name and then appends it * */
+	virtual void AddWidget(const string& aName, const string& aType, const string& aHint = string()) = 0;
+	// From MIface
+	virtual MIface* Call(const string& aSpec, string& aRes) override {return NULL;}
+	virtual string Uid() const { return Mid() + "%" + Type();}
+	virtual string Mid() const override { return MContainer_Mid();}
+	virtual string MContainer_Mid() const { return "?";}
+};
+
 #endif
 

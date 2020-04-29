@@ -70,7 +70,7 @@
 			</listitem>
 		    </itemizedlist>
 		</sect4>
-		<sect4 id="ds_wdgs_cnt_wsa_slw"><title>Approach of slot assisiating via link to widget (<xref linkend="gls_slw"/>)</title>
+		<sect4 id="ds_wdgs_cnt_wsa_slw"><title>Approach of slot assosiating via link to widget (<xref linkend="gls_slw"/>)</title>
 		    <simpara>This approach shows that even the layouting (i.e. transition of widget allocation) can be effectively implemented in slots.
 			This mean that the layouting gets distributed! With this approach slot acts as widget "extension" containing tranitions of widget allocation.
 			</simpara>

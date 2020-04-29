@@ -2,49 +2,47 @@
 #include "mwindow.h"
 #include "alignment.h"
 
+const string KSlotName = "Slot";
+const string KSlotCpName = "SCp";
+const string KWidgetCpName = "Cp";
 
-AAlignment::AAlignment(const string& aName, MUnit* aMan, MEnv* aEnv): AVContainer(aName, aMan, aEnv)
+AAlignment::AAlignment(const string& aName, MUnit* aMan, MEnv* aEnv): AVContainerL(aName, aMan, aEnv)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
 }
 
 string AAlignment::PEType()
 {
-    return AVContainer::PEType() + GUri::KParentSep + Type();
-}
-
-void AAlignment::Render()
-{
-    AVContainer::Render();
-}
-
-void AAlignment::Init()
-{
-    AVContainer::Init();
+    return AVContainerL::PEType() + GUri::KParentSep + Type();
 }
 
 TBool AAlignment::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
 {
-    TBool res = AVContainer::HandleCompChanged(aContext, aComp, aContName);
+    TBool res = AVContainerL::HandleCompChanged(aContext, aComp, aContName);
     return res;
 }
 
-int AAlignment::GetComposedData(const string& aSlotName, TWdgPar aPar)
+void AAlignment::AddWidget(const string& aName, const string& aType, const string& aHint)
 {
-    int res = 0;
-    int wndWidth = 0, wndHeight = 0;
-    Wnd()->GetFbSize(&wndWidth, &wndHeight);
-    if (wndWidth >0 && wndHeight > 0) {
-	if (aPar == E_AlcX) {
-	    res = mPadding;
-	} else if (aPar == E_AlcY) {
-	    res = mPadding;
-	} else if (aPar == E_AlcW) {
-	    res = GetCompRqs(aSlotName, true);
-	} else if (aPar == E_AlcH) {
-	    res = GetCompRqs(aSlotName, false);
-	}
-    }
-    return res;
+    MUnit* host = GetMan();
+    MElem* hoste = host->GetObj(hoste);
+    __ASSERT(hoste);
+    // No need to add new slot, it is already there
+    string slotUri = "./" + KSlotName;
+    MUnit* slot = host->GetNode(slotUri);
+    __ASSERT(slot);
+    // Add new widget
+    TNs ns; MutCtx mctx(NULL, ns);
+    hoste->AppendMutation(TMut(ENt_Node, ENa_Id, aName, ENa_Parent, aType));
+    hoste->Mutate(true, false, false, mctx);
+    string newWdgUri = "./" + aName;
+    MUnit* newWdg = host->GetNode(newWdgUri);
+    __ASSERT(newWdg);
+    // Bind widget to slot
+    string widgetCp = "./" + aName + "/" + KWidgetCpName;
+    string slotCp = slot->GetUri(this, ETrue);
+    hoste->AppendMutation(TMut(ENt_Conn, ENa_P, widgetCp, ENa_Q, slotCp + "/" + KSlotCpName));
+    hoste->Mutate(true, false, false, mctx);
+    // Invalidate Iface cache
+    InvalidateIfCache();
 }
-

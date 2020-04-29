@@ -15,7 +15,7 @@
  * This container doesn't provide widgets allocation by itself but delegates it to slots
  * Each slot can have its own rules for allocating assosiated widget
  * */
-class AVContainerL: public AVWidget
+class AVContainerL: public AVWidget, public MContainer
 {
     public:
 	static const char* Type() { return "AVContainerL";};
@@ -24,6 +24,17 @@ class AVContainerL: public AVWidget
 	// From MUnit
 	virtual MIface* DoGetObj(const char *aName) override;
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
+	// From MSceneElem
+	virtual void Render() override;
+	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
+	// From MContainer
+	virtual void AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
+	// Local
+	virtual string GetSlotType();
+	virtual MUnit* AppendSlot(MUnit* aSlot);
+	virtual int GetLastSlotId();
+	virtual int GetSlotId(const string& aSlotName) const;
+	virtual string GetSlotName(int aSlotId) const;
 };
 
 /** @brief Container's slot base using approach of widghet to slot assosiation via link

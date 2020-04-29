@@ -238,18 +238,19 @@ bool AVWidget::IsInnerWidgetPos(double aX, double aY)
 {
     int wc = GetParInt("./AlcW");
     int hc = GetParInt("./AlcH");
-    int wx0 = 0, wy0 = 0, wxw = 0, wyh = 0;
-    getWndCoord(0, 0, wx0, wy0);
-    getWndCoord(wc, hc, wxw, wyh);
-    int wdX = aX - wx0;
-    int wdY = aY - wy0;
-    return (wdX >= 0 && wdX < wc && wdY >= 0 && wdY < hc);
-	
+    int wlx = 0, wty = 0, wrx = 0, wby = 0;
+    getWndCoord(0, 0, wlx, wty);
+    getWndCoord(wc, hc, wrx, wby);
+    int wndWidth = 0, wndHeight = 0;
+    Wnd()->GetFbSize(&wndWidth, &wndHeight);
+    int wwty = wndHeight - wty;
+    int wwby = wwty - hc;
+    return (aX > wlx && aX < wrx && aY > wwby && aY < wwty);
 }
 
 void AVWidget::onWdgCursorPos(int aX, int aY)
 {
-    cout << "Widget [" << iMan->Name() << "], cursor, X: " << aX << ", Y:" << aY << endl;
+    //cout << "Widget [" << iMan->Name() << "], cursor, X: " << aX << ", Y:" << aY << endl;
 }
 
 void AVWidget::getWndCoord(int aInpX, int aInpY, int& aOutX, int& aOutY)
@@ -282,12 +283,14 @@ int AVWidget::WndY(int aY)
 
 bool AVWidget::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
+    bool res = false;
     double x = 0, y = 0;
     GetCursorPosition(x, y);
     if (IsInnerWidgetPos(x, y)) {
 	cout << "Widget [" << iMan->Name() << "], button" << endl;
+	res = true;
     }
-    return false;
+    return res;
 }
 
 void AVWidget::GetCursorPosition(double& aX, double& aY)

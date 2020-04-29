@@ -51,6 +51,7 @@ class AGWindow: public ADes, public MWindow
 	virtual void Update();
 	virtual void Confirm() override;
     protected:
+	void Init();
 	void Construct();
 	void Render();
 	const GLFWwindow* RawWindow() const { return mWindow;}
@@ -74,6 +75,7 @@ class AGWindow: public ADes, public MWindow
 	static AGWindow* FindInstance(GLFWwindow* aWnd);
 	//<! Window width native settier iface
 	MDVarSet* StWidth();
+	int GetParInt(const string& aUri);
     protected:
 	TBool mWndInit;
 	GLFWwindow* mWindow;

@@ -42,6 +42,8 @@ libfap2vis_la_SOURCES = \
 		       containerl.cpp \
 		       vlayoutl.h \
 		       vlayoutl.cpp \
+		       hlayoutl.h \
+		       hlayoutl.cpp \
 		       magentvr.h \
 		       agentvr.h \
 		       agentvr.cpp \

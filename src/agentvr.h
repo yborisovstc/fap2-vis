@@ -4,6 +4,7 @@
 
 #include "widget.h"
 #include "container.h"
+#include "hlayoutl.h"
 #include "magentvr.h"
 
 
@@ -64,7 +65,7 @@ class AUnitCrp : public AAgentVr, public MVrp
 
 /** @brief Unit detail representation widget
  * */
-class AUnitDrp : public AVHLayout, public MVrp
+class AUnitDrp : public AHLayoutL, public MVrp
 {
     public:
 	static const char* Type() { return "AUnitDrp";};
