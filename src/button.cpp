@@ -53,7 +53,7 @@ bool AButton::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMod
 	if (IsInnerWidgetPos(x, y)) {
 	    MUnit* host = GetMan();
 	    MUnit* owner = host->GetMan();
-	    cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
+	    //cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
 	    MUnit* spressed = GetStatePressed();
 	    spressed->ChangeCont("SB true", true, KStateContVal);
 	}

@@ -222,7 +222,7 @@ bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
 	if (IsInnerWidgetPos(x, y)) {
 	    MUnit* host = GetMan();
 	    MUnit* owner = host->GetMan();
-	    cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
+	    //cout << "UnitCrp [" << iMan->Name() << "], button" << endl;
 	    MViewMgr* view = owner->GetSIfit(view, this);
 	    if (view) {
 		MVrpView* vrpView = dynamic_cast<MVrpView*>(view->DoGetIface(MVrpView::Type()));

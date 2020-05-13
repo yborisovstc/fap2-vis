@@ -201,7 +201,9 @@ void AVrController::CreateModel(const string& aSpecPath)
     mEnv = new Env(aSpecPath, aSpecPath + ".log");
     assert(mEnv != nullptr);
     mEnv->ConstructSystem();
-    //MVrp* drp = CreateDrp(mEnv->Root());
+    if (mEnv->Root() == NULL) {
+	Logger()->Write(EErr, this, "Cannot create model [%s]", aSpecPath.c_str());
+    }
 }
 
 void AVrController::OnRpSelected(const MVrp* aRp)
@@ -291,7 +293,7 @@ void TrModelCreated::DtGet(Sdata<bool>& aData)
     if (dg != NULL) {
 	Sdata<string> modelPath;
 	dg->DtGet(modelPath);
-	Logger()->Write(EInfo, this, "Module path changed: %s", modelPath.mData.c_str());
+	Logger()->Write(EInfo, this, "Model path changed: %s", modelPath.mData.c_str());
 	MVrController* ctr = dynamic_cast<MVrController*>(iMan->GetSIfi(MVrController::Type()));
 	__ASSERT(ctr);
 	ctr->CreateModel(modelPath.mData);

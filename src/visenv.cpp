@@ -3,7 +3,6 @@
 
 #include "visenv.h"
 #include <mdata.h>
-#include <iostream>
 #include <functional>
 #include "mdata.h"
 #include "mscene.h"
@@ -214,7 +213,7 @@ void AGWindow::onCursorPosition(double aX, double aY)
 
 void AGWindow::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods)
 {
-    cout << "Window, onMouseButton" << endl;
+    //cout << "Window, onMouseButton" << endl;
 
     MUnit* scene = GetNode("./../Scene");
     if (scene != NULL) {

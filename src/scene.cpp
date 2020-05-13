@@ -39,15 +39,6 @@ MIface *AGtScene::DoGetObj(const char *aName)
 
 void AGtScene::RenderScene(void)
 {
-    /*
-    if (sroot != NULL) {
-	MSceneElem* mse = (MSceneElem*) sroot->GetSIfi(MSceneElem::Type(), this);
-	if (mse != NULL) {
-	    mse->Render();
-	}
-    }
-    */
-
     glClearColor(0.0, 0.0, 0.0, 0.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
