@@ -15,6 +15,7 @@ testroot : Elem
         $ + /GVisComps/SceRect;
         $ + /FvWidgetsL/FUnitCrp;
         $ + /AvrMdl/UnitDrp;
+        $ + /AvrMdl/SystDrp;
         $ + /AvrMdl/VrController;
         $ + /AvrMdl/VrViewCp;
         $ + /FvWidgetsL/FButtonL;

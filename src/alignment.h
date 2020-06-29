@@ -16,7 +16,7 @@ class AAlignment: public AVContainerL
 	// From MACompsObserver
 	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
 	// From MContainer
-	virtual void AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
+	virtual MUnit* AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
 };
 
 #endif // __FAP2VIS_VLAYOUT_H

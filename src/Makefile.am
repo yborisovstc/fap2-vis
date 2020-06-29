@@ -47,6 +47,8 @@ libfap2vis_la_SOURCES = \
 		       magentvr.h \
 		       agentvr.h \
 		       agentvr.cpp \
+		       systdrp.h \
+		       systdrp.cpp \
 		       visrepr.h \
 		       visrepr.cpp \
 		       visprov.cpp

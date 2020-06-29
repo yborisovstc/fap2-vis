@@ -36,6 +36,9 @@ class AVrController : public ADes, public MVrController, public MACompsObserver
 	// From MDesSyncable
 	virtual void Update();
     protected:
+	/** @brief Gets DRP type (parent) for given agent of model */
+	string GetDrpType(const MUnit* aModel) const;
+    protected:
 	virtual void Init();
 	/** @brief Gets DRP mounitng point - container MUnit */
 	MUnit* GetDrpMpcU();

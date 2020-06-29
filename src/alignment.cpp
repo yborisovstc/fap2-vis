@@ -22,7 +22,7 @@ TBool AAlignment::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string&
     return res;
 }
 
-void AAlignment::AddWidget(const string& aName, const string& aType, const string& aHint)
+MUnit* AAlignment::AddWidget(const string& aName, const string& aType, const string& aHint)
 {
     MUnit* host = GetMan();
     MElem* hoste = host->GetObj(hoste);
@@ -45,4 +45,5 @@ void AAlignment::AddWidget(const string& aName, const string& aType, const strin
     hoste->Mutate(true, false, false, mctx);
     // Invalidate Iface cache
     InvalidateIfCache();
+    return newWdg;
 }

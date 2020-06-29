@@ -20,6 +20,16 @@ AvrMdl : Elem
         }
         Padding = 10;
     }
+    SystDrp : /*/Modules/ContainerModL/FHLayoutLBase
+    {
+        $ # " Syst detail representation";
+        CntAgent : ASystDrp;
+        CntAgent < {
+            ModelSynced : AStatec;
+            ModelSynced < Value = "SB false";
+        }
+        Padding = 10;
+    }
     VrViewCp : ASocketMcm
     {
         About = "Vis representation view CP";
@@ -45,7 +55,7 @@ AvrMdl : Elem
         $ # " Visual representation controller";
         AVrc : AVrController;
         ModelPath : AStatec;
-        ModelPath < Value = "SS none";
+        ModelPath < Value = "SS nil";
         ModelCreated : AStatec;
         ModelCreated < Debug.Update = y;
         ModelCreated < Value = "SB false";

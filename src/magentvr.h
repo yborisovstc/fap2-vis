@@ -12,7 +12,7 @@ class MVrp: public MIface
 	static const char* Type() { return "MVrp";};
 	virtual void SetEnv(MEnv* aEnv) = 0;
 	virtual void SetModel(const string& aMdlUri) = 0;
-	virtual string GetModel() const = 0;
+	virtual string GetModelUri() const = 0;
 	//virtual void OnCompSelected(const MVrp* aComp) = 0;
 	/** @ Sets info of binding to controller
 	 * @param[in]  aCtrUri - Controller absolute URI

@@ -236,7 +236,7 @@ bool AUnitCrp::onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMo
     return res;
 }
 
-string AUnitCrp::GetModel() const
+string AUnitCrp::GetModelUri() const
 {
     __ASSERT(mMdl);
     return mMdl->GetUri(NULL, true);
@@ -298,7 +298,7 @@ void AUnitDrp::CreateRp()
     for (int ind = 0; ind < mMdl->CompsCount(); ind++) {
 	MUnit* comp = mMdl->GetComp(ind);
 	string compUri = comp->GetUri(0,true);
-	AddWidget(comp->Name(), "FUnitCrp");
+	InsertWidget(comp->Name(), "/*/Modules/FvWidgetsL/FUnitCrp", KPosEnd);
 	MUnit* vcompu = host->GetNode("./" + comp->Name());
 	__ASSERT(vcompu != nullptr);
 	MVrp* vcompr = vcompu->GetSIfit(vcompr);
@@ -338,7 +338,7 @@ void AUnitDrp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
     }
 }
 
-string AUnitDrp::GetModel() const
+string AUnitDrp::GetModelUri() const
 {
     __ASSERT(mMdl);
     return mMdl->GetUri(NULL, true);
@@ -383,7 +383,7 @@ MIface* AVrpView::MAgent_DoGetIface(const string& aUid)
 
 void AVrpView::OnCompSelected(const MVrp* aComp)
 {
-    string selUri = aComp->GetModel();
+    string selUri = aComp->GetModelUri();
     MElem* eowner = iMan->GetObj(eowner);
     eowner->AppendMutation(TMut(ENt_Cont, ENa_Targ, "./NodeSelected", ENa_Id, "Value", ENa_MutVal, "SS " + selUri));
     TNs ns; MutCtx mctx(NULL, ns);

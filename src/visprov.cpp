@@ -15,6 +15,7 @@
 #include "alignment.h"
 #include "containerl.h"
 #include "vlayoutl.h"
+#include "systdrp.h"
 
 
 const string KModulesPath = "/usr/share/grayb/modules/";
@@ -25,7 +26,7 @@ const ProvBase::TFReg VisProv::mReg ( {
     Item<AVWidget>(), Item<AVHLayout>(), Item<AVSlot>(), Item<AVCpsCpInp>(), Item<AVCpsCpOut>(), Item<AUnitCrp>(), Item<AVLabel>(),
     Item<AUnitDrp>(), Item<AVrController>(), Item<TrModelCreated>(), Item<AButton>(), Item<AVLayout>(), Item<AVDesLauncher>(),
     Item<AAlignment>(), Item<TrReqSum>(), Item<TrReqMax>(), Item<TrCursor>(), Item<TrCursorApplied>(), Item<AVrpView>(),
-    Item<AVSlotL>(), Item<AVContainerL>(), Item<AVLayoutL>(), Item<AHLayoutL>()
+    Item<AVSlotL>(), Item<AVLayoutL>(), Item<AHLayoutL>(), Item<ASystDrp>()
 });
 
 VisProv::VisProv(const string& aName, MEnv* aEnv): ProvBase(aName, aEnv)

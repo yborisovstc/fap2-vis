@@ -28,13 +28,26 @@ class AVContainerL: public AVWidget, public MContainer
 	virtual void Render() override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
 	// From MContainer
-	virtual void AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
+	virtual MUnit* AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
+	virtual MUnit* InsertWidget(const string& aName, const string& aType, const TPos& aPos) override;
+	virtual TPos LastPos() const override;
 	// Local
 	virtual string GetSlotType();
 	virtual MUnit* AppendSlot(MUnit* aSlot);
+	virtual MUnit* InsertSlot(MUnit* aSlot, const TPos& aPos);
 	virtual int GetLastSlotId();
 	virtual int GetSlotId(const string& aSlotName) const;
 	virtual string GetSlotName(int aSlotId) const;
+	virtual MUnit* GetPrevSlotCp(MUnit* aSlot);
+	virtual MUnit* GetNextSlotCp(MUnit* aSlot);
+	virtual MUnit* GetNextSlot(MUnit* aSlot);
+	virtual MUnit* GetSlotByPos(const TPos& aPos) override;
+	virtual TPos PrevPos(const TPos& aPos) const;
+	virtual TPos NextPos(const TPos& aPos) const;
+	virtual MUnit* GetWidgetBySlot(MUnit* aSlot);
+    protected:
+	static const TPos KPosFirst;
+	static const TPos KPosEnd;
 };
 
 /** @brief Container's slot base using approach of widghet to slot assosiation via link
@@ -48,6 +61,29 @@ class AVSlotL: public Syst, public MVCslot
 	AVSlotL(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual MIface* DoGetObj(const char *aName) override;
 };
+
+/** @brief Linear layout base agent
+ * */
+class ALinearLayout: public AVContainerL
+{
+    public:
+	static const char* Type() { return "ALinearLayout";};
+	static string PEType();
+	ALinearLayout(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
+	// From AVContainer
+	virtual MUnit* AppendSlot(MUnit* aSlot) override;
+	virtual MUnit* InsertSlot(MUnit* aSlot, const TPos& aPos) override;
+	virtual MUnit* GetSlotByPos(const TPos& aPos) override;
+	virtual MUnit* GetPrevSlotCp(MUnit* aSlot) override;
+	virtual MUnit* GetNextSlotCp(MUnit* aSlot) override;
+	virtual MUnit* GetNextSlot(MUnit* aSlot) override;
+	virtual TPos PrevPos(const TPos& aPos) const override;
+	virtual TPos NextPos(const TPos& aPos) const override;
+    protected:
+	MUnit* GetLastSlot();
+};
+
+;
 
 #endif // __FAP2VIS_CONTAITER_H
 

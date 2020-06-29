@@ -51,7 +51,7 @@ class AUnitCrp : public AAgentVr, public MVrp
 	virtual string MVrp_Mid() const override;
 	virtual void SetEnv(MEnv* aEnv) override;
 	virtual void SetModel(const string& aMdlUri) override;
-	virtual string GetModel() const override;
+	virtual string GetModelUri() const override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override {}
     protected:
 	// From AVWidget
@@ -71,8 +71,8 @@ class AUnitDrp : public AHLayoutL, public MVrp
 	static const char* Type() { return "AUnitDrp";};
 	static string PEType();
 	AUnitDrp(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
-	virtual MIface* DoGetObj(const char *aName) override;
 	// From MUnit
+	virtual MIface* DoGetObj(const char *aName) override;
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// From MSceneElem
 	virtual void Render() override;
@@ -80,10 +80,11 @@ class AUnitDrp : public AHLayoutL, public MVrp
 	virtual string MVrp_Mid() const override;
 	virtual void SetEnv(MEnv* aEnv) override;
 	virtual void SetModel(const string& aMdlUri) override;
-	virtual string GetModel() const override;
+	virtual string GetModelUri() const override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override;
     protected:
-	void CreateRp();
+	// Local
+	virtual void CreateRp();
     protected:
 	MEnv* mEnv; /*!< Binded env, not owned */
 	MUnit* mMdl; /*!< Binded model, not owned */

@@ -62,3 +62,6 @@ src/.exrc
 doc/design/index.html
 test/*.txt
 test/ut-fap2vis-lib
+*.out
+*.csv
+

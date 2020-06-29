@@ -10,6 +10,11 @@
 
 
 const string KVrc_ModelPath = "";
+const string KSystEType = ":Unit:Elem:Syst";
+const string KSystDrpName = "SystDrp";
+const string KUnitDrpName = "UnitDrp";
+const string KModelPathEvarName = "Model";
+
 
 /** @brief Content: DRP mounting point */
 const string KVrc_DrpMp = "DrpMp";
@@ -89,12 +94,12 @@ MVrp* AVrController::CreateDrp(const MUnit* aNode)
     __ASSERT(sceneu);
     MElem* scenee = sceneu->GetObj(scenee);
     __ASSERT(scenee);
-    string drpType = "UnitDrp";
+    string drpType = GetDrpType(aNode);
     const string drpmpUri = GetDrpMpUri();
 
     MContainer* mpc = sceneu->GetSIfit(mpc);
     __ASSERT(mpc);
-    mpc->AddWidget(aNode->Name(), "/*/Modules/AvrMdl/UnitDrp");
+    mpc->AddWidget(aNode->Name(), "/*/Modules/AvrMdl/" + drpType);
 #if 0
     scenee->AppendMutation(TMut(ENt_Node, ENa_Targ, drpmpUri , ENa_Id, aNode->Name(), ENa_Parent, "/*/Modules/AvrMdl/" + drpType));
     TNs ns; MutCtx mctx(NULL, ns);
@@ -208,7 +213,7 @@ void AVrController::CreateModel(const string& aSpecPath)
 
 void AVrController::OnRpSelected(const MVrp* aRp)
 {
-    string mdlUri = aRp->GetModel();
+    string mdlUri = aRp->GetModelUri();
     MUnit* mdl = mEnv->Root()->GetNode(mdlUri);
     __ASSERT(mdl);
     MUnit* drp = GetDrpU();
@@ -247,6 +252,16 @@ void AVrController::ApplyCursor(const string& aCursor)
     CreateDrp(mdl);
 }
 
+string AVrController::GetDrpType(const MUnit* aModel) const
+{
+    string res;
+    if (aModel->IsHeirOf(KSystEType)) {
+	res = KSystDrpName;
+    } else {
+	res = KUnitDrpName;
+    }
+    return res;
+}
 
 // Transition
 
@@ -287,17 +302,27 @@ void* TrModelCreated::DoGetDObj(const char *aName)
 void TrModelCreated::DtGet(Sdata<bool>& aData)
 {
     bool res = false;
-    //MUnit* inp = GetNode("./Inp");
-    MDVarGet* inpvg = (MDVarGet*) GetSIfi("./Inp", MDVarGet::Type());
-    MDtGet<Sdata<string>>* dg = inpvg->GetDObj(dg);
-    if (dg != NULL) {
-	Sdata<string> modelPath;
-	dg->DtGet(modelPath);
-	Logger()->Write(EInfo, this, "Model path changed: %s", modelPath.mData.c_str());
-	MVrController* ctr = dynamic_cast<MVrController*>(iMan->GetSIfi(MVrController::Type()));
-	__ASSERT(ctr);
-	ctr->CreateModel(modelPath.mData);
+    MVrController* ctr = dynamic_cast<MVrController*>(iMan->GetSIfi(MVrController::Type()));
+    __ASSERT(ctr);
+    // Check model path from env var with priority
+    string mpath;
+    bool eres = iEnv->GetEVar(KModelPathEvarName, mpath);
+    if (eres) {
+	Logger()->Write(EInfo, this, "Model path from evar: %s", mpath.c_str());
+	ctr->CreateModel(mpath);
 	res = true;
+    } else {
+	MDVarGet* inpvg = (MDVarGet*) GetSIfi("./Inp", MDVarGet::Type());
+	MDtGet<Sdata<string>>* dg = inpvg->GetDObj(dg);
+	if (dg != NULL) {
+	    Sdata<string> modelPath;
+	    dg->DtGet(modelPath);
+	    if (modelPath.mData != "nil") {
+		Logger()->Write(EInfo, this, "Model path changed: %s", modelPath.mData.c_str());
+		ctr->CreateModel(modelPath.mData);
+		res = true;
+	    }
+	}
     }
     aData.mData = res;
 }
