@@ -1,4 +1,3 @@
-Pos: 0 -- Wrong context type
 testroot : Elem
 {
     $ # "UT of Unit DRP";

@@ -84,7 +84,7 @@ void AAgentVr::DrawLine(float x1, float y1, float x2, float y2)
 }
 
 
-const string KFont = "/home/yborisov/tmp/ubuntu-font-family-0.83/Ubuntu-B.ttf";
+const string KFont = "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf";
 const string KTitle = "Hellow World!";
 const string KStateContVal = "Value";
 

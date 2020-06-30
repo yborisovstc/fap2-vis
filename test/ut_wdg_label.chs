@@ -14,41 +14,38 @@ testroot : Elem
         $ + /GVisComps/SceRect;
         $ + /FvWidgets/FLabel;
     }
+    Launcher : AVDesLauncher;
+    Launcher < Path = /testroot/Test;
     Comps : Elem;
     Test : /testroot/Modules/DesComps/Des
     {
-        Env : /testroot/Modules/GVisComps/VisEnv
+        $ # "Visualisation environment";
+        VisEnvAgt : AVisEnv;
+        VisEnvAgt < Init = Yes;
+        Window : /testroot/Modules/GVisComps/GWindow
         {
-            $ # "Visualisation environment";
-            VisEnvAgt < Init = Yes;
-            Window : /testroot/Modules/GVisComps/GWindow
+            AWnd < Init = Yes;
+            Width < Value = "SI 1200";
+            Height < Value = "SI 800";
+            Scene : /testroot/Modules/GVisComps/Scene
             {
-                AWnd < Init = Yes;
-                Width < Value = "SI 1200";
-                Heigth < Value = "SI 800";
-                Scene : /testroot/Modules/GVisComps/Scene
+                $ # "Visualisation scene";
+                Wdg1 : /*/Modules/FvWidgets/FLabel
                 {
-                    $ # "Visualisation scene";
-                    Wdg1 : /*/Modules/FvWidgets/FLabel
-                    {
-                        BgColor = "{R:'1.0' G:'1.0' B:'0.0'}";
-                    }
-                    ./Wdg1/AlcX < Value = "SI 200";
-                    ./Wdg1/AlcY < Value = "SI 100";
-                    ./Wdg1/AlcW < Value = "SI 200";
-                    ./Wdg1/AlcH < Value = "SI 20";
+                    BgColor = "{R:'1.0' G:'1.0' B:'0.0'}";
                 }
+                ./Wdg1/AlcX < Value = "SI 200";
+                ./Wdg1/AlcY < Value = "SI 100";
+                ./Wdg1/AlcW < Value = "SI 200";
+                ./Wdg1/AlcH < Value = "SI 20";
             }
-            EnvWidth : AStatec;
-            EnvHeight : AStatec;
-            Title : AStatec;
-            EnvWidth ~ ./Window/Inp_W;
-            EnvHeight ~ ./Window/Inp_H;
-            Title ~ ./Window/Inp_Title;
         }
-        ./Env/EnvWidth < Value = "SI 640";
-        ./Env/EnvHeight < Value = "SI 480";
-        ./Env/Title < Value = "SS Title";
+        EnvWidth : AStatec;
+        EnvHeight : AStatec;
+        Title : AStatec;
+        EnvWidth ~ ./Window/Inp_W;
+        EnvHeight ~ ./Window/Inp_H;
+        Title ~ ./Window/Inp_Title;
         $ # " Increasing size of widget";
         WdgWidth : AStatec;
         WdgWidth < {
@@ -65,12 +62,12 @@ testroot : Elem
         IncrData : AStatec;
         IncrData < Value = "SI 1";
         IncrData ~ ./IncrW/Inp;
-        ./IncrW/Out ~ ./WdgWidth/Inp;
+        ./IncrW ~ ./WdgWidth/Inp;
         WdgWidth ~ ./IncrW/Inp;
         IncrData ~ ./IncrH/Inp;
-        ./IncrH/Out ~ ./WdgHeight/Inp;
+        ./IncrH ~ ./WdgHeight/Inp;
         WdgHeight ~ ./IncrH/Inp;
-        WdgWidth ~ ./Env/Window/Scene/Wdg1/InpAlcW;
-        WdgHeight ~ ./Env/Window/Scene/Wdg1/InpAlcH;
+        WdgWidth ~ ./Window/Scene/Wdg1/InpAlcW;
+        WdgHeight ~ ./Window/Scene/Wdg1/InpAlcH;
     }
 }

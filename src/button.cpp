@@ -8,7 +8,7 @@
 const string KCont_Text = "Text";
 const string KStateContVal = "Value";
 
-const string KFont = "/home/yborisov/tmp/ubuntu-font-family-0.83/Ubuntu-B.ttf";
+const string KFont = "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf";
 
 AButton::AButton(const string& aName, MUnit* aMan, MEnv* aEnv): AVWidget(aName, aMan, aEnv)
 {
