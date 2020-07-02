@@ -49,7 +49,8 @@ void AVLabel::Render()
     float hc = (float) GetParInt("./AlcH");
 
     /* Create a pixmap font from a TrueType file. */
-    FTGLPixmapFont font("/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf");
+    string fontPath = iMan->GetContent(KCnt_FontPath);
+    FTGLPixmapFont font(fontPath.c_str());
 
     if(font.Error()) {
 	return;

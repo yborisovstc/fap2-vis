@@ -84,7 +84,6 @@ void AAgentVr::DrawLine(float x1, float y1, float x2, float y2)
 }
 
 
-const string KFont = "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf";
 const string KTitle = "Hellow World!";
 const string KStateContVal = "Value";
 
@@ -166,7 +165,6 @@ void AUnitCrp::Render()
     int wys = wwty - nameDivH;
     DrawLine(wlx, wys, wrx, wys);
     // Draw the name
-    //FTGLPixmapFont font(KFont);
     const string& titleText = (mMdl != nullptr) ? mMdl->Name() : KTitle;
     glRasterPos2f(wlx + K_BPadding, wys + K_BPadding);
     mFont->Render(titleText.c_str());
@@ -178,7 +176,8 @@ void AUnitCrp::Init()
 {
     AAgentVr::Init();
 
-    mFont = new FTPixmapFont(KFont.c_str());
+    string fontPath = iMan->GetContent(KCnt_FontPath);
+    mFont = new FTPixmapFont(fontPath.c_str());
     mFont->FaceSize(K_BFontSize);
     const string& titleText = (mMdl != nullptr) ? mMdl->Name() : KTitle;
     int adv = (int) mFont->Advance(titleText.c_str());

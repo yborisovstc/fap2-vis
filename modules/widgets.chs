@@ -12,6 +12,7 @@ FvWidgets : Elem
     FWidgetBase : Syst
     {
         $ # " Widget base";
+	FontPath = /usr/share/fonts/truetype/ubuntu/Ubuntu-R.ttf;
         $ # " Allocation";
         AlcX : AStatec;
         AlcX < {

@@ -41,6 +41,7 @@ static const char* fragment_shader_text =
 
 const string AVWidget::KCnt_BgColor = "BgColor";
 const string AVWidget::KCnt_FgColor = "FgColor";
+const string AVWidget::KCnt_FontPath = "FontPath";
 const string KCnt_Color_R = "R";
 const string KCnt_Color_G = "G";
 const string KCnt_Color_B = "B";

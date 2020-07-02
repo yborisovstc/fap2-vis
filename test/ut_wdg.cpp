@@ -145,18 +145,6 @@ void Ut_wdg::test_Label()
     bool run = iEnv->RunSystem();
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
 
-    /*
-    const TInt ticksnum = 128;
-    for (TInt cnt = 0; cnt < ticksnum; cnt++) {
-	if (sync->IsActive()) {
-	    sync->Update();
-	}
-	if (sync->IsUpdated()) {
-	    sync->Confirm();
-	}
-    }
-    */
-
     delete iEnv;
 }
 

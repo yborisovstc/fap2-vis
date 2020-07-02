@@ -8,8 +8,6 @@
 const string KCont_Text = "Text";
 const string KStateContVal = "Value";
 
-const string KFont = "/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf";
-
 AButton::AButton(const string& aName, MUnit* aMan, MEnv* aEnv): AVWidget(aName, aMan, aEnv)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
@@ -109,7 +107,6 @@ void AButton::Render()
     DrawLine(wrx, wwby, wrx, wwty);
     DrawLine(wrx, wwty, wlx, wwty);
     // Draw the name
-    //FTGLPixmapFont font(KFont);
     const string btnText = iMan->GetContent(KCont_Text);
     glRasterPos2f(wlx + K_BPadding, wwby + K_BPadding);
     mFont->Render(btnText.c_str());
@@ -121,7 +118,8 @@ void AButton::Init()
 {
     AVWidget::Init();
 
-    mFont = new FTPixmapFont(KFont.c_str());
+    string fontPath = iMan->GetContent(KCnt_FontPath);
+    mFont = new FTPixmapFont(fontPath.c_str());
     mFont->FaceSize(K_BFontSize);
     const string btnText = iMan->GetContent(KCont_Text);
     int adv = (int) mFont->Advance(btnText.c_str());

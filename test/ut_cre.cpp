@@ -132,15 +132,7 @@ void Ut_cre::test_CreWnd()
 	CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
 	sSync = sync;
 
-	const TInt ticksnum = 128;
-	for (TInt cnt = 0; cnt < ticksnum; cnt++) {
-	    if (sync->IsActive()) {
-		sync->Update();
-	    }
-	    if (sync->IsUpdated()) {
-		sync->Confirm();
-	    }
-	}
+
 	delete iEnv;
     }
 }
@@ -162,12 +154,6 @@ void Ut_cre::test_Button()
     MUnit* root = iEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
 
-    // Set idle handler
-    MUnit* visenv = root->GetNode("./Test/Env/VisEnvAgt");
-    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent node", visenv != 0);
-    MVisEnv* mvisenv = visenv->GetObj(mvisenv);
-    CPPUNIT_ASSERT_MESSAGE("Fail to get env agent", mvisenv != 0);
-
     // Sync the state
     MUnit* esync = root->GetNode("./Test/Capsule/Sync");
     CPPUNIT_ASSERT_MESSAGE("Fail to get input for Syncable iface", esync != 0);
@@ -175,6 +161,10 @@ void Ut_cre::test_Button()
     CPPUNIT_ASSERT_MESSAGE("Fail to get Syncable iface", sync != 0);
     sSync = sync;
 
+    bool run = iEnv->RunSystem();
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    /*
     const TInt ticksnum = 128;
     //for (TInt cnt = 0; cnt < ticksnum; cnt++) {
     while (!mAgtObs.mClose) {
@@ -187,6 +177,8 @@ void Ut_cre::test_Button()
 	    glfwPollEvents();
 	}
     }
+    */
+
     delete iEnv;
 }
 
