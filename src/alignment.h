@@ -14,7 +14,7 @@ class AAlignment: public AVContainerL
 	static string PEType();
 	AAlignment(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	// From MACompsObserver
-	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
+	virtual TBool HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName = string()) override;
 	// From MContainer
 	virtual MUnit* AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
 };

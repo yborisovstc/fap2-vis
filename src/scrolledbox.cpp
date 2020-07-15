@@ -23,7 +23,7 @@ void AScrBox::Init()
     AVContainer::Init();
 }
 
-TBool AScrBox::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AScrBox::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = AVContainer::HandleCompChanged(aContext, aComp, aContName);
     return res;

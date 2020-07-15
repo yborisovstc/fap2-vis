@@ -52,7 +52,7 @@ MIface *AVisEnv::DoGetObj(const char *aName)
     return res;
 }
 
-TBool AVisEnv::OnCompChanged(MUnit& aComp, const string& aContName, TBool aModif)
+TBool AVisEnv::OnCompChanged(const MUnit* aComp, const string& aContName, TBool aModif)
 {
     if (aContName == mCont_Init) {
 	Construct();
@@ -272,7 +272,7 @@ void AGWindow::Confirm()
     glfwPollEvents();
 }
 
-TBool AGWindow::OnCompChanged(MUnit& aComp, const string& aContName, TBool aModif)
+TBool AGWindow::OnCompChanged(const MUnit* aComp, const string& aContName, TBool aModif)
 {
     if (aContName == KWndCnt_Init) {
 	//Construct();

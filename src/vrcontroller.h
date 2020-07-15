@@ -30,7 +30,7 @@ class AVrController : public ADes, public MVrController, public MACompsObserver
 	virtual MUnit* ModelRoot() override;
 	virtual void ApplyCursor(const string& aCursor) override;
 	// From MACompsObserver
-	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
+	virtual TBool HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName = string()) override;
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// From MDesSyncable

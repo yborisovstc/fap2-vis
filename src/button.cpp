@@ -35,7 +35,7 @@ MIface* AButton::DoGetObj(const char *aName)
     return res;
 }
 
-TBool AButton::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AButton::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = EFalse;
     res = AVWidget::HandleCompChanged(aContext, aComp, aContName);

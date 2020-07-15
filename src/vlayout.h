@@ -14,7 +14,7 @@ class AVLayout: public AVContainer
 	static string PEType();
 	AVLayout(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	// From MACompsObserver
-	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
+	virtual TBool HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName = string()) override;
 	// From MSceneElem
 	virtual void Render() override;
 	// From AVContainer

@@ -23,7 +23,7 @@ void AVLayout::Init()
     AVContainer::Init();
 }
 
-TBool AVLayout::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AVLayout::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = AVContainer::HandleCompChanged(aContext, aComp, aContName);
     return res;

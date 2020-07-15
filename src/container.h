@@ -65,7 +65,7 @@ class AVContainerBase: public AVWidget, public MDesInpObserver_Imd
 	AVContainerBase(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual MIface* DoGetObj(const char *aName) override;
 	// From MACompsObserver
-	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
+	virtual TBool HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName = string()) override;
 	// From MSceneElem
 	virtual void Render() override;
 	virtual void onSeCursorPosition(double aX, double aY) override;
@@ -217,7 +217,7 @@ class AVHLayout: public AVContainer
 	AVHLayout(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual MIface* DoGetObj(const char *aName) override;
 	// From MACompsObserver
-	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
+	virtual TBool HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName = string()) override;
 	// From MSceneElem
 	virtual void Render() override;
 	// From AVContainer

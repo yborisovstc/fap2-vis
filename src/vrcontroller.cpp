@@ -172,12 +172,12 @@ void AVrController::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 #endif
 }
 
-TBool AVrController::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AVrController::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = EFalse;
-    if (&aComp == GetMan()) {
+    if (aComp == GetMan()) {
 	if (aContName == KVrc_ModelPath) {
-	    string val = aComp.GetContent(KVrc_ModelPath);
+	    string val = aComp->GetContent(KVrc_ModelPath);
 	    res = true;
 	} else if (aContName == KVrc_DrpMp) {
 	    res = true;

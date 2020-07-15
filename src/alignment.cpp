@@ -16,7 +16,7 @@ string AAlignment::PEType()
     return AVContainerL::PEType() + GUri::KParentSep + Type();
 }
 
-TBool AAlignment::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AAlignment::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = AVContainerL::HandleCompChanged(aContext, aComp, aContName);
     return res;

@@ -27,11 +27,11 @@ MIface* AVLabel::DoGetObj(const char *aName)
     return res;
 }
 
-TBool AVLabel::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AVLabel::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = false;
 
-    if (&aComp == GetMan() && aContName == KCont_Text) {
+    if (aComp == GetMan() && aContName == KCont_Text) {
 	res = ETrue;
     } 
     if (!res) {

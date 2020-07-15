@@ -381,11 +381,11 @@ void AVContainerBase::Init()
     AVWidget::Init();
 }
 
-TBool AVContainerBase::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AVContainerBase::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = EFalse;
-    if (&aComp == GetMan() && aContName == KCont_Padding) {
-	const string data = aComp.GetContent(KCont_Padding);
+    if (aComp == GetMan() && aContName == KCont_Padding) {
+	const string data = aComp->GetContent(KCont_Padding);
 	mPadding = stoi(data);
 	res = ETrue;
     }
@@ -733,7 +733,7 @@ void AVHLayout::Init()
     AVContainer::Init();
 }
 
-TBool AVHLayout::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AVHLayout::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = AVContainer::HandleCompChanged(aContext, aComp, aContName);
     return res;

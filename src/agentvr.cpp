@@ -35,7 +35,7 @@ MIface* AAgentVr::DoGetObj(const char *aName)
     return res;
 }
 
-TBool AAgentVr::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AAgentVr::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = EFalse;
     res = AVWidget::HandleCompChanged(aContext, aComp, aContName);

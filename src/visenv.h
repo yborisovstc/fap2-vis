@@ -24,7 +24,7 @@ class AVisEnv:  public Unit, public MVisEnv
 	// From Base
 	virtual MIface *DoGetObj(const char *aName) override;
 	// From MElem
-	virtual TBool OnCompChanged(MUnit& aComp, const string& aContName = string(), TBool aModif = EFalse);
+	virtual TBool OnCompChanged(const MUnit* aComp, const string& aContName = string(), TBool aModif = EFalse);
     protected:
 	void Construct();
 	static const string mCont_Init;
@@ -41,7 +41,7 @@ class AGWindow: public ADes, public MWindow
 	// From Base
 	virtual MIface *DoGetObj(const char *aName) override;
 	// From MElem
-	virtual TBool OnCompChanged(MUnit& aComp, const string& aContName = string(), TBool aModif = EFalse);
+	virtual TBool OnCompChanged(const MUnit* aComp, const string& aContName = string(), TBool aModif = EFalse) override;
 	// From MWindow
 	virtual void GetCursorPos(double& aX, double& aY) override;
 	virtual void GetFbSize(int* aW, int* aH) const override;

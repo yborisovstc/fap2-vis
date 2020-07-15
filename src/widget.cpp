@@ -183,12 +183,12 @@ void AVWidget::Init()
 	    sizeof(vertices[0]), (void*) (sizeof(float) * 2));
 }
 
-TBool AVWidget::HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName)
+TBool AVWidget::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName)
 {
     TBool res = ETrue;
 
-    if (&aComp == GetMan()) {
-	string val = aComp.GetContent(aContName);
+    if (aComp == GetMan()) {
+	string val = aComp->GetContent(aContName);
 	if (aContName == ContentCompId(KCnt_BgColor, KCnt_Color_R)) {
 	    mBgColor.r = stof(val);
 	} else if (aContName == ContentCompId(KCnt_BgColor, KCnt_Color_G)) {

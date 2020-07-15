@@ -29,7 +29,7 @@ class AVWidget : public ADes, public MSceneElem, public MACompsObserver, public 
 	AVWidget(const string& aName = string(), MUnit* aMan = NULL, MEnv* aEnv = NULL);
 	virtual MIface* DoGetObj(const char *aName) override;
 	// From MACompsObserver
-	virtual TBool HandleCompChanged(MUnit& aContext, MUnit& aComp, const string& aContName = string()) override;
+	virtual TBool HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& aContName = string()) override;
 	// From MSceneElem
 	virtual string MSceneElem_Mid() const { return GetUri(0, ETrue);}
 	virtual void Render() override;
