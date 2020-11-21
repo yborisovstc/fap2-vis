@@ -35,6 +35,7 @@ testroot : Elem
         Controller < {
             ModelPath < Value = "SS ./test_model.chs";
             DrpMp = /testroot/Test/Window/Scene/VBox/ModelView;
+            ModelViewUdp < AgentUri = /testroot/Test/Window/Scene/VBox/ModelView;
         }
         $ # "Visualisation environment";
         VisEnvAgt : AVisEnv;

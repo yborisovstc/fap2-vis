@@ -1,0 +1,43 @@
+// fdp -Tpng:cairo ./vrc_appr_1.dot -o vrc_app_1.png
+
+digraph vrc_appr_1 {
+    Cursor [shape = box];
+    // Name of DRP set
+    Drp_unset [shape = box];
+    // VRP view (VRPV) is cleaned up
+    View_dirty [shape = box];
+    And -> View_dirty;
+    Eq_1 [label = "Eq to 1"];
+    Eq_1 -> And;
+    Neq_names [label = "Neq of str"];
+    Neq_names -> And;
+    Isnt_empty;
+    And_2 [label = "And"];
+    And_2 -> Drp_unset;
+    Isnt_empty -> And_2;
+    subgraph cluster_0 {
+	label = "VRP view";
+	Mut_applied [shape = box];
+	Comps_count [shape = box];
+	Comp_0 [shape = box];
+	Inp_Mut;
+    }
+    Mut_node_name;
+    Mut_applied -> Mut_node_name;
+    Cursor -> Isnt_empty;
+    Comps_count -> Eq_0;
+    Eq_0 -> And_2;
+    Comps_count -> Eq_1;
+    Comp_0_name [label = "Get name"];
+    Comp_0 -> Comp_0_name;
+    Comp_0_name -> Neq_names;
+    Get_cursor_name [label = "Get name"];
+    Cursor -> Get_cursor_name;
+    Get_cursor_name -> Neq_names;
+    Mux -> Inp_Mut;
+    View_dirty -> Mux [label = "En_1"];
+    Mut_Rm_Comp_0 -> Mux [label = "Data_1"];
+    Mut_Node -> Mux [label = "Data_2"];
+    Get_cursor_name -> Mut_Node [label = "Name"];
+    Drp_unset -> Mux [label = "En_2"];
+}

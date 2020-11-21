@@ -43,6 +43,9 @@
 	<glossentry id="gls_slw"><glossterm>SLW</glossterm> <acronym>SLW</acronym>
 	    <glossdef> <para>Slot Links to Widget = approach of assosiating widget to slot in container when
 		slots is connected to widget. Ref <xref linkend="ds_wdgs_cnt_wsa"/>.</para> </glossdef> </glossentry>
+	<glossentry id="gls_vrc"><glossterm>VRC</glossterm> <acronym>VRC</acronym>
+	    <glossdef> <para>Visual Representation Controller - agent that managed model representing in visual form.
+		One of key part of models visual representation architecture.</para> </glossdef> </glossentry>
     </glossary>
 
     <sect1 id="ds_wdgs"><title>Widget system</title>
@@ -97,10 +100,25 @@
 	    </sect3>
 	    <sect3><title>FTGL</title>
 		<simpara>Installation</simpara>
-		<programming>
+		<programlisting>
 		    sudo apt-get install libftgl2 libftgl-dev
 		    sudo apt-get install libfreetype6-dev libfreetype6
-		</programming>
+		</programlisting>
+	    </sect3>
+	</sect2>
+    </sect1>
+
+    <sect1 id="ds_desvrc"><title>DES Visual representation controller</title>
+	<sect2><title>Intro</title>
+	    <simpara>Currently (6d85d67677f5c) <xref linkend="gls_vrc"/> is implemented with using of custom native agent
+		AVrController and custom transitions, like TrCurApplied.
+		Even this approach promises to be more effective the primary design should be purely DES based without using
+		custom agents.</simpara>
+	</sect2>
+	<sect2><title>Handling of cursor change</title>
+	    <sect3><title>Intro</title>
+		<simpara>Ref the diagram below for handling of cursor change.</simpara>
+		<figure><imageobject> <imagedata fileref="./diagrams/vrc_appr_1/vrc_appr_1.png"/> </imageobject></figure>
 	    </sect3>
 	</sect2>
     </sect1>

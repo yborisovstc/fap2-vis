@@ -7,6 +7,8 @@ AvrMdl : Elem
         $ + /DesComps/Des;
         $ + /DesComps/StcInpExt;
         $ + /DesComps/StcOutExt;
+        $ + /AdpComps/UnitAdp;
+        $ + /AdpComps/MelemAdp;
         $ + /FvWidgets/FWidgetBase;
         $ + /ContainerModL/FHLayoutLBase;
     }
@@ -54,6 +56,9 @@ AvrMdl : Elem
     {
         $ # " Visual representation controller";
         AVrc : AVrController;
+        $ # " Model view adapter. Set AgentView cnt to model view.";
+        ModelViewUdp : /*/Modules/AdpComps/UnitAdp;
+        ModelViewEdp : /*/Modules/AdpComps/MelemAdp;
         ModelPath : AStatec;
         ModelPath < Value = "SS nil";
         ModelCreated : AStatec;
