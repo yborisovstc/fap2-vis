@@ -11,6 +11,8 @@ install-sh
 *.dsc
 *.tar.gz
 Makefile
+!doc/design/diagrams/vrc_appr_1/Makefile
+!doc/design/Makefile
 *.ex
 .deps
 .libs
