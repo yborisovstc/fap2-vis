@@ -23,7 +23,7 @@ AC_ARG_ENABLE([debug],
 
 
 PKG_CHECK_MODULES(GLFW, [glfw3 >= 3.0], , [
-    AC_MSG_ERROR([You must have 'libglfw' dev headers (libglfw-dev) installed
+    AC_MSG_ERROR([You must have 'libglfw' dev headers (libglfw3-dev) installed
     ]) ])
 
 AC_SUBST(GLFW_CFLAGS)

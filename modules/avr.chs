@@ -52,37 +52,60 @@ AvrMdl : Elem
             NodeSelected : CpStatecOutp;
         }
     }
-    VrController : Syst
+    VrController : /*/Modules/DesComps/Des
     {
         $ # " Visual representation controller";
-        AVrc : AVrController;
+        $ # " Model adapter. Set AgentUri content to model URI.";
+        CursorUdp : /*/Modules/AdpComps/UnitAdp;
         $ # " Model view adapter. Set AgentView cnt to model view.";
         ModelViewUdp : /*/Modules/AdpComps/UnitAdp;
         ModelViewEdp : /*/Modules/AdpComps/MelemAdp;
-        ModelPath : AStatec;
-        ModelPath < Value = "SS nil";
-        ModelCreated : AStatec;
-        ModelCreated < Debug.Update = y;
-        ModelCreated < Value = "SB false";
-        TrsModelCreated : TrModelCreated;
-        TrsModelCreated ~ ./ModelCreated/Inp;
-        ModelPath ~ ./TrsModelCreated/Inp;
+        $ # "Model mounting";
+        ModelMnt : AMntp;
+        ModelMnt < EnvVar = Model;
+        $ # "Model adapter";
+        ModelUdp : /*/Modules/AdpComps/UnitAdp;
+        ModelUdp/AdpAgent < AgentUri = ./../../ModelMnt;
+        $ # "CP binding to view";
+        CtrlCp : ./../VrControllerCp;
         $ # " Cursor";
         Cursor : AStatec;
         Cursor < Debug.Update = y;
         Cursor < Value = "SS nil";
-        CtrlCp : ./../VrControllerCp;
-        TrCur : TrCursor;
-        ./Cursor/Inp ~ TrCur;
-        ./TrCur/InpCmdUp ~ ./CtrlCp/NavCtrl/CmdUp;
-        ./TrCur/InpNodeSelected ~ ./CtrlCp/NavCtrl/NodeSelected;
-        ./TrCur/InpCursor ~ Cursor;
-        ./TrCur/InpMdlCreated ~ ModelCreated;
-        CursorApplied : AStatec;
-        CursorApplied < Debug.Update = y;
-        CursorApplied < Value = "SS nil";
-        TrCurApplied : TrCursorApplied;
-        ./CursorApplied/Inp ~ TrCurApplied;
-        ./TrCurApplied/Inp ~ Cursor;
+        CursorUdp/InpMagUri ~ Cursor;
+        Sw1 : ATrcSwitchBool;
+        Cursor/Inp ~ Sw1;
+        Cmp_Eq_2 : ATrcCmpVar;
+        Cmp_Eq_2/Inp ~ Cursor;
+        Const_SNil : AStatec;
+        Const_SNil < Value = "SS nil";
+        Cmp_Eq_2/Inp2 ~ Const_SNil;
+        Sw1/Sel ~ Cmp_Eq_2;
+        Const_SMdlRoot : AStatec;
+        Const_SMdlRoot < Value = "SS ./../../ModelMnt/*";
+        Sw1/Inp2 ~ Const_SMdlRoot;
+        Sw2 : ATrcSwitchBool;
+        Sw1/Inp1 ~ Sw2;
+        Sw2/Inp1 ~ ./CtrlCp/NavCtrl/NodeSelected;
+        Sw2/Inp2 ~ Cursor;
+        Cmp_Eq_3 : ATrcCmpVar;
+        Cmp_Eq_3/Inp ~ Const_SNil;
+        Cmp_Eq_3/Inp2 ~ ./CtrlCp/NavCtrl/NodeSelected;
+        Sw2/Sel ~ Cmp_Eq_3;
+        $ # " VRP dirty indication";
+        VrpDirty : AStatec;
+        VrpDirty < Debug.Update = y;
+        VrpDirty < Value = "SB false";
+        And_1 : ATrcAndVar;
+        VrpDirty/Inp ~ And_1;
+        Const_1 : AStatec;
+        Const_1 < Value = "SI 1";
+        Const_T : AStatec;
+        Const_T < Value = "SB true";
+        And_1/Inp ~ Const_T;
+        Cmp_Eq : ATrcCmpVar;
+        Cmp_Eq/Inp ~ ModelViewUdp/CompsCount;
+        Cmp_Eq/Inp2 ~ Const_1;
+        And_1/Inp ~ Cmp_Eq;
     }
 }

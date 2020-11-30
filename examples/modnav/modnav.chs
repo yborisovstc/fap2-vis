@@ -31,13 +31,6 @@ testroot : Elem
     Test : /testroot/Modules/DesComps/Des
     {
         $ # "Visualisation environment";
-        Controller : /testroot/Modules/AvrMdl/VrController;
-        Controller < {
-            ModelPath < Value = "SS ./test_model.chs";
-            DrpMp = /testroot/Test/Window/Scene/VBox/ModelView;
-            ModelViewUdp < AgentUri = /testroot/Test/Window/Scene/VBox/ModelView;
-        }
-        $ # "Visualisation environment";
         VisEnvAgt : AVisEnv;
         VisEnvAgt < Init = Yes;
         Window : /testroot/Modules/GVisComps/GWindow
@@ -115,6 +108,13 @@ testroot : Elem
         EnvWidth ~ ./Window/Inp_W;
         EnvHeight ~ ./Window/Inp_H;
         Title ~ ./Window/Inp_Title;
+        $ # "Visual representation controller";
+        Controller : /testroot/Modules/AvrMdl/VrController;
+        Controller < {
+            DrpMp = /testroot/Test/Window/Scene/VBox/ModelView;
+            ModelViewUdp/AdpAgent < AgentUri = /testroot/Test/Window/Scene/VBox/ModelView;
+            ModelViewEdp/AdpAgent < AgentUri = /testroot/Test/Window/Scene/VBox/ModelView;
+        }
         ./Controller/CtrlCp ~ ./Window/VrvCp;
     }
 }
