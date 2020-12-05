@@ -21,6 +21,7 @@ AvrMdl : Elem
             ModelSynced < Value = "SB false";
         }
         Padding = 10;
+        InpModelUri : CpStatecInp;
     }
     SystDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
@@ -31,6 +32,7 @@ AvrMdl : Elem
             ModelSynced < Value = "SB false";
         }
         Padding = 10;
+        InpModelUri : CpStatecInp;
     }
     VrViewCp : ASocketMcm
     {
@@ -40,6 +42,9 @@ AvrMdl : Elem
             About = "Navigation control";
             CmdUp : CpStatecInp;
             NodeSelected : CpStatecInp;
+            MutAddWidget : CpStatecOutp;
+            DrpCreated : CpStatecInp;
+            ModelUri : CpStatecOutp;
         }
     }
     VrControllerCp : ASocketMcm
@@ -50,6 +55,9 @@ AvrMdl : Elem
             About = "Navigation control";
             CmdUp : CpStatecOutp;
             NodeSelected : CpStatecOutp;
+            MutAddWidget : CpStatecInp;
+            DrpCreated : CpStatecOutp;
+            ModelUri : CpStatecInp;
         }
     }
     VrController : /*/Modules/DesComps/Des
@@ -59,7 +67,8 @@ AvrMdl : Elem
         CursorUdp : /*/Modules/AdpComps/UnitAdp;
         $ # " Model view adapter. Set AgentView cnt to model view.";
         ModelViewUdp : /*/Modules/AdpComps/UnitAdp;
-        ModelViewEdp : /*/Modules/AdpComps/MelemAdp;
+        $ # " Window MElem adapter";
+        WindowEdp : /*/Modules/AdpComps/MelemAdp;
         $ # "Model mounting";
         ModelMnt : AMntp;
         ModelMnt < EnvVar = Model;
@@ -82,7 +91,7 @@ AvrMdl : Elem
         Cmp_Eq_2/Inp2 ~ Const_SNil;
         Sw1/Sel ~ Cmp_Eq_2;
         Const_SMdlRoot : AStatec;
-        Const_SMdlRoot < Value = "SS ./../../ModelMnt/*";
+        $ # "!! Const_SMdlRoot < Value = SS ./../../ModelMnt/*";
         Sw1/Inp2 ~ Const_SMdlRoot;
         Sw2 : ATrcSwitchBool;
         Sw1/Inp1 ~ Sw2;
@@ -107,5 +116,33 @@ AvrMdl : Elem
         Cmp_Eq/Inp ~ ModelViewUdp/CompsCount;
         Cmp_Eq/Inp2 ~ Const_1;
         And_1/Inp ~ Cmp_Eq;
+        $ # " VRP control test";
+        TestDrp : AStatec;
+        TestDrp < Debug.Update = y;
+        TestDrp < Value = "TPL,SS:name,SS:type,SI:pos Drp /*/Modules/AvrMdl/UnitDrp 0";
+        ./CtrlCp/NavCtrl/MutAddWidget ~ TestDrp;
+        $ # " Model set to DRP: needs to connect DRPs input to controller";
+        TMutConn : ATrcMutConn;
+        MutConnCp1 : AStatec;
+        MutConnCp1 < Value = "SS ./VrvCp/NavCtrl/ModelUri";
+        MutConnCp2 : AStatec;
+        MutConnCp2 < Value = "SS /testroot/Test/Window/Scene/VBox/ModelView/Drp/InpModelUri";
+        TMutConn/Cp1 ~ MutConnCp1;
+        TMutConn/Cp2 ~ MutConnCp2;
+        TSwitch : ATrcSwitchBool;
+        TCmp_Eq : ATrcCmpVar;
+        SDrpCreated : AStatec;
+        SDrpCreated < Debug.Update = y;
+        SDrpCreated < Value = "SI 0";
+        SDrpCreated/Inp ~ ./CtrlCp/NavCtrl/DrpCreated;
+        TCmp_Eq/Inp ~ ./CtrlCp/NavCtrl/DrpCreated;
+        TCmp_Eq/Inp2 ~ Const_1;
+        TSwitch/Sel ~ TCmp_Eq;
+        Const_MutNone : AStatec;
+        Const_MutNone < Value = "MUT none";
+        TSwitch/Inp1 ~ Const_MutNone;
+        TSwitch/Inp2 ~ TMutConn;
+        WindowEdp/InpMut ~ TSwitch;
+        ./CtrlCp/NavCtrl/ModelUri ~ Cursor;
     }
 }

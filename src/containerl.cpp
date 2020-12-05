@@ -8,13 +8,23 @@ const string KWidgetCpName = "Cp";
 const string KSlotCpName = "SCp";
 const string KSlot_Name = "Slot";
 
+const string K_CpUriInpAddWidget = "./../InpMutAddWidget";
+const string K_CpUriCompNames = "./../OutCompNames";
+const string K_CpUriCompCount = "./../OutCompsCount";
+
 const MContainer::TPos AVContainerL::KPosFirst = TPos(0, 0);
 const MContainer::TPos AVContainerL::KPosEnd = TPos(-1, -1);
 
-AVContainerL::AVContainerL(const string& aName, MUnit* aMan, MEnv* aEnv): AVWidget(aName, aMan, aEnv)
+AVContainerL::AVContainerL(const string& aName, MUnit* aMan, MEnv* aEnv): AVWidget(aName, aMan, aEnv), mMag(aMan)
 {
     iName = aName.empty() ? GetType(PEType()) : aName;
     InsertContent(KCont_Padding);
+    iEnv->SetObserver(&mMagObs);
+}
+
+AVContainerL::~AVContainerL()
+{
+    iEnv->UnsetObserver(&mMagObs);
 }
 
 string AVContainerL::PEType()
@@ -43,6 +53,23 @@ void AVContainerL::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 	host = iMan->GetMan();
 	rr = host->GetIfi(aName, ctx);
 	InsertIfCache(aName, aCtx, host, rr);
+    } else if (aName == MDVarGet::Type()) {
+	MUnit* cmpCount = GetNode(K_CpUriCompCount);
+	if (ctx.IsInContext(cmpCount)) {
+	    MIface* iface = dynamic_cast<MDVarGet*>(&mApCmpCount);
+	    InsertIfCache(aName, aCtx, cmpCount, iface);
+	}
+	MUnit* cmpNames = GetNode(K_CpUriCompNames);
+	if (ctx.IsInContext(cmpNames)) {
+	    MIface* iface = dynamic_cast<MDVarGet*>(&mApCmpNames);
+	    InsertIfCache(aName, aCtx, cmpNames, iface);
+	}
+    } else if (aName == MDesInpObserver::Type()) {
+	MUnit* mutAddWdt = GetNode(K_CpUriInpAddWidget);
+	if (ctx.IsInContext(mutAddWdt)) {
+	    MIface* iface = dynamic_cast<MDesInpObserver*>(&mIapMutAddWdt);
+	    InsertIfCache(aName, aCtx, mutAddWdt, iface);
+	}
     } else {
 	AVWidget::UpdateIfi(aName, aCtx);
     }
@@ -242,6 +269,123 @@ MUnit* AVContainerL::GetWidgetBySlot(MUnit* aSlot)
     return res;
 }
 
+void AVContainerL::OnMutAddWdg()
+{
+    // Checking MutAddWidget
+    MUnit* inp = GetNode(K_CpUriInpAddWidget);
+    if (inp) {
+	NTuple data;
+	TBool res = GetGData(inp, data);
+	if (res && data != mMutAddWidget) {
+	    MutAddWidget(data);
+	}
+    }
+}
+
+void AVContainerL::MutAddWidget(const NTuple& aData)
+{
+    TBool res = ETrue;
+    string name;
+    string type;
+    for (TInt i = 0; i < aData.mData.size(); i++) {
+	NTuple::tComp item = aData.mData.at(i);
+	if (item.first == "name") {
+	    Sdata<string>* sd = dynamic_cast<Sdata<string>*>(item.second);
+	    if (sd) {
+		name = sd->mData;
+	    } else {
+		res = EFalse; break;
+	    }
+	} else if (item.first == "type") {
+	    Sdata<string>* sd = dynamic_cast<Sdata<string>*>(item.second);
+	    if (sd) {
+		type = sd->mData;
+	    } else {
+		res = EFalse; break;
+	    }
+	}
+    }
+    if (res) {
+	AddWidget(name, type);
+    }
+}
+
+void AVContainerL::GetCompsCount(Sdata<TInt>& aData)
+{
+    aData.mData = mCompNames.mData.size();
+    aData.mValid = ETrue;
+}
+
+void AVContainerL::OnMagCompDeleting(const MUnit* aComp, TBool aSoft, TBool aModif)
+{
+    if (aComp == mMag) {
+	mCompNamesUpdated = ETrue;
+    }
+}
+
+void AVContainerL::OnMagCompAdding(const MUnit* aComp, TBool aModif)
+{
+    if (mMag && mMag->IsComp(aComp)) {
+	mCompNamesUpdated = ETrue;
+	SetUpdated();
+    }
+}
+
+TBool AVContainerL::OnMagCompChanged(const MUnit* aComp, const string& aContName, TBool aModif)
+{
+    return ETrue;
+}
+
+TBool AVContainerL::OnMagChanged(const MUnit* aComp)
+{
+    return ETrue;
+}
+
+TBool AVContainerL::OnMagCompRenamed(const MUnit* aComp, const string& aOldName)
+{
+    mCompNamesUpdated = ETrue;
+    return ETrue;
+}
+
+void AVContainerL::OnMagCompMutated(const MUnit* aNode)
+{
+}
+
+void AVContainerL::OnMagError(const MUnit* aComp)
+{
+}
+
+void AVContainerL::Confirm()
+{
+    if (mMag) {
+	if (mCompNamesUpdated) {
+	    UpdateCompNames();
+	    mCompNamesUpdated = EFalse;
+	    MUnit* cp = GetNode(K_CpUriCompNames);
+	    NotifyInpsUpdated(cp);
+	    // Comps count
+	    cp = GetNode(K_CpUriCompCount);
+	    NotifyInpsUpdated(cp);
+	}
+    } else {
+	Logger()->Write(EErr, this, "Managed agent is not attached");
+    }
+    AVWidget::Confirm();
+}
+
+void AVContainerL::NotifyInpsUpdated(MUnit* aCp)
+{
+    TIfRange range = aCp->GetIfi(MDesInpObserver::Type());
+    for (TIfIter it = range.first; it != range.second; it++) {
+	MDesInpObserver* mobs = (MDesInpObserver*) (*it);
+	if (mobs != NULL) {
+	    mobs->OnInpUpdated();
+	}
+    }
+}
+
+
+
 
 
 
@@ -342,6 +486,7 @@ MUnit* ALinearLayout::AppendSlot(MUnit* aSlot)
     // Connect new slot to end
     hoste->AppendMutation(TMut(ENt_Conn, ENa_P, newSlotPrevUri, ENa_Q, endUri));
     hoste->Mutate(true, false, false, mctx);
+    return NULL; // TODO to fix
 }
 
 MUnit* ALinearLayout::InsertSlot(MUnit* aSlot, const TPos& aPos)
@@ -395,6 +540,7 @@ MUnit* ALinearLayout::InsertSlot(MUnit* aSlot, const TPos& aPos)
 	    __ASSERT(false);
 	}
     }
+    return NULL; // TODO to fix
 }
 
 MContainer::TPos ALinearLayout::PrevPos(const TPos& aPos) const
@@ -473,4 +619,17 @@ MUnit* ALinearLayout::GetNextSlot(MUnit* aSlot)
 	res = nslu;
     }
     return res;
+}
+
+void ALinearLayout::UpdateCompNames()
+{
+    mCompNames.mData.clear();
+    MUnit* slot = GetSlotByPos(TPos(0,0));
+    while (slot) {
+	MUnit* widget = GetWidgetBySlot(slot);
+	if (widget) {
+	    mCompNames.mData.push_back(widget->Name());
+	}
+	slot = GetNextSlot(slot);
+    }
 }

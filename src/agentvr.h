@@ -82,13 +82,19 @@ class AUnitDrp : public AHLayoutL, public MVrp
 	virtual void SetModel(const string& aMdlUri) override;
 	virtual string GetModelUri() const override;
 	virtual void SetCrtlBinding(const string& aCtrUri) override;
+	// From MDesSyncable
+	virtual void Update() override;
     protected:
+	void OnInpModelUri();
+	void ApplyModelUri();
 	// Local
 	virtual void CreateRp();
     protected:
 	MEnv* mEnv; /*!< Binded env, not owned */
 	MUnit* mMdl; /*!< Binded model, not owned */
 	string mCtrBnd; /*!< Binding to controller info: URI */
+	AAdp::AdpIap mIapModelUri = AAdp::AdpIap(*this, [this]() {OnInpModelUri();}); /*!< Mut input access point: Model Uri */
+	TBool mModelUriChanged = ETrue;
 };
 
 

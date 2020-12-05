@@ -30,6 +30,9 @@ ContainerModL : Elem
         # = " Padding value";
         Padding : AStatec;
         Padding < Value = "SI 10";
+        InpMutAddWidget : CpStatecInp;
+        OutCompsCount : CpStatecOutp;
+        OutCompNames : CpStatecOutp;
     }
     FSlotl : AVSlotL
     {

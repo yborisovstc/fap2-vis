@@ -69,6 +69,8 @@ MIface* AVWidget::DoGetObj(const char *aName)
 	res = dynamic_cast<MACompsObserver*>(this);
     } else if (strcmp(aName, MVCcomp::Type()) == 0) {
 	res = dynamic_cast<MVCcomp*>(this);
+    } else if (strcmp(aName, MDesInpObserver::Type()) == 0) {
+	res = dynamic_cast<MDesInpObserver*>(this);
     } else {
 	res = ADes::DoGetObj(aName);
     }
@@ -203,6 +205,7 @@ TBool AVWidget::HandleCompChanged(MUnit* aContext, MUnit* aComp, const string& a
 	    mFgColor.b = stof(val);
 	}
     }
+    res = ADes::HandleCompChanged(aContext, aComp, aContName);
     return res;
 }
 

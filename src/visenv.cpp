@@ -58,7 +58,7 @@ TBool AVisEnv::OnCompChanged(const MUnit* aComp, const string& aContName, TBool 
 	Construct();
     }
 
-    Unit::OnCompChanged(aComp, aContName);
+    return Unit::OnCompChanged(aComp, aContName);
 }
 
 
@@ -277,7 +277,7 @@ TBool AGWindow::OnCompChanged(const MUnit* aComp, const string& aContName, TBool
     if (aContName == KWndCnt_Init) {
 	//Construct();
     }
-    Unit::OnCompChanged(aComp, aContName);
+    return Unit::OnCompChanged(aComp, aContName);
 }
 
 void AGWindow::GetCursorPos(double& aX, double& aY)

@@ -47,3 +47,25 @@ MUnit* AAlignment::AddWidget(const string& aName, const string& aType, const str
     InvalidateIfCache();
     return newWdg;
 }
+
+MUnit* AAlignment::GetSlotByPos(const TPos& aPos)
+{
+    MUnit* res = nullptr;
+    if (aPos == KPosFirst) {
+	MUnit* host = GetMan();
+	res = host->GetNode("./" + KSlotName);
+    }
+    return res;
+}
+
+void AAlignment::UpdateCompNames()
+{
+    mCompNames.mData.clear();
+    MUnit* slot = GetSlotByPos(KPosFirst);
+    if (slot) {
+	MUnit* widget = GetWidgetBySlot(slot);
+	if (widget) {
+	    mCompNames.mData.push_back(widget->Name());
+	}
+    }
+}

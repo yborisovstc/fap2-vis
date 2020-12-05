@@ -14,7 +14,7 @@
 /** @brief Base widgets containter agent
  * It contains set (mWap) of allocation providers specific for each component (widget)
  * */
-class AVContainerBase: public AVWidget, public MDesInpObserver_Imd
+class AVContainerBase: public AVWidget
 {
     public:
 	/** @brief Id of widget parameter */
@@ -70,10 +70,6 @@ class AVContainerBase: public AVWidget, public MDesInpObserver_Imd
 	virtual void Render() override;
 	virtual void onSeCursorPosition(double aX, double aY) override;
 	virtual bool onMouseButton(TFvButton aButton, TFvButtonAction aAction, int aMods) override;
-	// From MDesInpObserver
-	virtual void OnInpUpdated() override;
-	virtual MIface* MDesInpObserver_Call(const string& aSpec, string& aRes) override;
-	virtual string MDesInpObserver_Mid() const override;
 	// From MUnit
 	virtual void UpdateIfi(const string& aName, const TICacheRCtx& aCtx = TICacheRCtx()) override;
 	// Local

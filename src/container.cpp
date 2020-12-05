@@ -392,17 +392,6 @@ TBool AVContainerBase::HandleCompChanged(MUnit* aContext, MUnit* aComp, const st
     return res;
 }
 
-
-MIface* AVContainerBase::MDesInpObserver_Call(const string& aSpec, string& aRes)
-{
-    return NULL;
-}
-
-string AVContainerBase::MDesInpObserver_Mid() const
-{
-    return GetUri(NULL, ETrue);
-}
-
 MUnit* AVContainerBase::GetCompRqsInp(bool aW)
 {
     MUnit* res = NULL;
@@ -475,32 +464,6 @@ void AVContainerBase::NotifyReqsOnInpUpdated(bool aW)
     MDesInpObserver* rqinpo = dynamic_cast<MDesInpObserver*>(rqinp->GetSIfi(MDesInpObserver::Type()));
     __ASSERT(rqinpo);
     rqinpo->OnInpUpdated();
-}
-
-void AVContainerBase::OnInpUpdated()
-{
-    Logger()->Write(EInfo, this, "OnInpUpdated");
-    MUnit* rqsInpW = GetCompRqsInp(true);
-    __ASSERT(rqsInpW != NULL);
-    TIfRange rr = rqsInpW->GetIfi(MDVarGet::Type(), this);
-    for (auto it = rr.first; it != rr.second; it++) {
-	MDVarGet* dvg = (MDVarGet*) (*it);
-	MDtGet<Sdata<int> >* dg = dvg->GetDObj(dg);
-	if (dg != NULL) {
-	    Sdata<int> arg;
-	    dg->DtGet(arg);
-	    string dis;
-	    arg.ToString(dis);
-	    Logger()->Write(EInfo, this, "Requisition W: %s", dis.c_str());
-	}
-    }
-    // Propagate update notification to inp observers
-    NotifyReqsOnInpUpdated(true);
-    NotifyReqsOnInpUpdated(false);
-    NotifyWidgetOnInpUpdated("./AlcWOut");
-    NotifyWidgetOnInpUpdated("./AlcHOut");
-    NotifyWidgetOnInpUpdated("./AlcXOut");
-    NotifyWidgetOnInpUpdated("./AlcYOut");
 }
 
 

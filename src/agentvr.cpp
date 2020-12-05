@@ -206,8 +206,8 @@ void AUnitCrp::SetEnv(MEnv* aEnv)
 
 void AUnitCrp::SetModel(const string& aMdlUri)
 {
-    __ASSERT(mEnv != nullptr && mMdl == nullptr);
-    MUnit* mdl = mEnv->Root()->GetNode(aMdlUri);
+    __ASSERT(mMdl == nullptr);
+    MUnit* mdl = iEnv->Root()->GetNode(aMdlUri);
     __ASSERT(mdl != nullptr);
     mMdl = mdl;
 }
@@ -243,6 +243,8 @@ string AUnitCrp::GetModelUri() const
 	
 
 // Unit DRP
+
+const string K_CpInpModelUri = "./InpModelUri";
 
 AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AHLayoutL(aName, aMan, aEnv),
     mEnv(nullptr), mMdl(nullptr)
@@ -284,8 +286,8 @@ void AUnitDrp::SetEnv(MEnv* aEnv)
 
 void AUnitDrp::SetModel(const string& aMdlUri)
 {
-    __ASSERT(mEnv != nullptr && mMdl == nullptr);
-    MUnit* mdl = mEnv->Root()->GetNode(aMdlUri);
+    __ASSERT(mMdl == nullptr);
+    MUnit* mdl = iEnv->Root()->GetNode(aMdlUri);
     __ASSERT(mdl != nullptr);
     mMdl = mdl;
     CreateRp();
@@ -302,7 +304,7 @@ void AUnitDrp::CreateRp()
 	__ASSERT(vcompu != nullptr);
 	MVrp* vcompr = vcompu->GetSIfit(vcompr);
 	__ASSERT(vcompr != nullptr);
-	vcompr->SetEnv(mEnv);
+	//vcompr->SetEnv(mEnv);
 	vcompr->SetModel(compUri);
     }
 }
@@ -332,6 +334,12 @@ void AUnitDrp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 		InsertIfCache(aName, aCtx, ctru, rr);
 	    }
 	}
+    } else if (aName == MDesInpObserver::Type()) {
+	MUnit* inpMdlUri = iMan->GetNode(K_CpInpModelUri);
+	if (ctx.IsInContext(inpMdlUri)) {
+	    MIface* iface = dynamic_cast<MDesInpObserver*>(&mIapModelUri);
+	    InsertIfCache(aName, aCtx, inpMdlUri, iface);
+	}
     } else {
 	AHLayoutL::UpdateIfi(aName, aCtx);
     }
@@ -341,6 +349,39 @@ string AUnitDrp::GetModelUri() const
 {
     __ASSERT(mMdl);
     return mMdl->GetUri(NULL, true);
+}
+
+void AUnitDrp::OnInpModelUri()
+{
+    mModelUriChanged = ETrue;
+    SetActive();
+}
+
+void AUnitDrp::ApplyModelUri()
+{
+    MUnit* inp = iMan->GetNode(K_CpInpModelUri);
+    if (inp) {
+	string uris;
+	TBool res = GetSData(inp, uris);
+	if (res) {
+	    mMdl = iMan->GetNode(uris);
+	    if (mMdl) {
+		CreateRp();
+		Logger()->Write(EErr, this, "Model applied [%s]", uris.c_str());
+	    } else {
+		Logger()->Write(EErr, this, "Couldn't find the model [%s]", uris.c_str());
+	    }
+	}
+    }
+}
+
+void AUnitDrp::Update()
+{
+    if (mModelUriChanged) {
+	ApplyModelUri();
+	mModelUriChanged = EFalse;
+    }
+    AHLayoutL::Update();
 }
 
 

@@ -15,7 +15,7 @@ class MVrp;
 /** @brief Model's visual representation controller
  *
  * */
-class AVrController : public ADes, public MVrController, public MACompsObserver
+class AVrController : public ADes, public MVrController
 {
     public:
 	static const char* Type() { return "AVrController";};

@@ -19,7 +19,7 @@ class MWindow;
  *
  * */
 // TODO Use unit based DES agent as a base
-class AVWidget : public ADes, public MSceneElem, public MACompsObserver, public MVCcomp
+class AVWidget : public ADes, public MSceneElem, public MVCcomp
 {
     public:
 	using TColor = struct {float r, g, b, a;};
