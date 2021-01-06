@@ -1,4 +1,3 @@
-Pos: 0 -- Wrong context type
 FvWidgets : Elem
 {
     About = "FAP2 widget visualization system";

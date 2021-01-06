@@ -15,6 +15,7 @@ testroot : Elem
         $ + /GVisComps/SceRect;
         $ + /FvWidgetsL/FUnitCrp;
         $ + /AvrMdl/UnitDrp;
+        $ + /AvrMdl/SystDrp;
         $ + /AvrMdl/VrController;
         $ + /AvrMdl/VrViewCp;
         $ + /FvWidgetsL/FButtonL;
@@ -93,6 +94,10 @@ testroot : Elem
                     ./Slot_2/SCp ~ ./ModelView/Cp;
                     ./Slot_2/Next ~ ./Slot_1/Prev;
                     ./End ~ ./Slot_2/Prev;
+                    TestMvCompsCount : AStatec;
+                    TestMvCompsCount < Debug.Update = y;
+                    TestMvCompsCount < Value = SI;
+                    TestMvCompsCount/Inp ~ ModelView/OutCompsCount;
                 }
                 Scp : /*/Modules/ContainerModL/SlotCp;
                 Scp ~ ./VBox/Cp;
@@ -101,6 +106,8 @@ testroot : Elem
             }
             ./Scene/Cp ~ ScCpc;
             ./VrvCp/NavCtrl/CmdUp ~ ./Scene/VBox/Toolbar/BtnUp/Pressed;
+            ./Scene/VBox/ModelView/InpMutAddWidget ~ ./VrvCp/NavCtrl/MutAddWidget;
+            ./Scene/VBox/ModelView/OutCompsCount ~ ./VrvCp/NavCtrl/DrpCreated;
         }
         EnvWidth : AStatec;
         EnvHeight : AStatec;
@@ -113,7 +120,9 @@ testroot : Elem
         Controller < {
             DrpMp = /testroot/Test/Window/Scene/VBox/ModelView;
             ModelViewUdp/AdpAgent < AgentUri = /testroot/Test/Window/Scene/VBox/ModelView;
-            ModelViewEdp/AdpAgent < AgentUri = /testroot/Test/Window/Scene/VBox/ModelView;
+            WindowEdp/AdpAgent < AgentUri = /testroot/Test/Window;
+            $ # " Just interim solution";
+            Const_SMdlRoot < Value = "SS /*/Test/Controller/ModelMnt/*";
         }
         ./Controller/CtrlCp ~ ./Window/VrvCp;
     }

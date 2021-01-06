@@ -1,4 +1,3 @@
-Pos: 0 -- Wrong context type
 ContainerMdl : Elem
 {
     About = "FAP2 widget visualization system";
