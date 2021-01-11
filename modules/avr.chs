@@ -15,10 +15,10 @@ AvrMdl : Elem
     UnitDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
         $ # " Unit detail representation";
-        CntAgent : AUnitDrp;
-        CntAgent < {
-            ModelSynced : AStatec;
-            ModelSynced < Value = "SB false";
+        CntAgent : AUnitDrp {
+            ModelSynced : AStatec {
+                Value = "SB false";
+            }
         }
         Padding = 10;
         InpModelUri : CpStatecInp;
@@ -78,71 +78,78 @@ AvrMdl : Elem
         $ # "CP binding to view";
         CtrlCp : ./../VrControllerCp;
         $ # " Cursor";
-        Cursor : AStatec;
-        Cursor < Debug.Update = y;
-        Cursor < Value = "SS nil";
-        CursorUdp/InpMagUri ~ Cursor;
-        Sw1 : ATrcSwitchBool;
-        Cursor/Inp ~ Sw1;
-        Cmp_Eq_2 : ATrcCmpVar;
-        Cmp_Eq_2/Inp ~ Cursor;
-        Const_SNil : AStatec;
-        Const_SNil < Value = "SS nil";
-        Cmp_Eq_2/Inp2 ~ Const_SNil;
-        Sw1/Sel ~ Cmp_Eq_2;
-        Const_SMdlRoot : AStatec;
-        $ # "!! Const_SMdlRoot < Value = SS ./../../ModelMnt/*";
-        Sw1/Inp2 ~ Const_SMdlRoot;
-        Sw2 : ATrcSwitchBool;
-        Sw1/Inp1 ~ Sw2;
-        Sw2/Inp1 ~ ./CtrlCp/NavCtrl/NodeSelected;
-        Sw2/Inp2 ~ Cursor;
-        Cmp_Eq_3 : ATrcCmpVar;
-        Cmp_Eq_3/Inp ~ Const_SNil;
-        Cmp_Eq_3/Inp2 ~ ./CtrlCp/NavCtrl/NodeSelected;
-        Sw2/Sel ~ Cmp_Eq_3;
+        CursorUdp/InpMagUri ~ Cursor : AStatec {
+            Debug.Update = y;
+            Value = "SS nil";
+        };
+        Const_SNil : AStatec {
+            Value = "SS nil";
+        }
+        Cursor/Inp ~ : ATrcSwitchBool @ {
+            Sel ~ Cmp_Eq_2 : ATrcCmpVar @ {
+	        Inp ~ Cursor;
+                Inp2 ~ Const_SNil;
+            };
+	    Inp1 ~ : ATrcSwitchBool @ {
+                Inp1 ~ ./CtrlCp/NavCtrl/NodeSelected;
+                Inp2 ~ Cursor;
+                Sel ~ : ATrcCmpVar @ {
+                    Inp ~ Const_SNil;
+                    Inp2 ~ ./CtrlCp/NavCtrl/NodeSelected;
+                };
+            };
+            Inp2 ~ Const_SMdlRoot : AStatec {
+                $ # "!! Value = SS ./../../ModelMnt/*";
+            };
+        };
         $ # " VRP dirty indication";
-        VrpDirty : AStatec;
-        VrpDirty < Debug.Update = y;
-        VrpDirty < Value = "SB false";
-        And_1 : ATrcAndVar;
-        VrpDirty/Inp ~ And_1;
-        Const_1 : AStatec;
-        Const_1 < Value = "SI 1";
-        Const_T : AStatec;
-        Const_T < Value = "SB true";
-        And_1/Inp ~ Const_T;
-        Cmp_Eq : ATrcCmpVar;
-        Cmp_Eq/Inp ~ ModelViewUdp/CompsCount;
-        Cmp_Eq/Inp2 ~ Const_1;
-        And_1/Inp ~ Cmp_Eq;
+        VrpDirty : AStatec
+        {
+            Debug.Update = y;
+            Value = "SB false";
+        }
+        VrpDirty/Inp ~ : ATrcAndVar @ {
+            Inp ~ : AStatec
+            {
+                Value = "SB true";
+            };
+            Inp ~ Cmp_Eq : ATrcCmpVar @ {
+                Inp ~ ModelViewUdp/CompsCount;
+                Inp2 ~ Const_1 : AStatec
+                {
+                    Value = "SI 1";
+                };
+            };
+        };
         $ # " VRP control test";
-        TestDrp : AStatec;
-        TestDrp < Debug.Update = y;
-        TestDrp < Value = "TPL,SS:name,SS:type,SI:pos Drp /*/Modules/AvrMdl/UnitDrp 0";
-        ./CtrlCp/NavCtrl/MutAddWidget ~ TestDrp;
+        ./CtrlCp/NavCtrl/MutAddWidget ~ TestDrp : AStatec
+        {
+            Debug.Update = y;
+            Value = "TPL,SS:name,SS:type,SI:pos Drp /*/Modules/AvrMdl/UnitDrp 0";
+        };
         $ # " Model set to DRP: needs to connect DRPs input to controller";
-        TMutConn : ATrcMutConn;
-        MutConnCp1 : AStatec;
-        MutConnCp1 < Value = "SS ./VrvCp/NavCtrl/ModelUri";
-        MutConnCp2 : AStatec;
-        MutConnCp2 < Value = "SS /testroot/Test/Window/Scene/VBox/ModelView/Drp/InpModelUri";
-        TMutConn/Cp1 ~ MutConnCp1;
-        TMutConn/Cp2 ~ MutConnCp2;
-        TSwitch : ATrcSwitchBool;
-        TCmp_Eq : ATrcCmpVar;
-        SDrpCreated : AStatec;
-        SDrpCreated < Debug.Update = y;
-        SDrpCreated < Value = "SI 0";
+        SDrpCreated : AStatec {
+            Debug.Update = y;
+            Value = "SI 0";
+        }
         SDrpCreated/Inp ~ ./CtrlCp/NavCtrl/DrpCreated;
-        TCmp_Eq/Inp ~ ./CtrlCp/NavCtrl/DrpCreated;
-        TCmp_Eq/Inp2 ~ Const_1;
-        TSwitch/Sel ~ TCmp_Eq;
-        Const_MutNone : AStatec;
-        Const_MutNone < Value = "MUT none";
-        TSwitch/Inp1 ~ Const_MutNone;
-        TSwitch/Inp2 ~ TMutConn;
-        WindowEdp/InpMut ~ TSwitch;
+        WindowEdp/InpMut ~ : ATrcSwitchBool @ {
+            Sel ~ TCmp_Eq : ATrcCmpVar @ {
+                Inp ~ ./CtrlCp/NavCtrl/DrpCreated;
+                Inp2 ~ Const_1;
+            };
+            Inp1 ~ : AStatec {
+                Value = "MUT none";
+            };
+            Inp2 ~ TMutConn : ATrcMutConn @ {
+                Cp1 ~ : AStatec {
+                    Value = "SS ./VrvCp/NavCtrl/ModelUri";
+                };
+                Cp2 ~ : AStatec {
+                    Value = "SS /testroot/Test/Window/Scene/VBox/ModelView/Drp/InpModelUri";
+                };
+            };
+        };
         ./CtrlCp/NavCtrl/ModelUri ~ Cursor;
     }
 }

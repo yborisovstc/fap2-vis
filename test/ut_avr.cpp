@@ -196,6 +196,7 @@ void Ut_avr::test_UnitDrp()
 void Ut_avr::test_VrCtrl()
 {
     printf("\n === VR Controller test 1\n");
+
     const string specn("ut_avr_vrc_1l");
     string ext = "chs";
     string spec = specn + string(".") + ext;
@@ -210,6 +211,12 @@ void Ut_avr::test_VrCtrl()
     iEnv->ConstructSystem();
     MUnit* root = iEnv->Root();
     CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+    // Dump vrcontroller chromo
+    MUnit* vrc = root->GetNode("./Modules/AvrMdl/VrController");
+    MElem* vrce = vrc ? vrc->GetObj(vrce) : nullptr;
+    CPPUNIT_ASSERT_MESSAGE("Fail to get vrc", vrce);
+    cout << endl << "VRC chromo dump:" << endl;
+    vrce->Chromos().Root().Dump();
 
     // Sync the state
     MUnit* esync = root->GetNode("./Test/Capsule/Sync");

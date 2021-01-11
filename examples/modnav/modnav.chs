@@ -41,13 +41,14 @@ testroot : Elem
             Width < Value = "SI 1200";
             Height < Value = "SI 800";
             VrvCp : /testroot/Modules/AvrMdl/VrViewCp;
-            NodeSelected : AStatec;
-            NodeSelected < Debug.Update = y;
-            NodeSelected < Value = "SS nil";
-            NodeSelectedReset : AStatec;
-            NodeSelectedReset < Value = "SS nil";
-            NodeSelectedReset ~ ./NodeSelected/Inp;
-            NodeSelected ~ ./VrvCp/NavCtrl/NodeSelected;
+            ./VrvCp/NavCtrl/NodeSelected ~ NodeSelected : AStatec
+            {
+                Debug.Update = y;
+                Value = "SS nil";
+            };
+            ./NodeSelected/Inp ~ NodeSelectedReset : AStatec {
+                Value = "SS nil";
+            };
             Scene : /testroot/Modules/GVisComps/Scene
             {
                 VBox : /*/Modules/ContainerModL/FVLayoutL
