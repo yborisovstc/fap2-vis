@@ -95,9 +95,10 @@ testroot : Elem
                     ./Slot_2/SCp ~ ./ModelView/Cp;
                     ./Slot_2/Next ~ ./Slot_1/Prev;
                     ./End ~ ./Slot_2/Prev;
-                    TestMvCompsCount : AStatec;
-                    TestMvCompsCount < Debug.Update = y;
-                    TestMvCompsCount < Value = SI;
+                    TestMvCompsCount : AStatec {
+                        Debug.Update = y;
+                        Value = SI;
+                    }
                     TestMvCompsCount/Inp ~ ModelView/OutCompsCount;
                 }
                 Scp : /*/Modules/ContainerModL/SlotCp;

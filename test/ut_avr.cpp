@@ -210,10 +210,13 @@ void Ut_avr::test_VrCtrl()
     iEnv->SetObserver(&mAgtObs);
     iEnv->ConstructSystem();
     MUnit* root = iEnv->Root();
-    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+    MElem* eroot = root ? root->GetObj(eroot) : nullptr;
+    CPPUNIT_ASSERT_MESSAGE("Fail to get root", eroot);
+    // Save root chromo
+    eroot->Chromos().Save(specn + "_saved." + ext);
     // Dump vrcontroller chromo
-    MUnit* vrc = root->GetNode("./Modules/AvrMdl/VrController");
-    MElem* vrce = vrc ? vrc->GetObj(vrce) : nullptr;
+    MUnit* vrcu =  root->GetNode("./Modules/AvrMdl/VrController");
+    MElem* vrce = vrcu ? vrcu->GetObj(vrce) : nullptr;
     CPPUNIT_ASSERT_MESSAGE("Fail to get vrc", vrce);
     cout << endl << "VRC chromo dump:" << endl;
     vrce->Chromos().Root().Dump();

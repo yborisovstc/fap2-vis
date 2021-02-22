@@ -22,6 +22,7 @@ AvrMdl : Elem
         }
         Padding = 10;
         InpModelUri : CpStatecInp;
+        OutModelUri : CpStatecOutp;
     }
     SystDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
@@ -93,7 +94,7 @@ AvrMdl : Elem
 	    Inp1 ~ : ATrcSwitchBool @ {
                 Inp1 ~ ./CtrlCp/NavCtrl/NodeSelected;
                 Inp2 ~ Cursor;
-                Sel ~ : ATrcCmpVar @ {
+                Sel ~ Cmp_Eq_3 : ATrcCmpVar @ {
                     Inp ~ Const_SNil;
                     Inp2 ~ ./CtrlCp/NavCtrl/NodeSelected;
                 };

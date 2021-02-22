@@ -245,6 +245,7 @@ string AUnitCrp::GetModelUri() const
 // Unit DRP
 
 const string K_CpInpModelUri = "./InpModelUri";
+const string K_CpOutModelUri = "./OutModelUri";
 
 AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AHLayoutL(aName, aMan, aEnv),
     mEnv(nullptr), mMdl(nullptr)
@@ -340,9 +341,20 @@ void AUnitDrp::UpdateIfi(const string& aName, const TICacheRCtx& aCtx)
 	    MIface* iface = dynamic_cast<MDesInpObserver*>(&mIapModelUri);
 	    InsertIfCache(aName, aCtx, inpMdlUri, iface);
 	}
+    } else if (aName == MDVarGet::Type()) {
+	MUnit* outMdlUri = iMan->GetNode(K_CpOutModelUri);
+	if (ctx.IsInContext(outMdlUri)) {
+	    MIface* iface = dynamic_cast<MDVarGet*>(&mPapModelUri);
+	    InsertIfCache(aName, aCtx, outMdlUri, iface);
+	}
     } else {
 	AHLayoutL::UpdateIfi(aName, aCtx);
     }
+}
+
+void AUnitDrp::GetModelUri(Sdata<string>& aData)
+{
+    aData.mData = GetModelUri();
 }
 
 string AUnitDrp::GetModelUri() const
@@ -367,10 +379,23 @@ void AUnitDrp::ApplyModelUri()
 	    mMdl = iMan->GetNode(uris);
 	    if (mMdl) {
 		CreateRp();
+		NotifyOnMdlUpdated();
 		Logger()->Write(EErr, this, "Model applied [%s]", uris.c_str());
 	    } else {
 		Logger()->Write(EErr, this, "Couldn't find the model [%s]", uris.c_str());
 	    }
+	}
+    }
+}
+
+void AUnitDrp::NotifyOnMdlUpdated()
+{
+    MUnit* outMdlUri = iMan->GetNode(K_CpOutModelUri);
+    if (outMdlUri) {
+	TIfRange ifr = outMdlUri->GetIfi(MDesInpObserver::Type());
+	for (auto it = ifr.first; it != ifr.second; it++) {
+	    MDesInpObserver* mobs = dynamic_cast<MDesInpObserver*>(*it);
+	    mobs->OnInpUpdated();
 	}
     }
 }

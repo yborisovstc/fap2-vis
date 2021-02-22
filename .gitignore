@@ -66,4 +66,5 @@ test/*.txt
 test/ut-fap2vis-lib
 *.out
 *.csv
+*.odg#
 

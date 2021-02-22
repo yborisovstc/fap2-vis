@@ -87,13 +87,16 @@ class AUnitDrp : public AHLayoutL, public MVrp
     protected:
 	void OnInpModelUri();
 	void ApplyModelUri();
+	void GetModelUri(Sdata<string>& aData);
 	// Local
 	virtual void CreateRp();
+	void NotifyOnMdlUpdated();
     protected:
 	MEnv* mEnv; /*!< Binded env, not owned */
 	MUnit* mMdl; /*!< Binded model, not owned */
 	string mCtrBnd; /*!< Binding to controller info: URI */
-	AAdp::AdpIap mIapModelUri = AAdp::AdpIap(*this, [this]() {OnInpModelUri();}); /*!< Mut input access point: Model Uri */
+	AAdp::AdpIap mIapModelUri = AAdp::AdpIap(*this, [this]() {OnInpModelUri();}); /*!< Input access point: Model Uri */
+	AAdp::AdpPap<string> mPapModelUri = AAdp::AdpPap<string>(*this, [this](Sdata<string>& aData) {GetModelUri(aData);}); /*!< Param access point: Model Uri */
 	TBool mModelUriChanged = ETrue;
 };
 
