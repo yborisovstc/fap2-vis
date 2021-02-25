@@ -245,7 +245,7 @@ string AUnitCrp::GetModelUri() const
 // Unit DRP
 
 const string K_CpInpModelUri = "./InpModelUri";
-const string K_CpOutModelUri = "./OutModelUri";
+const string K_CpOutModelUri = "./RpCp/OutModelUri";
 
 AUnitDrp::AUnitDrp(const string& aName, MUnit* aMan, MEnv* aEnv): AHLayoutL(aName, aMan, aEnv),
     mEnv(nullptr), mMdl(nullptr)

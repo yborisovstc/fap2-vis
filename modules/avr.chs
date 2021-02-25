@@ -12,6 +12,30 @@ AvrMdl : Elem
         $ + /FvWidgets/FWidgetBase;
         $ + /ContainerModL/FHLayoutLBase;
     }
+    UDrpCp : ASocketMcm
+    {
+        $ # "Unit DRP output socket";
+        InpModelUri : AExtd
+        {
+            Int : CpStatecOutp;
+        }
+        OutCompsCount : AExtd
+        {
+            Int : CpStatecInp;
+        }
+        OutModelUri : CpStatecOutp;
+    }
+    UDrpCpp : ASocketMcm
+    {
+        $ # "Unit DRP output socket";
+        InpModelUri : CpStatecOutp;
+        OutCompsCount : CpStatecInp;
+        OutModelUri : CpStatecInp;
+    }
+    UDrpCpe : AExtd
+    {
+        Int : ./../UDrpCp;
+    }
     UnitDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
         $ # " Unit detail representation";
@@ -21,8 +45,11 @@ AvrMdl : Elem
             }
         }
         Padding = 10;
+        RpCp : ./../UDrpCp;
+        RpCp/OutCompsCount/Int ~ OutCompsCount;
+        $ # "Needs to use auxiliary cp to IFR from socket";
         InpModelUri : CpStatecInp;
-        OutModelUri : CpStatecOutp;
+        RpCp/InpModelUri/Int ~ InpModelUri;
     }
     SystDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
@@ -45,7 +72,7 @@ AvrMdl : Elem
             NodeSelected : CpStatecInp;
             MutAddWidget : CpStatecOutp;
             DrpCreated : CpStatecInp;
-            ModelUri : CpStatecOutp;
+            DrpCp : ./../../UDrpCpp;
         }
     }
     VrControllerCp : ASocketMcm
@@ -58,7 +85,7 @@ AvrMdl : Elem
             NodeSelected : CpStatecOutp;
             MutAddWidget : CpStatecInp;
             DrpCreated : CpStatecOutp;
-            ModelUri : CpStatecInp;
+            DrpCp : ./../../UDrpCp;
         }
     }
     VrController : /*/Modules/DesComps/Des
@@ -144,13 +171,13 @@ AvrMdl : Elem
             };
             Inp2 ~ TMutConn : ATrcMutConn @ {
                 Cp1 ~ : AStatec {
-                    Value = "SS ./VrvCp/NavCtrl/ModelUri";
+                    Value = "SS ./VrvCp/NavCtrl/DrpCp";
                 };
                 Cp2 ~ : AStatec {
-                    Value = "SS /testroot/Test/Window/Scene/VBox/ModelView/Drp/InpModelUri";
+                    Value = "SS /testroot/Test/Window/Scene/VBox/ModelView/Drp/RpCp";
                 };
             };
         };
-        ./CtrlCp/NavCtrl/ModelUri ~ Cursor;
+        ./CtrlCp/NavCtrl/DrpCp/InpModelUri ~ Cursor;
     }
 }
