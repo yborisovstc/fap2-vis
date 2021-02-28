@@ -15,10 +15,7 @@ AvrMdl : Elem
     UDrpCp : ASocketMcm
     {
         $ # "Unit DRP output socket";
-        InpModelUri : AExtd
-        {
-            Int : CpStatecOutp;
-        }
+        InpModelUri : CpStatecInp;
         OutCompsCount : AExtd
         {
             Int : CpStatecInp;
@@ -45,11 +42,14 @@ AvrMdl : Elem
             }
         }
         Padding = 10;
-        RpCp : ./../UDrpCp;
-        RpCp/OutCompsCount/Int ~ OutCompsCount;
+        RpCp : AExtd
+        {
+            Int : ./../../UDrpCpp;
+        }
+        RpCp/Int/OutCompsCount ~ OutCompsCount;
         $ # "Needs to use auxiliary cp to IFR from socket";
         InpModelUri : CpStatecInp;
-        RpCp/InpModelUri/Int ~ InpModelUri;
+        RpCp/Int/InpModelUri ~ InpModelUri;
     }
     SystDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
