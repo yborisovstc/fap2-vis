@@ -27,10 +27,11 @@ ContainerModL : Elem
         $ # " Container base";
         RqsW < Debug.Update = y;
         RqsH < Debug.Update = y;
-        # = " Padding value";
+        $ # " Padding value";
         Padding : AStatec;
         Padding < Value = "SI 10";
         InpMutAddWidget : CpStatecInp;
+        InpMutRmWidget : CpStatecInp;
         OutCompsCount : CpStatecOutp;
         OutCompNames : CpStatecOutp;
     }

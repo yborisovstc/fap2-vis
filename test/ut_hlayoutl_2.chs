@@ -76,6 +76,7 @@ testroot : Elem
                     Slot_2 : /*/Modules/ContainerModL/FHLayoutLSlot;
                     ./Slot_2/SCp ~ ./Btn3/Cp;
                     ./Slot_2/Next ~ ./Slot_1/Prev;
+                    Slot_2/Prev ~ End;
                 }
             }
         }

@@ -110,6 +110,7 @@ testroot : Elem
             ./VrvCp/NavCtrl/CmdUp ~ ./Scene/VBox/Toolbar/BtnUp/Pressed;
             ./Scene/VBox/ModelView/InpMutAddWidget ~ ./VrvCp/NavCtrl/MutAddWidget;
             ./Scene/VBox/ModelView/OutCompsCount ~ ./VrvCp/NavCtrl/DrpCreated;
+            ./Scene/VBox/ModelView/OutCompsCount ~ ./VrvCp/NavCtrl/VrvCompsCount;
         }
         EnvWidth : AStatec;
         EnvHeight : AStatec;

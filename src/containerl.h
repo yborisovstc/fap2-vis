@@ -34,6 +34,7 @@ class AVContainerL: public AVWidget, public MContainer
 	// From MContainer
 	virtual MUnit* AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
 	virtual MUnit* InsertWidget(const string& aName, const string& aType, const TPos& aPos) override;
+	virtual bool RmWidget(int aSlotPos, const string& aHint = string()) override;
 	virtual TPos LastPos() const override;
 	// From MDesSyncable
 	virtual void Confirm() override;
@@ -41,6 +42,7 @@ class AVContainerL: public AVWidget, public MContainer
 	virtual string GetSlotType();
 	virtual MUnit* AppendSlot(MUnit* aSlot);
 	virtual MUnit* InsertSlot(MUnit* aSlot, const TPos& aPos);
+	virtual void RmSlot(MUnit* aSlot);
 	virtual int GetLastSlotId();
 	virtual int GetSlotId(const string& aSlotName) const;
 	virtual string GetSlotName(int aSlotId) const;
@@ -54,9 +56,11 @@ class AVContainerL: public AVWidget, public MContainer
     protected:
 	// Local
 	void MutAddWidget(const NTuple& aData);
+	void MutRmWidget(const Sdata<int>& aData);
 	void GetCompsCount(Sdata<TInt>& aData);
 	void GetCompNames(AMunitAdp::TCmpNames& aData) { aData = mCompNames;}
 	void OnMutAddWdg();
+	void OnMutRmWdg();
 	virtual void UpdateCompNames() {}
 	MUnit* Host() { return iMan;}
 	/** @brief Notifies dependencies of input updated */
@@ -73,6 +77,7 @@ class AVContainerL: public AVWidget, public MContainer
 	static const TPos KPosFirst;
 	static const TPos KPosEnd;
 	NTuple mMutAddWidget;     /*!< Mutation: append component */
+	Sdata<TInt> mMutRmWidget;     /*!< Mutation: remove component */
 	MUnit* mMag = NULL;       /*!< Managed object, host */
 	TCmpNames mCompNames;     /*!< Component names, observable data */
 	TBool mCompNamesUpdated = ETrue;
@@ -80,7 +85,8 @@ class AVContainerL: public AVWidget, public MContainer
 	AAdp::AdpPap<int> mApCmpCount = AAdp::AdpPap<int>(*this, [this](Sdata<TInt>& aData) {GetCompsCount(aData);}); /*!< Comps count access point */
 	AAdp::AdpPapB<TCmpNames> mApCmpNames = AAdp::AdpPapB<TCmpNames>([this](TCmpNames& aData) {GetCompNames(aData);}); /*!< Comp names access point */
 	AAdp::AdpMagObs<AVContainerL> mMagObs = AAdp::AdpMagObs<AVContainerL>(this); /*!< Managed agent observer */
-	AAdp::AdpIap mIapMutAddWdt = AAdp::AdpIap(*this, [this]() {OnMutAddWdg();}); /*!< Mut Add Widget input access point */
+	AAdp::AdpIap mIapMutAddWdt = AAdp::AdpIap(*this, [this]() {OnMutAddWdg();}); /*!< Mut Add_Widget input access point */
+	AAdp::AdpIap mIapMutRmWdt = AAdp::AdpIap(*this, [this]() {OnMutRmWdg();}); /*!< Mut Remove_Widget input access point */
 };
 
 /** @brief Container's slot base using approach of widghet to slot assosiation via link
@@ -106,6 +112,7 @@ class ALinearLayout: public AVContainerL
 	// From AVContainer
 	virtual MUnit* AppendSlot(MUnit* aSlot) override;
 	virtual MUnit* InsertSlot(MUnit* aSlot, const TPos& aPos) override;
+	virtual void RmSlot(MUnit* aSlot) override;
 	virtual MUnit* GetSlotByPos(const TPos& aPos) override;
 	virtual MUnit* GetPrevSlotCp(MUnit* aSlot) override;
 	virtual MUnit* GetNextSlotCp(MUnit* aSlot) override;

@@ -27,9 +27,10 @@ class Ut_cntl : public CPPUNIT_NS::TestFixture
     CPPUNIT_TEST_SUITE(Ut_cntl);
     //CPPUNIT_TEST(testVlayout1);
     //CPPUNIT_TEST(testVlayoutCmb);
-    CPPUNIT_TEST(testVlayoutCmb2);
+    //CPPUNIT_TEST(testVlayoutCmb2);
     //CPPUNIT_TEST(testHlayout1);
     //CPPUNIT_TEST(testHlayout2);
+    CPPUNIT_TEST(testHlayout_RmWidget1);
     CPPUNIT_TEST_SUITE_END();
     public:
     virtual void setUp();
@@ -40,6 +41,7 @@ private:
     void testVlayoutCmb2();
     void testHlayout1();
     void testHlayout2();
+    void testHlayout_RmWidget1();
 private:
     Env* iEnv;
 };
@@ -153,6 +155,39 @@ void Ut_cntl::testHlayout2()
     iEnv->ConstructSystem();
     bool run = iEnv->RunSystem();
     CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    delete iEnv;
+}
+
+
+/** @brief HLayout, removing widget
+ *
+ * */
+void Ut_cntl::testHlayout_RmWidget1()
+{
+    printf("\n === Combined horisontal layout, removing widget 1\n");
+    const string specn("ut_hlayoutl_rmwidget_1");
+    string ext = "chs";
+    string spec = specn + string(".") + ext;
+    string log = specn + "_" + ext + ".log";
+    iEnv = new Env(spec, log);
+    CPPUNIT_ASSERT_MESSAGE("Fail to create Env", iEnv != 0);
+    iEnv->ImpsMgr()->AddImportsPaths("../modules");
+    VisProv* visprov = new VisProv("VisProv", iEnv);
+    iEnv->AddProvider(visprov);
+    iEnv->ConstructSystem();
+    MUnit* root = iEnv->Root();
+    CPPUNIT_ASSERT_MESSAGE("Fail to get root", root != 0);
+    // Checking the widget/slot exists
+    MUnit* slot = root->GetNode("./Test/Window/Scene/HBox/Slot_2");
+    CPPUNIT_ASSERT_MESSAGE("Failed creating widget/slot", slot);
+
+    bool run = iEnv->RunSystem(40);
+    CPPUNIT_ASSERT_MESSAGE("Fail to run system", run);
+
+    // Checking the widget removed
+    slot = root->GetNode("./Test/Window/Scene/HBox/Slot_2");
+    CPPUNIT_ASSERT_MESSAGE("Fail to remove widget", slot == NULL);
 
     delete iEnv;
 }

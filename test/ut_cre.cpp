@@ -28,9 +28,9 @@ class AgentObserver: public MAgentObserver
 	// From MAgentObserver
 	virtual void OnCompDeleting(const MUnit* aComp, TBool aSoft = ETrue, TBool aModif = EFalse) override {}
 	virtual void OnCompAdding(const MUnit* aComp, TBool aModif = EFalse) override {}
-	virtual TBool OnCompChanged(const MUnit* aComp, const string& aContName = string(), TBool aModif = EFalse) override {}
-	virtual TBool OnChanged(const MUnit* aComp) override {}
-	virtual TBool OnCompRenamed(const MUnit* aComp, const string& aOldName) override {}
+	virtual TBool OnCompChanged(const MUnit* aComp, const string& aContName = string(), TBool aModif = EFalse) override { return false;}
+	virtual TBool OnChanged(const MUnit* aComp) override { return false;}
+	virtual TBool OnCompRenamed(const MUnit* aComp, const string& aOldName) override { return false;}
 	virtual void OnCompMutated(const MUnit* aNode) override {}
 	virtual void OnError(const MUnit* aComp) { mClose = true;}
 	MIface* Call(const string& aSpec, string& aRes) override { return NULL;};

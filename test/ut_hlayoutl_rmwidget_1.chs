@@ -65,5 +65,32 @@ testroot : Elem
         EnvWidth ~ ./Window/Inp_W;
         EnvHeight ~ ./Window/Inp_H;
         Title ~ ./Window/Inp_Title;
+        $ # "Mutation to remove Bnt2";
+        Timeout : AStatec {
+            Debug.Update = y;
+            Debug.LogLevel = 0;
+            Value = "SI 0";
+        }
+        Timeout/Inp ~ : ATrcAddVar @ {
+            Inp ~ Timeout;
+            Inp ~ : AStatec {
+                Value = "SI 1";
+            };
+        };
+        Window/Scene/HBox/InpMutRmWidget ~ : ATrcSwitchBool @ {
+            Sel ~ Cmp_Eq : ATrcCmpVar @ {
+                Inp ~ Timeout;
+                Inp2 ~ : AStatec {
+                    Value = "SI 20";
+                };
+            };
+            Cmp_Eq < Debug.LogLevel = 20;
+            Inp1 ~ : AStatec {
+                Value = "SI -1";
+            };
+            Inp2 ~ : AStatec {
+                Value = "SI 1";
+            };
+        };
     }
 }

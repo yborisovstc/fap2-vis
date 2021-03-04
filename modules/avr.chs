@@ -16,10 +16,7 @@ AvrMdl : Elem
     {
         $ # "Unit DRP output socket";
         InpModelUri : CpStatecInp;
-        OutCompsCount : AExtd
-        {
-            Int : CpStatecInp;
-        }
+        OutCompsCount : CpStatecOutp;
         OutModelUri : CpStatecOutp;
     }
     UDrpCpp : ASocketMcm
@@ -50,6 +47,8 @@ AvrMdl : Elem
         $ # "Needs to use auxiliary cp to IFR from socket";
         InpModelUri : CpStatecInp;
         RpCp/Int/InpModelUri ~ InpModelUri;
+        OutModelUri : CpStatecOutp;
+        RpCp/Int/OutModelUri ~ OutModelUri;
     }
     SystDrp : /*/Modules/ContainerModL/FHLayoutLBase
     {
@@ -71,6 +70,7 @@ AvrMdl : Elem
             CmdUp : CpStatecInp;
             NodeSelected : CpStatecInp;
             MutAddWidget : CpStatecOutp;
+            VrvCompsCount : CpStatecInp;
             DrpCreated : CpStatecInp;
             DrpCp : ./../../UDrpCpp;
         }
@@ -85,6 +85,7 @@ AvrMdl : Elem
             NodeSelected : CpStatecOutp;
             MutAddWidget : CpStatecInp;
             DrpCreated : CpStatecOutp;
+            VrvCompsCount : CpStatecOutp;
             DrpCp : ./../../UDrpCp;
         }
     }
@@ -130,6 +131,13 @@ AvrMdl : Elem
                 $ # "!! Value = SS ./../../ModelMnt/*";
             };
         };
+        $ # "For debugging only";
+        DbgModelUri : AStatec {
+            Debug.Update = y;
+            Value = "SS nil";
+        }
+        DbgModelUri/Inp ~ CtrlCp/NavCtrl/DrpCp/OutModelUri;
+
         $ # " VRP dirty indication";
         VrpDirty : AStatec
         {
@@ -137,18 +145,28 @@ AvrMdl : Elem
             Value = "SB false";
         }
         VrpDirty/Inp ~ : ATrcAndVar @ {
-            Inp ~ : AStatec
-            {
-                Value = "SB true";
+            Inp ~ U_Neq : ATrcCmpVar @ {
+                Inp ~ : ATrcUri @ {
+                    Inp ~ CtrlCp/NavCtrl/DrpCp/OutModelUri;
+                };
+                Inp2 ~ : ATrcUri @ {
+                     Inp ~ Cursor;
+                };
             };
             Inp ~ Cmp_Eq : ATrcCmpVar @ {
-                Inp ~ ModelViewUdp/CompsCount;
+                Inp ~ CtrlCp/NavCtrl/VrvCompsCount;
                 Inp2 ~ Const_1 : AStatec
                 {
                     Value = "SI 1";
                 };
             };
         };
+        $ # "For debugging only";
+        VrvCompsCnt : AStatec {
+            Debug.Update = y;
+            Value = "SI 0";
+        }
+        $ # "VrvCompsCnt/Inp ~ CtrlCp/NavCtrl/VrvCompsCount";
         $ # " VRP control test";
         ./CtrlCp/NavCtrl/MutAddWidget ~ TestDrp : AStatec
         {

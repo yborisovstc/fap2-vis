@@ -61,6 +61,11 @@ class MContainer: public MIface
 	 * @return Pointer to added widget unit
 	 * */
 	virtual MUnit* InsertWidget(const string& aName, const string& aType, const TPos& aPos) = 0;
+	/** @brief Removes slot by Id and assosiated widget
+	 * @param  Id of slot to be removed
+	 * @return Sign of success
+	 * */
+	virtual bool RmWidget(int aSlotId, const string& aHint = string()) = 0;
 	/** @brief Gets last slot postion */
 	virtual TPos LastPos() const = 0;
 	/** @brief Gets slot by slot postion */
