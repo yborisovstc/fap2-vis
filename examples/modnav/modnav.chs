@@ -46,9 +46,7 @@ testroot : Elem
                 Debug.Update = y;
                 Value = "SS nil";
             };
-            ./NodeSelected/Inp ~ NodeSelectedReset : AStatec {
-                Value = "SS nil";
-            };
+            $ # "Node selected reset fragment !!";
             Scene : /testroot/Modules/GVisComps/Scene
             {
                 VBox : /*/Modules/ContainerModL/FVLayoutL
@@ -109,6 +107,7 @@ testroot : Elem
             ./Scene/Cp ~ ScCpc;
             ./VrvCp/NavCtrl/CmdUp ~ ./Scene/VBox/Toolbar/BtnUp/Pressed;
             ./Scene/VBox/ModelView/InpMutAddWidget ~ ./VrvCp/NavCtrl/MutAddWidget;
+            ./Scene/VBox/ModelView/InpMutRmWidget ~ ./VrvCp/NavCtrl/MutRmWidget;
             ./Scene/VBox/ModelView/OutCompsCount ~ ./VrvCp/NavCtrl/DrpCreated;
             ./Scene/VBox/ModelView/OutCompsCount ~ ./VrvCp/NavCtrl/VrvCompsCount;
         }

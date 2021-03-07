@@ -140,19 +140,31 @@ bool AVContainerL::RmWidget(int aSlotPos, const string& aHint)
     __ASSERT(hoste);
     MUnit* slot = GetSlotByPos(TPos(aSlotPos,0));
     if (slot) {
-	MUnit* widget = GetWidgetBySlot(slot);
-	if (widget) {
-	    // Remove widget
-	    string wname = widget->Name();
+	RmWidgetBySlot(slot);
+    } else {
+	Logger()->Write(EErr, this, "Cannot find slot [%d]", aSlotPos);
+    }
+    return res;
+}
+
+bool AVContainerL::RmWidgetBySlot(MUnit* aSlot)
+{
+    bool res = false;
+    MUnit* widget = GetWidgetBySlot(aSlot);
+    if (widget) {
+	// Remove widget
+	string wname = widget->Name();
+	MUnit* host = GetMan();
+	MElem* hoste = host ? host->GetObj(hoste) : nullptr;
+	if (hoste) {
 	    hoste->AppendMutation(TMut(ENt_Rm, ENa_MutNode, wname));
 	    TNs ns; MutCtx mctx(NULL, ns);
 	    hoste->Mutate(true, false, false, mctx);
 	    Logger()->Write(EInfo, this, "Completed removing widget");
-	} else {
-	    Logger()->Write(EErr, this, "Cannot find widget in slot [%d]", aSlotPos);
+	    res = true;
 	}
     } else {
-	Logger()->Write(EErr, this, "Cannot find slot [%d]", aSlotPos);
+	Logger()->Write(EErr, this, "Cannot find widget in slot [%s]", aSlot->Name().c_str());
     }
     return res;
 }
@@ -300,39 +312,27 @@ MUnit* AVContainerL::GetWidgetBySlot(MUnit* aSlot)
     MUnit* slotCp = aSlot->GetNode("./" + KSlotCpName);
     __ASSERT(slotCp);
     MVert* slotCpv = slotCp->GetObj(slotCpv);
-    __ASSERT(slotCpv && (slotCpv->PairsCount() == 1));
-    MVert* wdgCp = slotCpv->GetPair(0);
-    __ASSERT(wdgCp);
-    MUnit* wdgCpu = wdgCp->GetObj(wdgCpu);
-    __ASSERT(wdgCpu);
-    res = wdgCpu->GetMan();
+    // Its allowed to not have widget assosiated
+    if (slotCpv && (slotCpv->PairsCount() == 1)) {
+	MVert* wdgCp = slotCpv->GetPair(0);
+	__ASSERT(wdgCp);
+	MUnit* wdgCpu = wdgCp->GetObj(wdgCpu);
+	__ASSERT(wdgCpu);
+	res = wdgCpu->GetMan();
+    }
     return res;
 }
 
 void AVContainerL::OnMutAddWdg()
 {
-    // Checking MutAddWidget
-    MUnit* inp = GetNode(K_CpUriInpAddWidget);
-    if (inp) {
-	NTuple data;
-	TBool res = GetGData(inp, data);
-	if (res && data != mMutAddWidget) {
-	    MutAddWidget(data);
-	}
-    }
+    mMutAddWdgChanged = true;
+    SetActive();
 }
 
 void AVContainerL::OnMutRmWdg()
 {
-    // Checking MutRmWidget input
-    MUnit* inp = GetNode(K_CpUriInpRmWidget);
-    if (inp) {
-	Sdata<int> data;
-	TBool res = GetGData(inp, data);
-	if (res && data != mMutRmWidget) {
-	    MutRmWidget(data);
-	}
-    }
+    mMutRmWdgChanged = true;
+    SetActive();
 }
 
 
@@ -360,7 +360,16 @@ void AVContainerL::MutAddWidget(const NTuple& aData)
 	}
     }
     if (res) {
-	AddWidget(name, type);
+	if (type != GUri::Nil()) {
+	    MUnit* newwdg = AddWidget(name, type);
+	    if (newwdg) {
+		Logger()->Write(EDbg, this, "Added widget [%s]", name.c_str());
+	    } else {
+		Logger()->Write(EDbg, this, "Failed adding widget [%s]", name.c_str());
+	    }
+	} else {
+	    Logger()->Write(EDbg, this, "Ignoring adding widget of type [nil]");
+	}
     }
 }
 
@@ -368,10 +377,14 @@ void AVContainerL::MutRmWidget(const Sdata<int>& aData)
 {
     int slotId = aData.mData;
     // Remove assosiated widget
-    RmWidget(slotId);
+    //RmWidget(slotId);
     // Remove slot
     MUnit* curSlot = GetSlotByPos(TPos(slotId, 0));
-    RmSlot(curSlot);
+    if (curSlot) {
+	RmSlot(curSlot);
+    } else {
+	Logger()->Write(EErr, this, "Cannot find slot in pos [%d]", slotId);
+    }
 }
 
 void AVContainerL::GetCompsCount(Sdata<TInt>& aData)
@@ -382,8 +395,9 @@ void AVContainerL::GetCompsCount(Sdata<TInt>& aData)
 
 void AVContainerL::OnMagCompDeleting(const MUnit* aComp, TBool aSoft, TBool aModif)
 {
-    if (aComp == mMag) {
+    if (mMag && mMag->IsComp(aComp)) {
 	mCompNamesUpdated = ETrue;
+	SetUpdated();
     }
 }
 
@@ -419,6 +433,33 @@ void AVContainerL::OnMagError(const MUnit* aComp)
 {
 }
 
+void AVContainerL::Update()
+{
+    if (mMutAddWdgChanged) {
+	MUnit* inp = GetNode(K_CpUriInpAddWidget);
+	if (inp) {
+	    NTuple data;
+	    TBool res = GetGData(inp, data);
+	    if (res && data != mMutAddWidget) {
+		MutAddWidget(data);
+	    }
+	}
+	mMutAddWdgChanged = EFalse;
+    }
+    if (mMutRmWdgChanged) {
+	MUnit* inp = GetNode(K_CpUriInpRmWidget);
+	if (inp) {
+	    Sdata<int> data;
+	    TBool res = GetGData(inp, data);
+	    if (res && data != mMutRmWidget) {
+		MutRmWidget(data);
+	    }
+	}
+	mMutRmWdgChanged = EFalse;
+    }
+    AVWidget::Update();
+}
+
 void AVContainerL::Confirm()
 {
     if (mMag) {
@@ -448,6 +489,22 @@ void AVContainerL::NotifyInpsUpdated(MUnit* aCp)
     }
 }
 
+MUnit* AVContainerL::GetLastSlot()
+{
+    MUnit* res = nullptr;
+    TPos pos = LastPos();
+    res = GetSlotByPos(pos);
+    return res;
+}
+
+void AVContainerL::RmAllSlots()
+{
+    MUnit* slot = GetLastSlot();
+    while (slot) {
+	RmSlot(slot);
+	slot = GetLastSlot();
+    }
+}
 
 
 
@@ -502,6 +559,7 @@ MUnit* ALinearLayout::GetLastSlot()
     MUnit* res = nullptr;
     MUnit* host = GetMan();
     MUnit* end = host->GetNode("./" + KEndSlotName);
+    MUnit* start = host->GetNode("./" + KStartSlotName);
     if (end) {
 	MVert* endv = end->GetObj(endv);
 	if (endv) {
@@ -509,7 +567,9 @@ MUnit* ALinearLayout::GetLastSlot()
 	    if (lastv) {
 		MUnit* prevu = lastv->GetObj(prevu);
 		if (prevu) {
-		    res = prevu->GetMan();
+		    if (prevu != start) {
+			res = prevu->GetMan();
+		    }
 		}
 	    }
 	}
@@ -559,19 +619,23 @@ void ALinearLayout::RmSlot(MUnit* aSlot)
     Logger()->Write(EInfo, this, "Start removing slot [%s]", sname.c_str());
     MUnit* host = GetMan();
     MElem* hoste = host->GetObj(hoste);
-    // Get prev and next
-    MUnit* prevSlotCp = GetPrevSlotCp(aSlot);
-    string prevSlotUri = prevSlotCp->GetUri(this, ETrue);
-    MUnit* nextSlotCp = GetNextSlotCp(aSlot);
-    string nextSlotUri = nextSlotCp->GetUri(this, ETrue);
-    // Remove slot, also disconnects from prev and next
-    hoste->AppendMutation(TMut(ENt_Rm, ENa_MutNode, sname));
-    TNs ns; MutCtx mctx(NULL, ns);
-    hoste->Mutate(true, false, false, mctx);
-    // Connect prev and next
-    hoste->AppendMutation(TMut(ENt_Conn, ENa_P, prevSlotUri, ENa_Q, nextSlotUri));
-    hoste->Mutate(true, false, false, mctx);
-    Logger()->Write(EInfo, this, "Completed removing slot");
+    // Remove assosiated widget
+    bool res = RmWidgetBySlot(aSlot);
+    if (res) {
+	// Get prev and next
+	MUnit* prevSlotCp = GetPrevSlotCp(aSlot);
+	string prevSlotUri = prevSlotCp->GetUri(this, ETrue);
+	MUnit* nextSlotCp = GetNextSlotCp(aSlot);
+	string nextSlotUri = nextSlotCp->GetUri(this, ETrue);
+	// Remove slot, also disconnects from prev and next
+	hoste->AppendMutation(TMut(ENt_Rm, ENa_MutNode, sname));
+	TNs ns; MutCtx mctx(NULL, ns);
+	hoste->Mutate(true, false, false, mctx);
+	// Connect prev and next
+	hoste->AppendMutation(TMut(ENt_Conn, ENa_P, prevSlotUri, ENa_Q, nextSlotUri));
+	hoste->Mutate(true, false, false, mctx);
+	Logger()->Write(EInfo, this, "Completed removing slot");
+    }
 }
 
 MUnit* ALinearLayout::InsertSlot(MUnit* aSlot, const TPos& aPos)
@@ -718,3 +782,4 @@ void ALinearLayout::UpdateCompNames()
 	slot = GetNextSlot(slot);
     }
 }
+

@@ -69,3 +69,36 @@ void AAlignment::UpdateCompNames()
 	}
     }
 }
+
+/*
+void AAlignment::RmSlot(MUnit* aSlot)
+{
+    string sname = aSlot->Name();
+    Logger()->Write(EInfo, this, "Start removing slot [%s]", sname.c_str());
+    MUnit* host = GetMan();
+    MElem* hoste = host->GetObj(hoste);
+    // Get prev and next
+    MUnit* prevSlotCp = GetPrevSlotCp(aSlot);
+    string prevSlotUri = prevSlotCp->GetUri(this, ETrue);
+    MUnit* nextSlotCp = GetNextSlotCp(aSlot);
+    string nextSlotUri = nextSlotCp->GetUri(this, ETrue);
+    // Remove slot, also disconnects from prev and next
+    hoste->AppendMutation(TMut(ENt_Rm, ENa_MutNode, sname));
+    TNs ns; MutCtx mctx(NULL, ns);
+    hoste->Mutate(true, false, false, mctx);
+    // Connect prev and next
+    hoste->AppendMutation(TMut(ENt_Conn, ENa_P, prevSlotUri, ENa_Q, nextSlotUri));
+    hoste->Mutate(true, false, false, mctx);
+    Logger()->Write(EInfo, this, "Completed removing slot");
+}
+*/
+
+
+void AAlignment::MutRmWidget(const Sdata<int>& aData)
+{
+    int slotId = aData.mData;
+    // Only remove assosiated widget, keep the slot 
+    RmWidget(slotId);
+}
+
+

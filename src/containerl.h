@@ -37,6 +37,7 @@ class AVContainerL: public AVWidget, public MContainer
 	virtual bool RmWidget(int aSlotPos, const string& aHint = string()) override;
 	virtual TPos LastPos() const override;
 	// From MDesSyncable
+	virtual void Update() override;
 	virtual void Confirm() override;
 	// Local
 	virtual string GetSlotType();
@@ -53,19 +54,23 @@ class AVContainerL: public AVWidget, public MContainer
 	virtual TPos PrevPos(const TPos& aPos) const;
 	virtual TPos NextPos(const TPos& aPos) const;
 	virtual MUnit* GetWidgetBySlot(MUnit* aSlot);
+	virtual MUnit* GetLastSlot();
+	// Local
+	void RmAllSlots();
     protected:
 	// Local
 	void MutAddWidget(const NTuple& aData);
-	void MutRmWidget(const Sdata<int>& aData);
+	virtual void MutRmWidget(const Sdata<int>& aData);
 	void GetCompsCount(Sdata<TInt>& aData);
 	void GetCompNames(AMunitAdp::TCmpNames& aData) { aData = mCompNames;}
 	void OnMutAddWdg();
 	void OnMutRmWdg();
+	bool RmWidgetBySlot(MUnit* aSlot);
 	virtual void UpdateCompNames() {}
 	MUnit* Host() { return iMan;}
 	/** @brief Notifies dependencies of input updated */
 	void NotifyInpsUpdated(MUnit* aCp);
-	// For managed agent observer
+	// For managed agent (host) observer
 	virtual void OnMagCompDeleting(const MUnit* aComp, TBool aSoft = ETrue, TBool aModif = EFalse);
 	virtual void OnMagCompAdding(const MUnit* aComp, TBool aModif = EFalse);
 	virtual TBool OnMagCompChanged(const MUnit* aComp, const string& aContName = string(), TBool aModif = EFalse);
@@ -81,10 +86,12 @@ class AVContainerL: public AVWidget, public MContainer
 	MUnit* mMag = NULL;       /*!< Managed object, host */
 	TCmpNames mCompNames;     /*!< Component names, observable data */
 	TBool mCompNamesUpdated = ETrue;
+	TBool mMutAddWdgChanged = false;
+	TBool mMutRmWdgChanged = false;
 	// Comps count param adapter. Even if the count can be get via comp names vector we support separate param for convenience
 	AAdp::AdpPap<int> mApCmpCount = AAdp::AdpPap<int>(*this, [this](Sdata<TInt>& aData) {GetCompsCount(aData);}); /*!< Comps count access point */
 	AAdp::AdpPapB<TCmpNames> mApCmpNames = AAdp::AdpPapB<TCmpNames>([this](TCmpNames& aData) {GetCompNames(aData);}); /*!< Comp names access point */
-	AAdp::AdpMagObs<AVContainerL> mMagObs = AAdp::AdpMagObs<AVContainerL>(this); /*!< Managed agent observer */
+	AAdp::AdpMagObs<AVContainerL> mMagObs = AAdp::AdpMagObs<AVContainerL>(this); /*!< Managed agent (host) observer */
 	AAdp::AdpIap mIapMutAddWdt = AAdp::AdpIap(*this, [this]() {OnMutAddWdg();}); /*!< Mut Add_Widget input access point */
 	AAdp::AdpIap mIapMutRmWdt = AAdp::AdpIap(*this, [this]() {OnMutRmWdg();}); /*!< Mut Remove_Widget input access point */
 };

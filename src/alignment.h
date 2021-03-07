@@ -19,6 +19,9 @@ class AAlignment: public AVContainerL
 	virtual MUnit* GetSlotByPos(const TPos& aPos) override;
 	virtual MUnit* AddWidget(const string& aName, const string& aType, const string& aHint = string()) override;
 	virtual void UpdateCompNames() override;
+	virtual void MutRmWidget(const Sdata<int>& aData) override;
+	// From AVContainer
+	//virtual void RmSlot(MUnit* aSlot) override;
 };
 
 #endif // __FAP2VIS_VLAYOUT_H

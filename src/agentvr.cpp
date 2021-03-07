@@ -296,6 +296,9 @@ void AUnitDrp::SetModel(const string& aMdlUri)
 
 void AUnitDrp::CreateRp()
 {
+    // Remove current slots first
+    RmAllSlots();
+    // Create new slots
     MUnit* host = GetMan();
     for (int ind = 0; ind < mMdl->CompsCount(); ind++) {
 	MUnit* comp = mMdl->GetComp(ind);
@@ -308,6 +311,10 @@ void AUnitDrp::CreateRp()
 	//vcompr->SetEnv(mEnv);
 	vcompr->SetModel(compUri);
     }
+}
+
+void AUnitDrp::DestroyRp()
+{
 }
 
 void AUnitDrp::SetCrtlBinding(const string& aCtrUri)
@@ -360,8 +367,7 @@ void AUnitDrp::GetModelUri(Sdata<string>& aData)
 
 string AUnitDrp::GetModelUri() const
 {
-    __ASSERT(mMdl);
-    return mMdl->GetUri(NULL, true);
+    return mMdl ? mMdl->GetUri(NULL, true) : GUri::Nil();
 }
 
 void AUnitDrp::OnInpModelUri()
@@ -377,13 +383,17 @@ void AUnitDrp::ApplyModelUri()
 	string uris;
 	TBool res = GetSData(inp, uris);
 	if (res) {
-	    mMdl = iMan->GetNode(uris);
-	    if (mMdl) {
-		CreateRp();
-		NotifyOnMdlUpdated();
-		Logger()->Write(EErr, this, "Model applied [%s]", uris.c_str());
-	    } else {
-		Logger()->Write(EErr, this, "Couldn't find the model [%s]", uris.c_str());
+	    if (uris != mModelUri && uris != GUri::Nil()) {
+		MUnit* mdl = iMan->GetNode(uris);
+		if (mdl) {
+		    mMdl = mdl;
+		    CreateRp();
+		    NotifyOnMdlUpdated();
+		    Logger()->Write(EDbg, this, "Model applied [%s]", uris.c_str());
+		} else {
+		    Logger()->Write(EErr, this, "Couldn't find the model [%s]", uris.c_str());
+		}
+		mModelUri = uris;
 	    }
 	}
     }
@@ -410,6 +420,19 @@ void AUnitDrp::Update()
     AHLayoutL::Update();
 }
 
+void AUnitDrp::SetActive()
+{
+    // We need to "activate" all pseudo-states
+    //mModelUriChanged = true;
+    AHLayoutL::SetActive();
+}
+
+void AUnitDrp::ForceActive()
+{
+    // We need to "activate" all pseudo-states
+    mModelUriChanged = true;
+    AHLayoutL::ForceActive();
+}
 
 // Agents Visual representation view manager
 
@@ -451,9 +474,11 @@ void AVrpView::OnCompSelected(const MVrp* aComp)
 {
     string selUri = aComp->GetModelUri();
     MElem* eowner = iMan->GetObj(eowner);
-    eowner->AppendMutation(TMut(ENt_Cont, ENa_Targ, "./NodeSelected", ENa_Id, "Value", ENa_MutVal, "SS " + selUri));
+    string newVal = "SS " + selUri;
+    eowner->AppendMutation(TMut(ENt_Cont, ENa_Targ, "./NodeSelected", ENa_Id, "Value", ENa_MutVal, newVal));
     TNs ns; MutCtx mctx(NULL, ns);
     eowner->Mutate(true, false, false, mctx);
+    Logger()->Write(EInfo, this, "NodeSelected, updated to [%s]", newVal.c_str());
 }
 
 MIface* AVrpView::MViewMgr_DoGetIface(const string& aName)
