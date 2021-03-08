@@ -41,12 +41,14 @@ testroot : Elem
             Width < Value = "SI 1200";
             Height < Value = "SI 800";
             VrvCp : /testroot/Modules/AvrMdl/VrViewCp;
+            $ # Agent VrpViewAgent sets value to NodeSelected state
             ./VrvCp/NavCtrl/NodeSelected ~ NodeSelected : AStatec
             {
                 Debug.Update = y;
                 Value = "SS nil";
             };
             $ # "Node selected reset fragment !!";
+            NodeSelected/Inp ~ : AStatec { Value = "SS nil"; };
             Scene : /testroot/Modules/GVisComps/Scene
             {
                 VBox : /*/Modules/ContainerModL/FVLayoutL

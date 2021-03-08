@@ -116,22 +116,37 @@ AvrMdl : Elem
         Const_SNil : AStatec {
             Value = "SS nil";
         }
+        $ # "For debugging only";
+        DbgCursorOwner : AStatec {
+            Debug.Update = y;
+            Value = "SS nil";
+        }
+        DbgCursorOwner/Inp ~ CursorUdp/Owner;
+        DbgCmdUp : AStatec {
+            Debug.Update = y;
+            Value = "SB false";
+        }
+        DbgCmdUp/Inp ~ CtrlCp/NavCtrl/CmdUp;
         Cursor/Inp ~ : ATrcSwitchBool @ {
-            Sel ~ Cmp_Eq_2 : ATrcCmpVar @ {
-	        Inp ~ Cursor;
-                Inp2 ~ Const_SNil;
-            };
-	    Inp1 ~ : ATrcSwitchBool @ {
-                Inp1 ~ ./CtrlCp/NavCtrl/NodeSelected;
-                Inp2 ~ Cursor;
-                Sel ~ Cmp_Eq_3 : ATrcCmpVar @ {
-                    Inp ~ Const_SNil;
-                    Inp2 ~ ./CtrlCp/NavCtrl/NodeSelected;
+            Sel ~ CtrlCp/NavCtrl/CmdUp;
+            $ # "Sel ~ : AStatec { Value = SB false; }";
+            Inp1 ~  : ATrcSwitchBool @ {
+                Sel ~ Cmp_Eq_2 : ATrcCmpVar @ {
+	            Inp ~ Cursor;
+                    Inp2 ~ Const_SNil;
                 };
+	        Inp1 ~ : ATrcSwitchBool @ {
+                    Inp1 ~ ./CtrlCp/NavCtrl/NodeSelected;
+                    Inp2 ~ Cursor;
+                    Sel ~ Cmp_Eq_3 : ATrcCmpVar @ {
+                        Inp ~ Const_SNil;
+                        Inp2 ~ ./CtrlCp/NavCtrl/NodeSelected;
+                    };
+                };
+                Inp2 ~ Const_SMdlRoot : AStatec;
             };
-            Inp2 ~ Const_SMdlRoot : AStatec {
-                $ # "!! Value = SS ./../../ModelMnt/*";
-            };
+            Inp2 ~ CursorUdp/Owner;
+            $ # "Inp2 ~ : AStatec { Value = SS nil; }";
         };
         $ # "For debugging only";
         DbgModelUri : AStatec {
